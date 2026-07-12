@@ -69,8 +69,13 @@ const compilations = [
 	'extensions/vscode-colorize-perf-tests/tsconfig.json',
 	'extensions/vscode-test-resolver/tsconfig.json',
 
-	'.vscode/extensions/vscode-selfhost-test-provider/tsconfig.json',
-	'.vscode/extensions/vscode-selfhost-import-aid/tsconfig.json',
+	// Statuz IDE: selfhost dev-only extensions excluded from compilation.
+	// These two extensions live under `.vscode/extensions/` and are used only
+	// for VS Code's own self-hosting development (test provider + import aid).
+	// They are not part of the shipping IDE and the sandbox blocks writes to
+	// `.vscode/extensions/`. Re-enable when running in a full dev environment.
+	// '.vscode/extensions/vscode-selfhost-test-provider/tsconfig.json',
+	// '.vscode/extensions/vscode-selfhost-import-aid/tsconfig.json',
 ];
 
 const getBaseUrl = out => `https://main.vscode-cdn.net/sourcemaps/${commit}/${out}`;
