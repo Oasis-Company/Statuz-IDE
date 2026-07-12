@@ -119,6 +119,8 @@
     "url": "https://github.com/microsoft/vscode.git"
   },
   "dependencies": {
-    "@vscode/markdown-it-katex": "^1.1.1"
+    "@vscode/markdown-it-katex": "^1.1.2",
+    "fs-extra": "^11.3.6",
+    "katex": "^0.17.0"
   }
 }
