@@ -83,3 +83,6 @@ import '../common/statuzUpdateService.js'
 
 // model service
 import '../common/statuzModelService.js'
+
+// graph engine service (stub — native module not yet integrated)
+import '../common/engine/statuzEngineService.js'

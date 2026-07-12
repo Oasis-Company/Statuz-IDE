@@ -133,6 +133,7 @@ import { LLMMessageChannel } from '../../workbench/contrib/statuz/electron-main/
 import { VoidSCMService } from '../../workbench/contrib/statuz/electron-main/statuzSCMMainService.js';
 import { IVoidSCMService } from '../../workbench/contrib/statuz/common/statuzSCMTypes.js';
 import { MCPChannel } from '../../workbench/contrib/statuz/electron-main/mcpChannel.js';
+import { StatuzEngineChannel } from '../../workbench/contrib/statuz/electron-main/engine/statuzEngineChannel.js';
 /**
  * The main VS Code application. There will only ever be one instance,
  * even if the user starts many instances (e.g. from the command line).
@@ -1253,6 +1254,10 @@ export class CodeApplication extends Disposable {
 		// Void added this
 		const mcpChannel = new MCPChannel();
 		mainProcessElectronServer.registerChannel('void-channel-mcp', mcpChannel);
+
+		// Statuz added this — graph engine IPC channel (stub until native module is integrated)
+		const statuzEngineChannel = new StatuzEngineChannel();
+		mainProcessElectronServer.registerChannel('statuz-channel-engine', statuzEngineChannel);
 
 		// Extension Host Debug Broadcasting
 		const electronExtensionHostDebugBroadcastChannel = new ElectronExtensionHostDebugBroadcastChannel(accessor.get(IWindowsMainService));
