@@ -1,0 +1,12 @@
+[Desktop Entry]
+Name=Statuz IDE - URL Handler
+Comment=Open source AI code editor.
+GenericName=Text Editor
+Exec=statuz --open-url %U
+Icon=statuz
+Type=Application
+NoDisplay=true
+StartupNotify=true
+Categories=Utility;TextEditor;Development;IDE;
+MimeType=x-scheme-handler/statuz;
+Keywords=statuz;

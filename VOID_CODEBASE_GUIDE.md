@@ -2,7 +2,7 @@
 
 The Void codebase is not as intimidating as it seems!
 
-Most of Void's code lives in the folder `src/vs/workbench/contrib/void/`.
+Most of Void's code lives in the folder `src/vs/workbench/contrib/statuz/`.
 
 The purpose of this document is to explain how Void's codebase works. If you want build instructions instead, see [Contributing](https://github.com/voideditor/void/blob/main/HOW_TO_CONTRIBUTE.md).
 

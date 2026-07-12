@@ -1,0 +1,101 @@
+/*--------------------------------------------------------------------------------------
+ *  Copyright 2025 Glass Devtools, Inc. All rights reserved.
+ *  Licensed under the Apache License, Version 2.0. See LICENSE.txt for more information.
+ *--------------------------------------------------------------------------------------*/
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+& {
+	--statuz-bg-1: var(--vscode-input-background);
+	--statuz-bg-1-alt: var(--vscode-badge-background);
+	--statuz-bg-2: var(--vscode-sideBar-background);
+	--statuz-bg-2-alt: color-mix(in srgb, var(--vscode-editor-background) 30%, var(--vscode-sideBar-background) 70%);
+	--statuz-bg-2-hover: color-mix(in srgb, var(--vscode-editor-foreground) 2%, var(--vscode-sideBar-background) 98%);
+	--statuz-bg-3: var(--vscode-editor-background);
+
+	--statuz-fg-0: color-mix(in srgb, var(--vscode-tab-activeForeground) 90%, black 10%);
+	--statuz-fg-1: var(--vscode-editor-foreground);
+	--statuz-fg-2: var(--vscode-input-foreground);
+	--statuz-fg-3: var(--vscode-input-placeholderForeground);
+	/* --statuz-fg-4: var(--vscode-tab-inactiveForeground); */
+	--statuz-fg-4: var(--vscode-list-deemphasizedForeground);
+
+	--statuz-warning: var(--vscode-charts-yellow);
+
+	--statuz-border-1: var(--vscode-commandCenter-activeBorder);
+	--statuz-border-2: var(--vscode-commandCenter-border);
+	--statuz-border-3: var(--vscode-commandCenter-inactiveBorder);
+	--statuz-border-4: var(--vscode-editorGroup-border);
+
+	--statuz-ring-color: #007FD4;
+	--statuz-link-color: #007FD4;
+}
+
+.select-child-restyle select {
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	padding-right: 24px;
+}
+
+.statuz-force-child-placeholder-statuz-fg-1 ::placeholder {
+	color: var(--statuz-fg-3);
+}
+
+* {
+	outline: none !important;
+}
+
+
+
+.inherit-bg-all-restyle > * {
+	background-color: inherit !important;
+}
+
+
+.bg-editor-style-override {
+	--vscode-sideBar-background: var(--vscode-editor-background);
+}
+
+
+
+/* html {
+	font-size: var(--vscode-font-size);
+}
+
+.btn {
+	@apply cursor-pointer transition-colors;
+
+	&.btn-primary {
+		@apply bg-vscode-button-bg text-vscode-button-fg;
+
+		&:not(:disabled) {
+			@apply hover:bg-vscode-button-hoverBg;
+		}
+	}
+
+	&.btn-sm {
+		@apply px-3 py-1 text-sm;
+	}
+
+	&.btn-secondary {
+		@apply bg-vscode-button-secondary-bg text-vscode-button-secondary-fg;
+
+		&:not(:disabled) {
+			@apply hover:bg-vscode-button-secondary-hoverBg;
+		}
+	}
+
+	&:disabled {
+		@apply opacity-75 cursor-not-allowed;
+	}
+}
+
+.input {
+	@apply bg-vscode-input-bg text-vscode-input-fg border-vscode-input-border focus:outline-vscode-focus-border;
+}
+
+.dropdown {
+	@apply bg-vscode-dropdown-bg text-vscode-dropdown-foreground border-vscode-dropdown-border focus:outline-vscode-focus-border;
+} */

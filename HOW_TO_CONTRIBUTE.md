@@ -16,7 +16,7 @@ We [highly recommend reading this](https://github.com/voideditor/void/blob/main/
 
 The repo is not as intimidating as it first seems if you read the guide!
 
-Most of Void's code lives in the folder `src/vs/workbench/contrib/void/`.
+Most of Void's code lives in the folder `src/vs/workbench/contrib/statuz/`.
 
 
 

@@ -43,7 +43,8 @@ function hasSupportedVisualStudioVersion() {
 	const path = require('path');
 	// Translated over from
 	// https://source.chromium.org/chromium/chromium/src/+/master:build/vs_toolchain.py;l=140-175
-	const supportedVersions = ['2022', '2019', '2017'];
+	const supportedVersions = ['2026', '2025', '2022', '2019', '2017'];
+	const versionToPath = { '2026': '18', '2025': '17', '2022': '2022', '2019': '2019', '2017': '2017' };
 
 	const availableVersions = [];
 	for (const version of supportedVersions) {
@@ -56,8 +57,9 @@ function hasSupportedVisualStudioVersion() {
 		const programFiles64Path = process.env['ProgramFiles'];
 
 		const vsTypes = ['Enterprise', 'Professional', 'Community', 'Preview', 'BuildTools', 'IntPreview'];
+		const pathVersion = versionToPath[version] || version;
 		if (programFiles64Path) {
-			vsPath = `${programFiles64Path}/Microsoft Visual Studio/${version}`;
+			vsPath = `${programFiles64Path}/Microsoft Visual Studio/${pathVersion}`;
 			if (vsTypes.some(vsType => fs.existsSync(path.join(vsPath, vsType)))) {
 				availableVersions.push(version);
 				break;
@@ -65,7 +67,7 @@ function hasSupportedVisualStudioVersion() {
 		}
 
 		if (programFiles86Path) {
-			vsPath = `${programFiles86Path}/Microsoft Visual Studio/${version}`;
+			vsPath = `${programFiles86Path}/Microsoft Visual Studio/${pathVersion}`;
 			if (vsTypes.some(vsType => fs.existsSync(path.join(vsPath, vsType)))) {
 				availableVersions.push(version);
 				break;

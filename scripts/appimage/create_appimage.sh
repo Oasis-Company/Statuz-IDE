@@ -22,7 +22,7 @@ fi
 # Enable BuildKit
 export DOCKER_BUILDKIT=1
 
-BUILD_IMAGE_NAME="void-appimage-builder"
+BUILD_IMAGE_NAME="statuz-appimage-builder"
 
 # Check if Docker is running
 if ! docker info >/dev/null 2>&1; then
@@ -46,7 +46,7 @@ if [ ! -f "appimagetool" ]; then
 fi
 
 # Delete any existing AppImage to avoid bloating the build
-rm -f Void-x86_64.AppImage
+rm -f Statuz-x86_64.AppImage
 
 # Create build Dockerfile
 echo "Creating build Dockerfile..."
@@ -101,68 +101,68 @@ docker build --no-cache -t "$BUILD_IMAGE_NAME" -f Dockerfile.build .
 echo "Creating AppImage..."
 docker run --rm --privileged -v "$(pwd):/app" "$BUILD_IMAGE_NAME" bash -c '
 cd /app && \
-rm -rf VoidApp.AppDir && \
-mkdir -p VoidApp.AppDir/usr/bin VoidApp.AppDir/usr/lib VoidApp.AppDir/usr/share/applications && \
-find . -maxdepth 1 ! -name VoidApp.AppDir ! -name "." ! -name ".." -exec cp -r {} VoidApp.AppDir/usr/bin/ \; && \
-cp void.png VoidApp.AppDir/ && \
-echo "[Desktop Entry]" > VoidApp.AppDir/void.desktop && \
-echo "Name=Void" >> VoidApp.AppDir/void.desktop && \
-echo "Comment=Open source AI code editor." >> VoidApp.AppDir/void.desktop && \
-echo "GenericName=Text Editor" >> VoidApp.AppDir/void.desktop && \
-echo "Exec=void %F" >> VoidApp.AppDir/void.desktop && \
-echo "Icon=void" >> VoidApp.AppDir/void.desktop && \
-echo "Type=Application" >> VoidApp.AppDir/void.desktop && \
-echo "StartupNotify=false" >> VoidApp.AppDir/void.desktop && \
-echo "StartupWMClass=Void" >> VoidApp.AppDir/void.desktop && \
-echo "Categories=TextEditor;Development;IDE;" >> VoidApp.AppDir/void.desktop && \
-echo "MimeType=application/x-void-workspace;" >> VoidApp.AppDir/void.desktop && \
-echo "Keywords=void;" >> VoidApp.AppDir/void.desktop && \
-echo "Actions=new-empty-window;" >> VoidApp.AppDir/void.desktop && \
-echo "[Desktop Action new-empty-window]" >> VoidApp.AppDir/void.desktop && \
-echo "Name=New Empty Window" >> VoidApp.AppDir/void.desktop && \
-echo "Name[de]=Neues leeres Fenster" >> VoidApp.AppDir/void.desktop && \
-echo "Name[es]=Nueva ventana vacía" >> VoidApp.AppDir/void.desktop && \
-echo "Name[fr]=Nouvelle fenêtre vide" >> VoidApp.AppDir/void.desktop && \
-echo "Name[it]=Nuova finestra vuota" >> VoidApp.AppDir/void.desktop && \
-echo "Name[ja]=新しい空のウィンドウ" >> VoidApp.AppDir/void.desktop && \
-echo "Name[ko]=새 빈 창" >> VoidApp.AppDir/void.desktop && \
-echo "Name[ru]=Новое пустое окно" >> VoidApp.AppDir/void.desktop && \
-echo "Name[zh_CN]=新建空窗口" >> VoidApp.AppDir/void.desktop && \
-echo "Name[zh_TW]=開新空視窗" >> VoidApp.AppDir/void.desktop && \
-echo "Exec=void --new-window %F" >> VoidApp.AppDir/void.desktop && \
-echo "Icon=void" >> VoidApp.AppDir/void.desktop && \
-chmod +x VoidApp.AppDir/void.desktop && \
-cp VoidApp.AppDir/void.desktop VoidApp.AppDir/usr/share/applications/ && \
-echo "[Desktop Entry]" > VoidApp.AppDir/void-url-handler.desktop && \
-echo "Name=Void - URL Handler" > VoidApp.AppDir/void-url-handler.desktop && \
-echo "Comment=Open source AI code editor." > VoidApp.AppDir/void-url-handler.desktop && \
-echo "GenericName=Text Editor" > VoidApp.AppDir/void-url-handler.desktop && \
-echo "Exec=void --open-url %U" > VoidApp.AppDir/void-url-handler.desktop && \
-echo "Icon=void" > VoidApp.AppDir/void-url-handler.desktop && \
-echo "Type=Application" > VoidApp.AppDir/void-url-handler.desktop && \
-echo "NoDisplay=true" > VoidApp.AppDir/void-url-handler.desktop && \
-echo "StartupNotify=true" > VoidApp.AppDir/void-url-handler.desktop && \
-echo "Categories=Utility;TextEditor;Development;IDE;" > VoidApp.AppDir/void-url-handler.desktop && \
-echo "MimeType=x-scheme-handler/void;" > VoidApp.AppDir/void-url-handler.desktop && \
-echo "Keywords=void;" > VoidApp.AppDir/void-url-handler.desktop && \
-chmod +x VoidApp.AppDir/void-url-handler.desktop && \
-cp VoidApp.AppDir/void-url-handler.desktop VoidApp.AppDir/usr/share/applications/ && \
-echo "#!/bin/bash" > VoidApp.AppDir/AppRun && \
-echo "HERE=\$(dirname \"\$(readlink -f \"\${0}\")\")" >> VoidApp.AppDir/AppRun && \
-echo "export PATH=\${HERE}/usr/bin:\${PATH}" >> VoidApp.AppDir/AppRun && \
-echo "export LD_LIBRARY_PATH=\${HERE}/usr/lib:\${LD_LIBRARY_PATH}" >> VoidApp.AppDir/AppRun && \
-echo "exec \${HERE}/usr/bin/void --no-sandbox \"\$@\"" >> VoidApp.AppDir/AppRun && \
-chmod +x VoidApp.AppDir/AppRun && \
-chmod -R 755 VoidApp.AppDir && \
+rm -rf StatuzApp.AppDir && \
+mkdir -p StatuzApp.AppDir/usr/bin StatuzApp.AppDir/usr/lib StatuzApp.AppDir/usr/share/applications && \
+find . -maxdepth 1 ! -name StatuzApp.AppDir ! -name "." ! -name ".." -exec cp -r {} StatuzApp.AppDir/usr/bin/ \; && \
+cp statuz.png StatuzApp.AppDir/ && \
+echo "[Desktop Entry]" > StatuzApp.AppDir/statuz.desktop && \
+echo "Name=Statuz IDE" >> StatuzApp.AppDir/statuz.desktop && \
+echo "Comment=Open source AI code editor." >> StatuzApp.AppDir/statuz.desktop && \
+echo "GenericName=Text Editor" >> StatuzApp.AppDir/statuz.desktop && \
+echo "Exec=statuz %F" >> StatuzApp.AppDir/statuz.desktop && \
+echo "Icon=statuz" >> StatuzApp.AppDir/statuz.desktop && \
+echo "Type=Application" >> StatuzApp.AppDir/statuz.desktop && \
+echo "StartupNotify=false" >> StatuzApp.AppDir/statuz.desktop && \
+echo "StartupWMClass=Statuz IDE" >> StatuzApp.AppDir/statuz.desktop && \
+echo "Categories=TextEditor;Development;IDE;" >> StatuzApp.AppDir/statuz.desktop && \
+echo "MimeType=application/x-statuz-workspace;" >> StatuzApp.AppDir/statuz.desktop && \
+echo "Keywords=statuz;" >> StatuzApp.AppDir/statuz.desktop && \
+echo "Actions=new-empty-window;" >> StatuzApp.AppDir/statuz.desktop && \
+echo "[Desktop Action new-empty-window]" >> StatuzApp.AppDir/statuz.desktop && \
+echo "Name=New Empty Window" >> StatuzApp.AppDir/statuz.desktop && \
+echo "Name[de]=Neues leeres Fenster" >> StatuzApp.AppDir/statuz.desktop && \
+echo "Name[es]=Nueva ventana vacía" >> StatuzApp.AppDir/statuz.desktop && \
+echo "Name[fr]=Nouvelle fenêtre vide" >> StatuzApp.AppDir/statuz.desktop && \
+echo "Name[it]=Nuova finestra vuota" >> StatuzApp.AppDir/statuz.desktop && \
+echo "Name[ja]=新しい空のウィンドウ" >> StatuzApp.AppDir/statuz.desktop && \
+echo "Name[ko]=새 빈 창" >> StatuzApp.AppDir/statuz.desktop && \
+echo "Name[ru]=Новое пустое окно" >> StatuzApp.AppDir/statuz.desktop && \
+echo "Name[zh_CN]=新建空窗口" >> StatuzApp.AppDir/statuz.desktop && \
+echo "Name[zh_TW]=開新空視窗" >> StatuzApp.AppDir/statuz.desktop && \
+echo "Exec=statuz --new-window %F" >> StatuzApp.AppDir/statuz.desktop && \
+echo "Icon=statuz" >> StatuzApp.AppDir/statuz.desktop && \
+chmod +x StatuzApp.AppDir/statuz.desktop && \
+cp StatuzApp.AppDir/statuz.desktop StatuzApp.AppDir/usr/share/applications/ && \
+echo "[Desktop Entry]" > StatuzApp.AppDir/statuz-url-handler.desktop && \
+echo "Name=Statuz IDE - URL Handler" > StatuzApp.AppDir/statuz-url-handler.desktop && \
+echo "Comment=Open source AI code editor." > StatuzApp.AppDir/statuz-url-handler.desktop && \
+echo "GenericName=Text Editor" > StatuzApp.AppDir/statuz-url-handler.desktop && \
+echo "Exec=statuz --open-url %U" > StatuzApp.AppDir/statuz-url-handler.desktop && \
+echo "Icon=statuz" > StatuzApp.AppDir/statuz-url-handler.desktop && \
+echo "Type=Application" > StatuzApp.AppDir/statuz-url-handler.desktop && \
+echo "NoDisplay=true" > StatuzApp.AppDir/statuz-url-handler.desktop && \
+echo "StartupNotify=true" > StatuzApp.AppDir/statuz-url-handler.desktop && \
+echo "Categories=Utility;TextEditor;Development;IDE;" > StatuzApp.AppDir/statuz-url-handler.desktop && \
+echo "MimeType=x-scheme-handler/statuz;" > StatuzApp.AppDir/statuz-url-handler.desktop && \
+echo "Keywords=statuz;" > StatuzApp.AppDir/statuz-url-handler.desktop && \
+chmod +x StatuzApp.AppDir/statuz-url-handler.desktop && \
+cp StatuzApp.AppDir/statuz-url-handler.desktop StatuzApp.AppDir/usr/share/applications/ && \
+echo "#!/bin/bash" > StatuzApp.AppDir/AppRun && \
+echo "HERE=\$(dirname \"\$(readlink -f \"\${0}\")\")" >> StatuzApp.AppDir/AppRun && \
+echo "export PATH=\${HERE}/usr/bin:\${PATH}" >> StatuzApp.AppDir/AppRun && \
+echo "export LD_LIBRARY_PATH=\${HERE}/usr/lib:\${LD_LIBRARY_PATH}" >> StatuzApp.AppDir/AppRun && \
+echo "exec \${HERE}/usr/bin/statuz --no-sandbox \"\$@\"" >> StatuzApp.AppDir/AppRun && \
+chmod +x StatuzApp.AppDir/AppRun && \
+chmod -R 755 StatuzApp.AppDir && \
 
 # Strip unneeded symbols from the binary to reduce size
-strip --strip-unneeded VoidApp.AppDir/usr/bin/void
+strip --strip-unneeded StatuzApp.AppDir/usr/bin/statuz
 
-ls -la VoidApp.AppDir/ && \
-ARCH=x86_64 ./appimagetool -n VoidApp.AppDir Void-x86_64.AppImage
+ls -la StatuzApp.AppDir/ && \
+ARCH=x86_64 ./appimagetool -n StatuzApp.AppDir Statuz-x86_64.AppImage
 '
 
 # Clean up
-rm -rf VoidApp.AppDir .dockerignore appimagetool
+rm -rf StatuzApp.AppDir .dockerignore appimagetool
 
-echo "AppImage creation complete! Your AppImage is: Void-x86_64.AppImage"
+echo "AppImage creation complete! Your AppImage is: Statuz-x86_64.AppImage"
