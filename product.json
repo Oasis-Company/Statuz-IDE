@@ -1,8 +1,8 @@
 {
 	"nameShort": "Statuz",
 	"nameLong": "Statuz IDE",
-	"voidVersion": "1.4.9",
-	"voidRelease": "0044",
+	"statuzVersion": "0.1.0",
+	"statuzRelease": "0001",
 	"applicationName": "statuz",
 	"dataFolderName": ".statuz-ide",
 	"win32MutexName": "statuzeditor",

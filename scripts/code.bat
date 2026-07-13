@@ -24,6 +24,12 @@ set ELECTRON_ENABLE_LOGGING=1
 set ELECTRON_ENABLE_STACK_DUMPING=1
 
 set DISABLE_TEST_EXTENSION="--disable-extension=vscode.vscode-api-tests"
+
+:: Window visibility and stability flags
+set USER_DATA_DIR=--user-data-dir="%CD%\.portable\user-data"
+set DISABLE_GPU=--disable-gpu
+set NEW_WINDOW=--new-window
+set WINDOW_POSITION=--window-position=0,0
 for %%A in (%*) do (
 	if "%%~A"=="--extensionTestsPath" (
 		set DISABLE_TEST_EXTENSION=""
@@ -32,7 +38,7 @@ for %%A in (%*) do (
 
 :: Launch Code
 
-%CODE% . %DISABLE_TEST_EXTENSION% %*
+%CODE% . %USER_DATA_DIR% %DISABLE_GPU% %NEW_WINDOW% %WINDOW_POSITION% %DISABLE_TEST_EXTENSION% %*
 goto end
 
 :builtin

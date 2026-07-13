@@ -3,7 +3,7 @@
   "version": "1.99.3",
   "distro": "21c8d8ea1e46d97c5639a7cabda6c0e063cc8dd5",
   "author": {
-    "name": "Microsoft Corporation"
+    "name": "Oasis Company"
   },
   "license": "MIT",
   "main": "./out/main.js",

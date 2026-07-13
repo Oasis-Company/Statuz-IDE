@@ -28,5 +28,10 @@ product.overrides.json
 .tool-versions
 .npm-cache/
 .node-gyp-cache/
+.electron-cache/
+.portable/
+.userdata/
+.fresh-userdata/
+.electron-userdata/
 src/vs/workbench/contrib/statuz/browser/react/out/**
 src/vs/workbench/contrib/statuz/browser/react/src2/**

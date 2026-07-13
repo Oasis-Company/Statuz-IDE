@@ -1,9 +1,10 @@
 # Statuz IDE — Long-Term Development Plan
 
 > **Document Status:** Draft for Team Review
-> **Last Updated:** 2026-07-12
+> **Last Updated:** 2026-07-13
+> **Team:** Oasis Company
 > **Repository:** https://github.com/Oasis-Company/Statuz-IDE
-> **Engine Repository:** `D:\github projects\statuz` (statuz-core, Rust)
+> **Engine Repository:** https://github.com/Oasis-Company/statuz (statuz-core, Rust)
 
 ---
 
@@ -31,7 +32,7 @@ These three queries, combined with the Cluster/Field/Bridge multi-layer architec
 
 ### 2.1 Statuz-IDE (this repository)
 
-**Origin:** Fork of Void (itself a fork of VS Code).
+**Origin:** Fork of VS Code (via Void), now independently developed by Oasis Company.
 
 **What exists:**
 - Brand replacement: `product.json`, `package.json` updated to Statuz branding (partially complete — React component paths still being migrated).
