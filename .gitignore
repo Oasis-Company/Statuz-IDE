@@ -35,3 +35,12 @@ product.overrides.json
 .electron-userdata/
 src/vs/workbench/contrib/statuz/browser/react/out/**
 src/vs/workbench/contrib/statuz/browser/react/src2/**
+
+# Local tooling / build noise (added during oasis rebrand):
+.trae/
+.workbuddy/
+compile-*.log
+electron-test.log
+
+# Generated extension lockfiles (npm regenerates them; tracked copies cause noisy diffs)
+extensions/**/package-lock.json
