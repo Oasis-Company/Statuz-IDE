@@ -1,11 +1,11 @@
 /*--------------------------------------------------------------------------------------
- *  Copyright 2025 Glass Devtools, Inc. All rights reserved.
+ *  Copyright 2026 Statuz. All rights reserved.
  *  Licensed under the Apache License, Version 2.0. See LICENSE.txt for more information.
  *--------------------------------------------------------------------------------------*/
 
 import { promisify } from 'util'
 import { exec as _exec } from 'child_process'
-import { IVoidSCMService } from '../common/statuzSCMTypes.js'
+import { IStatuzSCMService } from '../common/statuzSCMTypes.js'
 
 interface NumStat {
 	file: string
@@ -53,7 +53,7 @@ const hasStagedChanges = async (path: string): Promise<boolean> => {
 	return output.length > 0
 }
 
-export class VoidSCMService implements IVoidSCMService {
+export class StatuzSCMService implements IStatuzSCMService {
 	readonly _serviceBrand: undefined
 
 	async gitStat(path: string): Promise<string> {

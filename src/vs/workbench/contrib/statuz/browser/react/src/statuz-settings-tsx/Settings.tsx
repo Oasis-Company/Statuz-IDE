@@ -1,12 +1,12 @@
 /*--------------------------------------------------------------------------------------
- *  Copyright 2025 Glass Devtools, Inc. All rights reserved.
+ *  Copyright 2026 Statuz. All rights reserved.
  *  Licensed under the Apache License, Version 2.0. See LICENSE.txt for more information.
  *--------------------------------------------------------------------------------------*/
 
 import React, { useCallback, useEffect, useMemo, useState, useRef } from 'react'; // Added useRef import just in case it was missed, though likely already present
 import { ProviderName, SettingName, displayInfoOfSettingName, providerNames, VoidStatefulModelInfo, customSettingNamesOfProvider, RefreshableProviderName, refreshableProviderNames, displayInfoOfProviderName, nonlocalProviderNames, localProviderNames, GlobalSettingName, featureNames, displayInfoOfFeatureName, isProviderNameDisabled, FeatureName, hasDownloadButtonsOnModelsProviderNames, subTextMdOfProviderName } from '../../../../common/statuzSettingsTypes.js'
 import ErrorBoundary from '../sidebar-tsx/ErrorBoundary.js'
-import { VoidButtonBgDarken, VoidCustomDropdownBox, VoidInputBox2, VoidSimpleInputBox, VoidSwitch } from '../util/inputs.js'
+import { StatuzButtonBgDarken, StatuzCustomDropdownBox, StatuzInputBox2, StatuzSimpleInputBox, StatuzSwitch } from '../util/inputs.js'
 import { useAccessor, useIsDark, useIsOptedOut, useRefreshModelListener, useRefreshModelState, useSettingsState } from '../util/services.js'
 import { X, RefreshCw, Loader2, Check, Asterisk, Plus } from 'lucide-react'
 import { URI } from '../../../../../../../base/common/uri.js'
@@ -184,7 +184,7 @@ const ConfirmButton = ({ children, onConfirm, className }: { children: React.Rea
 	}, [confirm]);
 	return (
 		<div ref={ref} className={`inline-block`}>
-			<VoidButtonBgDarken className={className} onClick={() => {
+			<StatuzButtonBgDarken className={className} onClick={() => {
 				if (!confirm) {
 					setConfirm(true);
 				} else {
@@ -193,7 +193,7 @@ const ConfirmButton = ({ children, onConfirm, className }: { children: React.Rea
 				}
 			}}>
 				{confirm ? `Confirm Reset` : children}
-			</VoidButtonBgDarken>
+			</StatuzButtonBgDarken>
 		</div>
 	);
 };
@@ -220,7 +220,7 @@ const SimpleModelSettingsDialog = ({
 	const accessor = useAccessor()
 	const settingsState = useSettingsState()
 	const mouseDownInsideModal = useRef(false); // Ref to track mousedown origin
-	const settingsStateService = accessor.get('IVoidSettingsService')
+	const settingsStateService = accessor.get('IStatuzSettingsService')
 
 	// current overrides and defaults
 	const defaultModelCapabilities = getModelCapabilities(providerName, modelName, undefined);
@@ -321,16 +321,16 @@ const SimpleModelSettingsDialog = ({
 
 				{/* Display model recognition status */}
 				<div className="text-sm text-statuz-fg-3 mb-4">
-					{type === 'default' ? `${modelName} comes packaged with Void, so you shouldn't need to change these settings.`
+					{type === 'default' ? `${modelName} comes packaged with Statuz IDE, so you shouldn't need to change these settings.`
 						: isUnrecognizedModel
-							? `Model not recognized by Void.`
-							: `Void recognizes ${modelName} ("${recognizedModelName}").`}
+							? `Model not recognized by Statuz IDE.`
+							: `Statuz IDE recognizes ${modelName} ("${recognizedModelName}").`}
 				</div>
 
 
 				{/* override toggle */}
 				<div className="flex items-center gap-2 mb-4">
-					<VoidSwitch size='xs' value={overrideEnabled} onChange={setOverrideEnabled} />
+					<StatuzSwitch size='xs' value={overrideEnabled} onChange={setOverrideEnabled} />
 					<span className="text-statuz-fg-3 text-sm">Override model defaults</span>
 				</div>
 
@@ -353,15 +353,15 @@ const SimpleModelSettingsDialog = ({
 
 
 				<div className="flex justify-end gap-2 mt-4">
-					<VoidButtonBgDarken onClick={onClose} className="px-3 py-1">
+					<StatuzButtonBgDarken onClick={onClose} className="px-3 py-1">
 						Cancel
-					</VoidButtonBgDarken>
-					<VoidButtonBgDarken
+					</StatuzButtonBgDarken>
+					<StatuzButtonBgDarken
 						onClick={onSave}
 						className="px-3 py-1 bg-[#0e70c0] text-white"
 					>
 						Save
-					</VoidButtonBgDarken>
+					</StatuzButtonBgDarken>
 				</div>
 			</div>
 		</div>
@@ -373,7 +373,7 @@ const SimpleModelSettingsDialog = ({
 
 export const ModelDump = ({ filteredProviders }: { filteredProviders?: ProviderName[] }) => {
 	const accessor = useAccessor()
-	const settingsStateService = accessor.get('IVoidSettingsService')
+	const settingsStateService = accessor.get('IStatuzSettingsService')
 	const settingsState = useSettingsState()
 
 	// State to track which model's settings dialog is open
@@ -494,7 +494,7 @@ export const ModelDump = ({ filteredProviders }: { filteredProviders?: ProviderN
 
 
 					{/* Switch */}
-					<VoidSwitch
+					<StatuzSwitch
 						value={value}
 						onChange={() => { settingsStateService.toggleModelHidden(providerName, modelName); }}
 						disabled={disabled}
@@ -532,7 +532,7 @@ export const ModelDump = ({ filteredProviders }: { filteredProviders?: ProviderN
 
 					{/* Provider dropdown */}
 					<ErrorBoundary>
-						<VoidCustomDropdownBox
+						<StatuzCustomDropdownBox
 							options={providersToShow}
 							selectedOption={userChosenProviderName}
 							onChangeOption={(pn) => setUserChosenProviderName(pn)}
@@ -546,7 +546,7 @@ export const ModelDump = ({ filteredProviders }: { filteredProviders?: ProviderN
 
 					{/* Model name input */}
 					<ErrorBoundary>
-						<VoidSimpleInputBox
+						<StatuzSimpleInputBox
 							value={modelName}
 							compact={true}
 							onChangeValue={setModelName}
@@ -615,7 +615,7 @@ const ProviderSetting = ({ providerName, settingName, subTextMd }: { providerNam
 	const { title: settingTitle, placeholder, isPasswordField } = displayInfoOfSettingName(providerName, settingName)
 
 	const accessor = useAccessor()
-	const voidSettingsService = accessor.get('IVoidSettingsService')
+	const voidSettingsService = accessor.get('IStatuzSettingsService')
 	const settingsState = useSettingsState()
 
 	const settingValue = settingsState.settingsOfProvider[providerName][settingName] as string // this should always be a string in this component
@@ -631,7 +631,7 @@ const ProviderSetting = ({ providerName, settingName, subTextMd }: { providerNam
 
 	return <ErrorBoundary>
 		<div className='my-1'>
-			<VoidSimpleInputBox
+			<StatuzSimpleInputBox
 				value={settingValue}
 				onChangeValue={handleChangeValue}
 				placeholder={`${settingTitle} (${placeholder})`}
@@ -651,7 +651,7 @@ const ProviderSetting = ({ providerName, settingName, subTextMd }: { providerNam
 // 	const needsModel = isProviderNameDisabled(providerName, voidSettingsState) === 'addModel'
 
 // 	// const accessor = useAccessor()
-// 	// const voidSettingsService = accessor.get('IVoidSettingsService')
+// 	// const voidSettingsService = accessor.get('IStatuzSettingsService')
 
 // 	// const { enabled } = voidSettingsState.settingsOfProvider[providerName]
 // 	const settingNames = customSettingNamesOfProvider(providerName)
@@ -664,7 +664,7 @@ const ProviderSetting = ({ providerName, settingName, subTextMd }: { providerNam
 // 			{showProviderTitle && <h3 className='text-xl truncate'>{providerTitle}</h3>}
 
 // 			{/* enable provider switch */}
-// 			{/* <VoidSwitch
+// 			{/* <StatuzSwitch
 // 				value={!!enabled}
 // 				onChange={
 // 					useCallback(() => {
@@ -697,7 +697,7 @@ export const SettingsForProvider = ({ providerName, showProviderTitle, showProvi
 	const needsModel = isProviderNameDisabled(providerName, voidSettingsState) === 'addModel'
 
 	// const accessor = useAccessor()
-	// const voidSettingsService = accessor.get('IVoidSettingsService')
+	// const voidSettingsService = accessor.get('IStatuzSettingsService')
 
 	// const { enabled } = voidSettingsState.settingsOfProvider[providerName]
 	const settingNames = customSettingNamesOfProvider(providerName)
@@ -710,7 +710,7 @@ export const SettingsForProvider = ({ providerName, showProviderTitle, showProvi
 			{showProviderTitle && <h3 className='text-xl truncate'>{providerTitle}</h3>}
 
 			{/* enable provider switch */}
-			{/* <VoidSwitch
+			{/* <StatuzSwitch
 				value={!!enabled}
 				onChange={
 					useCallback(() => {
@@ -744,7 +744,7 @@ export const SettingsForProvider = ({ providerName, showProviderTitle, showProvi
 }
 
 
-export const VoidProviderSettings = ({ providerNames }: { providerNames: ProviderName[] }) => {
+export const StatuzProviderSettings = ({ providerNames }: { providerNames: ProviderName[] }) => {
 	return <>
 		{providerNames.map(providerName =>
 			<SettingsForProvider key={providerName} providerName={providerName} showProviderTitle={true} showProviderSuggestions={true} />
@@ -758,7 +758,7 @@ export const AutoDetectLocalModelsToggle = () => {
 	const settingName: GlobalSettingName = 'autoRefreshModels'
 
 	const accessor = useAccessor()
-	const voidSettingsService = accessor.get('IVoidSettingsService')
+	const voidSettingsService = accessor.get('IStatuzSettingsService')
 	const metricsService = accessor.get('IMetricsService')
 
 	const voidSettingsState = useSettingsState()
@@ -767,7 +767,7 @@ export const AutoDetectLocalModelsToggle = () => {
 	const enabled = voidSettingsState.globalSettings[settingName]
 
 	return <ButtonLeftTextRightOption
-		leftButton={<VoidSwitch
+		leftButton={<StatuzSwitch
 			size='xxs'
 			value={enabled}
 			onChange={(newVal) => {
@@ -783,9 +783,9 @@ export const AutoDetectLocalModelsToggle = () => {
 
 export const AIInstructionsBox = () => {
 	const accessor = useAccessor()
-	const voidSettingsService = accessor.get('IVoidSettingsService')
+	const voidSettingsService = accessor.get('IStatuzSettingsService')
 	const voidSettingsState = useSettingsState()
-	return <VoidInputBox2
+	return <StatuzInputBox2
 		className='min-h-[81px] p-3 rounded-sm'
 		initValue={voidSettingsState.globalSettings.aiInstructions}
 		placeholder={`Do not change my indentation or delete my comments. When writing TS or JS, do not add ;'s. Write new code using Rust if possible. `}
@@ -798,7 +798,7 @@ export const AIInstructionsBox = () => {
 
 const FastApplyMethodDropdown = () => {
 	const accessor = useAccessor()
-	const voidSettingsService = accessor.get('IVoidSettingsService')
+	const voidSettingsService = accessor.get('IStatuzSettingsService')
 
 	const options = useMemo(() => [true, false], [])
 
@@ -806,7 +806,7 @@ const FastApplyMethodDropdown = () => {
 		voidSettingsService.setGlobalSetting('enableFastApply', newVal)
 	}, [voidSettingsService])
 
-	return <VoidCustomDropdownBox
+	return <StatuzCustomDropdownBox
 		className='text-xs text-statuz-fg-3 bg-statuz-bg-1 border border-statuz-border-1 rounded p-0.5 px-1'
 		options={options}
 		selectedOption={voidSettingsService.state.globalSettings.enableFastApply}
@@ -831,19 +831,19 @@ export const OllamaSetupInstructions = ({ sayWeAutoDetect }: { sayWeAutoDetect?:
 		>
 			<ChatMarkdownRender string={`3. Run \`ollama pull your_model\` to install a model.`} chatMessageLocation={undefined} />
 		</div>
-		{sayWeAutoDetect && <div className=' pl-6'><ChatMarkdownRender string={`Void automatically detects locally running models and enables them.`} chatMessageLocation={undefined} /></div>}
+		{sayWeAutoDetect && <div className=' pl-6'><ChatMarkdownRender string={`Statuz IDE automatically detects locally running models and enables them.`} chatMessageLocation={undefined} /></div>}
 	</div>
 }
 
 
 const RedoOnboardingButton = ({ className }: { className?: string }) => {
 	const accessor = useAccessor()
-	const voidSettingsService = accessor.get('IVoidSettingsService')
+	const voidSettingsService = accessor.get('IStatuzSettingsService')
 	return <div
 		className={`text-statuz-fg-4 flex flex-nowrap text-nowrap items-center hover:brightness-110 cursor-pointer ${className}`}
 		onClick={() => { voidSettingsService.setGlobalSetting('isOnboardingComplete', false) }}
 	>
-		See onboarding screen?
+		Show onboarding screen?
 	</div>
 
 }
@@ -856,7 +856,7 @@ const RedoOnboardingButton = ({ className }: { className?: string }) => {
 
 export const ToolApprovalTypeSwitch = ({ approvalType, size, desc }: { approvalType: ToolApprovalType, size: "xxs" | "xs" | "sm" | "sm+" | "md", desc: string }) => {
 	const accessor = useAccessor()
-	const voidSettingsService = accessor.get('IVoidSettingsService')
+	const voidSettingsService = accessor.get('IStatuzSettingsService')
 	const voidSettingsState = useSettingsState()
 	const metricsService = accessor.get('IMetricsService')
 
@@ -869,7 +869,7 @@ export const ToolApprovalTypeSwitch = ({ approvalType, size, desc }: { approvalT
 	}, [voidSettingsService, metricsService])
 
 	return <>
-		<VoidSwitch
+		<StatuzSwitch
 			size={size}
 			value={voidSettingsState.globalSettings.autoApprove[approvalType] ?? false}
 			onChange={(newVal) => onToggleAutoApprove(approvalType, newVal)}
@@ -907,13 +907,13 @@ export const OneClickSwitchButton = ({ fromEditor = 'VS Code', className = '' }:
 	}
 
 	return <>
-		<VoidButtonBgDarken className={`max-w-48 p-4 ${className}`} disabled={transferState.type !== 'done'} onClick={onClick}>
+		<StatuzButtonBgDarken className={`max-w-48 p-4 ${className}`} disabled={transferState.type !== 'done'} onClick={onClick}>
 			{transferState.type === 'done' ? `Transfer from ${fromEditor}`
 				: transferState.type === 'loading' ? <span className='text-nowrap flex flex-nowrap'>Transferring<IconLoading /></span>
 					: transferState.type === 'justfinished' ? <AnimatedCheckmarkButton text='Settings Transferred' className='bg-none' />
 						: null
 			}
-		</VoidButtonBgDarken>
+		</StatuzButtonBgDarken>
 		{transferState.type === 'done' && transferState.error ? <WarningBox text={transferState.error} /> : null}
 	</>
 }
@@ -950,7 +950,7 @@ const MCPServerComponent = ({ name, server }: { name: string, server: MCPServer 
 				</div>
 
 				{/* Right side - power toggle switch */}
-				<VoidSwitch
+				<StatuzSwitch
 					value={isOn ?? false}
 					size='xs'
 					disabled={server.status === 'error'}
@@ -1050,7 +1050,7 @@ export const Settings = () => {
 	const environmentService = accessor.get('IEnvironmentService')
 	const nativeHostService = accessor.get('INativeHostService')
 	const settingsState = useSettingsState()
-	const voidSettingsService = accessor.get('IVoidSettingsService')
+	const voidSettingsService = accessor.get('IStatuzSettingsService')
 	const chatThreadsService = accessor.get('IChatThreadService')
 	const notificationService = accessor.get('INotificationService')
 	const mcpService = accessor.get('IMCPService')
@@ -1161,7 +1161,7 @@ export const Settings = () => {
 
 					<div className='max-w-3xl'>
 
-						<h1 className='text-2xl w-full'>{`Void's Settings`}</h1>
+						<h1 className='text-2xl w-full'>{`Statuz IDE Settings`}</h1>
 
 						<div className='w-full h-[1px] my-2' />
 
@@ -1189,13 +1189,13 @@ export const Settings = () => {
 							<div className={shouldShowTab('localProviders') ? `` : 'hidden'}>
 								<ErrorBoundary>
 									<h2 className={`text-3xl mb-2`}>Local Providers</h2>
-									<h3 className={`text-statuz-fg-3 mb-2`}>{`Void can access any model that you host locally. We automatically detect your local models by default.`}</h3>
+									<h3 className={`text-statuz-fg-3 mb-2`}>{`Statuz IDE can access any model that you host locally. We automatically detect your local models by default.`}</h3>
 
 									<div className='opacity-80 mb-4'>
 										<OllamaSetupInstructions sayWeAutoDetect={true} />
 									</div>
 
-									<VoidProviderSettings providerNames={localProviderNames} />
+									<StatuzProviderSettings providerNames={localProviderNames} />
 								</ErrorBoundary>
 							</div>
 
@@ -1203,9 +1203,9 @@ export const Settings = () => {
 							<div className={shouldShowTab('providers') ? `` : 'hidden'}>
 								<ErrorBoundary>
 									<h2 className={`text-3xl mb-2`}>Main Providers</h2>
-									<h3 className={`text-statuz-fg-3 mb-2`}>{`Void can access models from Anthropic, OpenAI, OpenRouter, and more.`}</h3>
+									<h3 className={`text-statuz-fg-3 mb-2`}>{`Statuz IDE can access models from Anthropic, OpenAI, OpenRouter, and more.`}</h3>
 
-									<VoidProviderSettings providerNames={nonlocalProviderNames} />
+									<StatuzProviderSettings providerNames={nonlocalProviderNames} />
 								</ErrorBoundary>
 							</div>
 
@@ -1237,7 +1237,7 @@ export const Settings = () => {
 													{/* Enable Switch */}
 													<ErrorBoundary>
 														<div className='flex items-center gap-x-2 my-2'>
-															<VoidSwitch
+															<StatuzSwitch
 																size='xs'
 																value={settingsState.globalSettings.enableAutocomplete}
 																onChange={(newVal) => voidSettingsService.setGlobalSetting('enableAutocomplete', newVal)}
@@ -1268,7 +1268,7 @@ export const Settings = () => {
 												<div className='my-2'>
 													{/* Sync to Chat Switch */}
 													<div className='flex items-center gap-x-2 my-2'>
-														<VoidSwitch
+														<StatuzSwitch
 															size='xs'
 															value={settingsState.globalSettings.syncApplyToChat}
 															onChange={(newVal) => voidSettingsService.setGlobalSetting('syncApplyToChat', newVal)}
@@ -1316,7 +1316,7 @@ export const Settings = () => {
 												<ErrorBoundary>
 
 													<div className='flex items-center gap-x-2 my-2'>
-														<VoidSwitch
+														<StatuzSwitch
 															size='xs'
 															value={settingsState.globalSettings.includeToolLintErrors}
 															onChange={(newVal) => voidSettingsService.setGlobalSetting('includeToolLintErrors', newVal)}
@@ -1328,7 +1328,7 @@ export const Settings = () => {
 												{/* Auto Accept LLM Changes Switch */}
 												<ErrorBoundary>
 													<div className='flex items-center gap-x-2 my-2'>
-														<VoidSwitch
+														<StatuzSwitch
 															size='xs'
 															value={settingsState.globalSettings.autoAcceptLLMChanges}
 															onChange={(newVal) => voidSettingsService.setGlobalSetting('autoAcceptLLMChanges', newVal)}
@@ -1343,13 +1343,13 @@ export const Settings = () => {
 
 										<div className='w-full'>
 											<h4 className={`text-base`}>Editor</h4>
-											<div className='text-sm text-statuz-fg-3 mt-1'>{`Settings that control the visibility of Void suggestions in the code editor.`}</div>
+											<div className='text-sm text-statuz-fg-3 mt-1'>{`Settings that control the visibility of Statuz IDE suggestions in the code editor.`}</div>
 
 											<div className='my-2'>
 												{/* Auto Accept Switch */}
 												<ErrorBoundary>
 													<div className='flex items-center gap-x-2 my-2'>
-														<VoidSwitch
+														<StatuzSwitch
 															size='xs'
 															value={settingsState.globalSettings.showInlineSuggestions}
 															onChange={(newVal) => voidSettingsService.setGlobalSetting('showInlineSuggestions', newVal)}
@@ -1370,7 +1370,7 @@ export const Settings = () => {
 												<div className='my-2'>
 													{/* Sync to Chat Switch */}
 													<div className='flex items-center gap-x-2 my-2'>
-														<VoidSwitch
+														<StatuzSwitch
 															size='xs'
 															value={settingsState.globalSettings.syncSCMToChat}
 															onChange={(newVal) => voidSettingsService.setGlobalSetting('syncSCMToChat', newVal)}
@@ -1396,7 +1396,7 @@ export const Settings = () => {
 								<div>
 									<ErrorBoundary>
 										<h2 className='text-3xl mb-2'>One-Click Switch</h2>
-										<h4 className='text-statuz-fg-3 mb-4'>{`Transfer your editor settings into Void.`}</h4>
+										<h4 className='text-statuz-fg-3 mb-4'>{`Transfer your editor settings into Statuz IDE.`}</h4>
 
 										<div className='flex flex-col gap-2'>
 											<OneClickSwitchButton className='w-48' fromEditor="VS Code" />
@@ -1409,17 +1409,17 @@ export const Settings = () => {
 								{/* Import/Export section */}
 								<div>
 									<h2 className='text-3xl mb-2'>Import/Export</h2>
-									<h4 className='text-statuz-fg-3 mb-4'>{`Transfer Void's settings and chats in and out of Void.`}</h4>
+									<h4 className='text-statuz-fg-3 mb-4'>{`Transfer Statuz IDE's settings and chats in and out of Statuz IDE.`}</h4>
 									<div className='flex flex-col gap-8'>
 										{/* Settings Subcategory */}
 										<div className='flex flex-col gap-2 max-w-48 w-full'>
 											<input key={2 * s} ref={fileInputSettingsRef} type='file' accept='.json' className='hidden' onChange={handleUpload('Settings')} />
-											<VoidButtonBgDarken className='px-4 py-1 w-full' onClick={() => { fileInputSettingsRef.current?.click() }}>
+											<StatuzButtonBgDarken className='px-4 py-1 w-full' onClick={() => { fileInputSettingsRef.current?.click() }}>
 												Import Settings
-											</VoidButtonBgDarken>
-											<VoidButtonBgDarken className='px-4 py-1 w-full' onClick={() => onDownload('Settings')}>
+											</StatuzButtonBgDarken>
+											<StatuzButtonBgDarken className='px-4 py-1 w-full' onClick={() => onDownload('Settings')}>
 												Export Settings
-											</VoidButtonBgDarken>
+											</StatuzButtonBgDarken>
 											<ConfirmButton className='px-4 py-1 w-full' onConfirm={() => { voidSettingsService.resetState(); }}>
 												Reset Settings
 											</ConfirmButton>
@@ -1428,12 +1428,12 @@ export const Settings = () => {
 										{/* Chats Subcategory */}
 										<div className='flex flex-col gap-2 max-w-48 w-full'>
 											<input key={2 * s + 1} ref={fileInputChatsRef} type='file' accept='.json' className='hidden' onChange={handleUpload('Chats')} />
-											<VoidButtonBgDarken className='px-4 py-1 w-full' onClick={() => { fileInputChatsRef.current?.click() }}>
+											<StatuzButtonBgDarken className='px-4 py-1 w-full' onClick={() => { fileInputChatsRef.current?.click() }}>
 												Import Chats
-											</VoidButtonBgDarken>
-											<VoidButtonBgDarken className='px-4 py-1 w-full' onClick={() => onDownload('Chats')}>
+											</StatuzButtonBgDarken>
+											<StatuzButtonBgDarken className='px-4 py-1 w-full' onClick={() => onDownload('Chats')}>
 												Export Chats
-											</VoidButtonBgDarken>
+											</StatuzButtonBgDarken>
 											<ConfirmButton className='px-4 py-1 w-full' onConfirm={() => { chatThreadsService.resetState(); }}>
 												Reset Chats
 											</ConfirmButton>
@@ -1450,18 +1450,18 @@ export const Settings = () => {
 
 									<ErrorBoundary>
 										<div className='flex flex-col gap-2 justify-center max-w-48 w-full'>
-											<VoidButtonBgDarken className='px-4 py-1' onClick={() => { commandService.executeCommand('workbench.action.openSettings') }}>
+											<StatuzButtonBgDarken className='px-4 py-1' onClick={() => { commandService.executeCommand('workbench.action.openSettings') }}>
 												General Settings
-											</VoidButtonBgDarken>
-											<VoidButtonBgDarken className='px-4 py-1' onClick={() => { commandService.executeCommand('workbench.action.openGlobalKeybindings') }}>
+											</StatuzButtonBgDarken>
+											<StatuzButtonBgDarken className='px-4 py-1' onClick={() => { commandService.executeCommand('workbench.action.openGlobalKeybindings') }}>
 												Keyboard Settings
-											</VoidButtonBgDarken>
-											<VoidButtonBgDarken className='px-4 py-1' onClick={() => { commandService.executeCommand('workbench.action.selectTheme') }}>
+											</StatuzButtonBgDarken>
+											<StatuzButtonBgDarken className='px-4 py-1' onClick={() => { commandService.executeCommand('workbench.action.selectTheme') }}>
 												Theme Settings
-											</VoidButtonBgDarken>
-											<VoidButtonBgDarken className='px-4 py-1' onClick={() => { nativeHostService.showItemInFolder(environmentService.logsHome.fsPath) }}>
+											</StatuzButtonBgDarken>
+											<StatuzButtonBgDarken className='px-4 py-1' onClick={() => { nativeHostService.showItemInFolder(environmentService.logsHome.fsPath) }}>
 												Open Logs
-											</VoidButtonBgDarken>
+											</StatuzButtonBgDarken>
 										</div>
 									</ErrorBoundary>
 								</div>
@@ -1470,13 +1470,13 @@ export const Settings = () => {
 								{/* Metrics section */}
 								<div className='max-w-[600px]'>
 									<h2 className={`text-3xl mb-2`}>Metrics</h2>
-									<h4 className={`text-statuz-fg-3 mb-4`}>Very basic anonymous usage tracking helps us keep Void running smoothly. You may opt out below. Regardless of this setting, Void never sees your code, messages, or API keys.</h4>
+									<h4 className={`text-statuz-fg-3 mb-4`}>Very basic anonymous usage tracking helps us keep Statuz IDE running smoothly. You may opt out below. Regardless of this setting, Statuz IDE never sees your code, messages, or API keys.</h4>
 
 									<div className='my-2'>
 										{/* Disable All Metrics Switch */}
 										<ErrorBoundary>
 											<div className='flex items-center gap-x-2 my-2'>
-												<VoidSwitch
+												<StatuzSwitch
 													size='xs'
 													value={isOptedOut}
 													onChange={(newVal) => {
@@ -1506,7 +1506,7 @@ Alternatively, place a \`.voidrules\` file in the root of your workspace.
 									<div className='my-4'>
 										<ErrorBoundary>
 											<div className='flex items-center gap-x-2'>
-												<VoidSwitch
+												<StatuzSwitch
 													size='xs'
 													value={!!settingsState.globalSettings.disableSystemMessage}
 													onChange={(newValue) => {
@@ -1519,7 +1519,7 @@ Alternatively, place a \`.voidrules\` file in the root of your workspace.
 											</div>
 										</ErrorBoundary>
 										<div className='text-statuz-fg-3 text-xs mt-1'>
-											{`When disabled, Void will not include anything in the system message except for content you specified above.`}
+											{`When disabled, Statuz IDE will not include anything in the system message except for content you specified above.`}
 										</div>
 									</div>
 								</div>
@@ -1538,9 +1538,9 @@ Use Model Context Protocol to provide Agent mode with more tools.
 							`} chatMessageLocation={undefined} />
 									</h4>
 									<div className='my-2'>
-										<VoidButtonBgDarken className='px-4 py-1 w-full max-w-48' onClick={async () => { await mcpService.revealMCPConfigFile() }}>
+										<StatuzButtonBgDarken className='px-4 py-1 w-full max-w-48' onClick={async () => { await mcpService.revealMCPConfigFile() }}>
 											Add MCP Server
-										</VoidButtonBgDarken>
+										</StatuzButtonBgDarken>
 									</div>
 
 									<ErrorBoundary>

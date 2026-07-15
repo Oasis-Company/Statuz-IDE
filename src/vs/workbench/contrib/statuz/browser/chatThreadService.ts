@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------------------------
- *  Copyright 2025 Glass Devtools, Inc. All rights reserved.
+ *  Copyright 2026 Statuz. All rights reserved.
  *  Licensed under the Apache License, Version 2.0. See LICENSE.txt for more information.
  *--------------------------------------------------------------------------------------*/
 
@@ -15,7 +15,7 @@ import { chat_userMessageContent, isABuiltinToolName } from '../common/prompt/pr
 import { AnthropicReasoning, getErrorMessage, RawToolCallObj, RawToolParamsObj } from '../common/sendLLMMessageTypes.js';
 import { generateUuid } from '../../../../base/common/uuid.js';
 import { FeatureName, ModelSelection, ModelSelectionOptions } from '../common/statuzSettingsTypes.js';
-import { IVoidSettingsService } from '../common/statuzSettingsService.js';
+import { IStatuzSettingsService } from '../common/statuzSettingsService.js';
 import { approvalTypeOfBuiltinToolName, BuiltinToolCallParams, ToolCallParams, ToolName, ToolResult } from '../common/toolsServiceTypes.js';
 import { IToolsService } from './toolsService.js';
 import { CancellationToken } from '../../../../base/common/cancellation.js';
@@ -24,7 +24,7 @@ import { ChatMessage, CheckpointEntry, CodespanLocationLink, StagingSelectionIte
 import { Position } from '../../../../editor/common/core/position.js';
 import { IMetricsService } from '../common/metricsService.js';
 import { shorten } from '../../../../base/common/labels.js';
-import { IVoidModelService } from '../common/statuzModelService.js';
+import { IStatuzModelService } from '../common/statuzModelService.js';
 import { findLast, findLastIdx } from '../../../../base/common/arraysFind.js';
 import { IEditCodeService } from './editCodeServiceInterface.js';
 import { VoidFileSnapshot } from '../common/editCodeServiceTypes.js';
@@ -314,10 +314,10 @@ class ChatThreadService extends Disposable implements IChatThreadService {
 
 	constructor(
 		@IStorageService private readonly _storageService: IStorageService,
-		@IVoidModelService private readonly _voidModelService: IVoidModelService,
+		@IStatuzModelService private readonly _voidModelService: IStatuzModelService,
 		@ILLMMessageService private readonly _llmMessageService: ILLMMessageService,
 		@IToolsService private readonly _toolsService: IToolsService,
-		@IVoidSettingsService private readonly _settingsService: IVoidSettingsService,
+		@IStatuzSettingsService private readonly _settingsService: IStatuzSettingsService,
 		@ILanguageFeaturesService private readonly _languageFeaturesService: ILanguageFeaturesService,
 		@IMetricsService private readonly _metricsService: IMetricsService,
 		@IEditCodeService private readonly _editCodeService: IEditCodeService,

@@ -1,11 +1,11 @@
 /*--------------------------------------------------------------------------------------
- *  Copyright 2025 Glass Devtools, Inc. All rights reserved.
+ *  Copyright 2026 Statuz. All rights reserved.
  *  Licensed under the Apache License, Version 2.0. See LICENSE.txt for more information.
  *--------------------------------------------------------------------------------------*/
 
 import { createDecorator } from '../../../../platform/instantiation/common/instantiation.js';
 
-export interface IVoidSCMService {
+export interface IStatuzSCMService {
 	readonly _serviceBrand: undefined;
 	/**
 	 * Get git diff --stat
@@ -33,4 +33,4 @@ export interface IVoidSCMService {
 	gitLog(path: string): Promise<string>
 }
 
-export const IVoidSCMService = createDecorator<IVoidSCMService>('voidSCMService')
+export const IStatuzSCMService = createDecorator<IStatuzSCMService>('statuzSCMService')

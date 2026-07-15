@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------------------------
- *  Copyright 2025 Glass Devtools, Inc. All rights reserved.
+ *  Copyright 2026 Statuz. All rights reserved.
  *  Licensed under the Apache License, Version 2.0. See LICENSE.txt for more information.
  *--------------------------------------------------------------------------------------*/
 
@@ -10,7 +10,7 @@ import { KeybindingWeight } from '../../../../platform/keybinding/common/keybind
 import { ICodeEditorService } from '../../../../editor/browser/services/codeEditorService.js';
 import { IEditCodeService } from './editCodeServiceInterface.js';
 import { roundRangeToLines } from './sidebarActions.js';
-import { VOID_CTRL_K_ACTION_ID } from './actionIDs.js';
+import { STATUZ_CTRL_K_ACTION_ID } from './actionIDs.js';
 import { localize2 } from '../../../../nls.js';
 import { IMetricsService } from '../common/metricsService.js';
 import { ContextKeyExpr } from '../../../../platform/contextkey/common/contextkey.js';
@@ -36,7 +36,7 @@ registerAction2(class extends Action2 {
 	constructor(
 	) {
 		super({
-			id: VOID_CTRL_K_ACTION_ID,
+			id: STATUZ_CTRL_K_ACTION_ID,
 			f1: true,
 			title: localize2('voidQuickEditAction', 'Void: Quick Edit'),
 			keybinding: {

@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------------------------
- *  Copyright 2025 Glass Devtools, Inc. All rights reserved.
+ *  Copyright 2026 Statuz. All rights reserved.
  *  Licensed under the Apache License, Version 2.0. See LICENSE.txt for more information.
  *--------------------------------------------------------------------------------------*/
 
@@ -15,10 +15,10 @@ import { isLinux } from '../../../../../../../base/common/platform.js';
 
 const OVERRIDE_VALUE = false
 
-export const VoidOnboarding = () => {
+export const StatuzOnboarding = () => {
 
-	const voidSettingsState = useSettingsState()
-	const isOnboardingComplete = voidSettingsState.globalSettings.isOnboardingComplete || OVERRIDE_VALUE
+	const statuzSettingsState = useSettingsState()
+	const isOnboardingComplete = statuzSettingsState.globalSettings.isOnboardingComplete || OVERRIDE_VALUE
 
 	const isDark = useIsDark()
 
@@ -32,37 +32,27 @@ export const VoidOnboarding = () => {
 				style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
 			>
 				<ErrorBoundary>
-					<VoidOnboardingContent />
+					<StatuzOnboardingContent />
 				</ErrorBoundary>
 			</div>
 		</div>
 	)
 }
 
-const VoidIcon = () => {
-	const accessor = useAccessor()
-	const themeService = accessor.get('IThemeService')
+// ─── Inline Statuz logo ────────────────────────────────────────
 
-	const divRef = useRef<HTMLDivElement | null>(null)
+const StatuzIcon = ({ isDark }: { isDark: boolean }) => {
+	const strokeColor = isDark ? '#FFFFFF' : '#000000';
 
-	useEffect(() => {
-		// void icon style
-		const updateTheme = () => {
-			const theme = themeService.getColorTheme().type
-			const isDark = theme === ColorScheme.DARK || theme === ColorScheme.HIGH_CONTRAST_DARK
-			if (divRef.current) {
-				divRef.current.style.maxWidth = '220px'
-				divRef.current.style.opacity = '50%'
-				divRef.current.style.filter = isDark ? '' : 'invert(1)' //brightness(.5)
-			}
-		}
-		updateTheme()
-		const d = themeService.onDidColorThemeChange(updateTheme)
-		return () => d.dispose()
-	}, [])
-
-	return <div ref={divRef} className='@@statuz-void-icon' />
-}
+	return (
+		<svg viewBox="0 0 256 256" fill="none" className="w-full h-full" style={{ maxWidth: '220px', opacity: '50%' }}>
+			<line x1="40" y1="184" x2="144" y2="168" stroke={strokeColor} strokeWidth="8" strokeLinecap="round" />
+			<line x1="144" y1="168" x2="112" y2="72" stroke={strokeColor} strokeWidth="8" strokeLinecap="round" />
+			<line x1="112" y1="72" x2="216" y2="56" stroke={strokeColor} strokeWidth="8" strokeLinecap="round" />
+			<circle cx="128" cy="120" r="12" fill={strokeColor} />
+		</svg>
+	);
+};
 
 const FADE_DURATION_MS = 2000
 
@@ -271,47 +261,103 @@ const AddProvidersPage = ({ pageIndex, setPageIndex }: { pageIndex: number, setP
 		</div>
 	</div>);
 };
-// =============================================
-// 	OnboardingPage
-// 		title:
-// 			div
-// 				"Welcome to Void"
-// 			image
-// 		content:<></>
-// 		title
-// 		content
-// 		prev/next
 
-// 	OnboardingPage
-// 		title:
-// 			div
-// 				"How would you like to use Void?"
-// 		content:
-// 			ModelQuestionContent
-// 				|
-// 					div
-// 						"I want to:"
-// 					div
-// 						"Use the smartest models"
-// 						"Keep my data fully private"
-// 						"Save money"
-// 						"I don't know"
-// 				| div
-// 					| div
-// 						"We recommend using "
-// 						"Set API"
-// 					| div
-// 						""
-// 					| div
-//
-// 		title
-// 		content
-// 		prev/next
-//
-// 	OnboardingPage
-// 		title
-// 		content
-// 		prev/next
+// =============================================
+//  Statuz Engine Configuration Page
+// =============================================
+
+const EngineConfigPage = ({ pageIndex, setPageIndex }: { pageIndex: number, setPageIndex: (index: number) => void }) => {
+	const isDark = useIsDark();
+
+	return (
+		<div className="flex flex-col w-full h-[80vh] gap-6 max-w-[700px] mx-auto">
+			<div className="flex-1 flex flex-col items-center justify-center gap-8 p-6">
+				{/* Engine icon */}
+				<div className="w-20 h-20 rounded-2xl border-2 border-statuz-border-2 flex items-center justify-center bg-statuz-bg-2/50">
+					<svg viewBox="0 0 24 24" fill="none" className="w-10 h-10" stroke={isDark ? '#888' : '#666'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+						<circle cx="12" cy="12" r="3" />
+						<path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83" />
+					</svg>
+				</div>
+
+				<div className="text-center">
+					<div className="text-3xl font-light mb-3">Statuz Engine</div>
+					<p className="text-statuz-fg-3 text-sm max-w-md mx-auto leading-relaxed">
+						The Statuz Graph Engine powers codebase analysis, cluster visualization, and impact mapping.
+						Configure storage paths and engine behavior below.
+					</p>
+				</div>
+
+				{/* Engine status indicator */}
+				<div className="w-full max-w-md bg-statuz-bg-2/50 rounded-lg p-5 border border-statuz-border-4">
+					<div className="flex items-center justify-between mb-4">
+						<span className="text-sm font-medium">Engine Status</span>
+						<span className="flex items-center gap-2 text-sm text-amber-500">
+							<span className="w-2 h-2 rounded-full bg-amber-500 inline-block" />
+							Not Connected
+						</span>
+					</div>
+
+					<div className="space-y-3">
+						{/* Storage path */}
+						<div className="flex items-center justify-between text-sm">
+							<span className="text-statuz-fg-3">Data Directory</span>
+							<span className="text-statuz-fg-2 font-mono text-xs">~/.statuz-ide/engine</span>
+						</div>
+
+						{/* Engine version */}
+						<div className="flex items-center justify-between text-sm">
+							<span className="text-statuz-fg-3">Engine Version</span>
+							<span className="text-statuz-fg-2 font-mono text-xs">0.1.0 (stub)</span>
+						</div>
+
+						{/* Native module status */}
+						<div className="flex items-center justify-between text-sm">
+							<span className="text-statuz-fg-3">Native Module</span>
+							<span className="text-statuz-fg-2 font-mono text-xs text-amber-500">Not integrated</span>
+						</div>
+					</div>
+
+					<div className="mt-4 pt-4 border-t border-statuz-border-4">
+						<p className="text-xs text-statuz-fg-3 leading-relaxed">
+							The native engine module will be integrated in an upcoming milestone.
+							Until then, engine-dependent features will show placeholder states.
+						</p>
+					</div>
+				</div>
+
+				{/* Config fields (static only — no API calls) */}
+				<div className="w-full max-w-md space-y-4">
+					<div className="flex flex-col gap-1.5">
+						<label className="text-xs text-statuz-fg-3 font-medium">Cluster Storage Path</label>
+						<div className="px-3 py-2 rounded-md bg-statuz-bg-2 border border-statuz-border-2 text-statuz-fg-3 text-sm font-mono text-xs cursor-not-allowed select-none">
+							~/.statuz-ide/clusters/
+						</div>
+						<p className="text-[10px] text-statuz-fg-4 mt-0.5">Directory where cluster files (.stz) are stored</p>
+					</div>
+
+					<div className="flex flex-col gap-1.5">
+						<label className="text-xs text-statuz-fg-3 font-medium">Auto-save Interval</label>
+						<div className="px-3 py-2 rounded-md bg-statuz-bg-2 border border-statuz-border-2 text-statuz-fg-3 text-sm font-mono text-xs cursor-not-allowed select-none">
+							30s (default)
+						</div>
+						<p className="text-[10px] text-statuz-fg-4 mt-0.5">Engine settings are read-only until the native module is connected</p>
+					</div>
+				</div>
+			</div>
+
+			{/* Navigation */}
+			<div className="flex items-center justify-end gap-2 pb-8">
+				<PreviousButton onClick={() => setPageIndex(pageIndex - 1)} />
+				<NextButton onClick={() => setPageIndex(pageIndex + 1)} />
+			</div>
+		</div>
+	);
+};
+
+// =============================================
+//  Buttons
+// =============================================
 
 const NextButton = ({ onClick, ...props }: { onClick: () => void } & React.ButtonHTMLAttributes<HTMLButtonElement>) => {
 
@@ -467,14 +513,14 @@ const PrimaryActionButton = ({ children, className, ringSize, ...props }: { chil
 
 type WantToUseOption = 'smart' | 'private' | 'cheap' | 'all'
 
-const VoidOnboardingContent = () => {
+const StatuzOnboardingContent = () => {
 
 
 	const accessor = useAccessor()
-	const voidSettingsService = accessor.get('IVoidSettingsService')
-	const voidMetricsService = accessor.get('IMetricsService')
+	const statuzSettingsService = accessor.get('IStatuzSettingsService')
+	const statuzMetricsService = accessor.get('IMetricsService')
 
-	const voidSettingsState = useSettingsState()
+	const statuzSettingsState = useSettingsState()
 
 	const [pageIndex, setPageIndex] = useState(0)
 
@@ -518,9 +564,9 @@ const VoidOnboardingContent = () => {
 
 
 	const selectedProviderName = getSelectedProvider();
-	const didFillInProviderSettings = selectedProviderName && voidSettingsState.settingsOfProvider[selectedProviderName]._didFillInProviderSettings
-	const isApiKeyLongEnoughIfApiKeyExists = selectedProviderName && voidSettingsState.settingsOfProvider[selectedProviderName].apiKey ? voidSettingsState.settingsOfProvider[selectedProviderName].apiKey.length > 15 : true
-	const isAtLeastOneModel = selectedProviderName && voidSettingsState.settingsOfProvider[selectedProviderName].models.length >= 1
+	const didFillInProviderSettings = selectedProviderName && statuzSettingsState.settingsOfProvider[selectedProviderName]._didFillInProviderSettings
+	const isApiKeyLongEnoughIfApiKeyExists = selectedProviderName && statuzSettingsState.settingsOfProvider[selectedProviderName].apiKey ? statuzSettingsState.settingsOfProvider[selectedProviderName].apiKey.length > 15 : true
+	const isAtLeastOneModel = selectedProviderName && statuzSettingsState.settingsOfProvider[selectedProviderName].models.length >= 1
 
 	const didFillInSelectedProviderSettings = !!(didFillInProviderSettings && isApiKeyLongEnoughIfApiKeyExists && isAtLeastOneModel)
 
@@ -543,11 +589,11 @@ const VoidOnboardingContent = () => {
 			/>
 			<PrimaryActionButton
 				onClick={() => {
-					voidSettingsService.setGlobalSetting('isOnboardingComplete', true);
-					voidMetricsService.capture('Completed Onboarding', { selectedProviderName, wantToUseOption })
+					statuzSettingsService.setGlobalSetting('isOnboardingComplete', true);
+					statuzMetricsService.capture('Completed Onboarding', { selectedProviderName, wantToUseOption })
 				}}
-				ringSize={voidSettingsState.globalSettings.isOnboardingComplete ? 'screen' : undefined}
-			>Enter the Void</PrimaryActionButton>
+				ringSize={statuzSettingsState.globalSettings.isOnboardingComplete ? 'screen' : undefined}
+			>Start Building</PrimaryActionButton>
 		</div>
 	</div>
 
@@ -586,23 +632,23 @@ const VoidOnboardingContent = () => {
 
 	// reset the page to page 0 if the user redos onboarding
 	useEffect(() => {
-		if (!voidSettingsState.globalSettings.isOnboardingComplete) {
+		if (!statuzSettingsState.globalSettings.isOnboardingComplete) {
 			setPageIndex(0)
 		}
-	}, [setPageIndex, voidSettingsState.globalSettings.isOnboardingComplete])
+	}, [setPageIndex, statuzSettingsState.globalSettings.isOnboardingComplete])
 
 
 	const contentOfIdx: { [pageIndex: number]: React.ReactNode } = {
+		// Page 0: Welcome
 		0: <OnboardingPageShell
 			content={
 				<div className='flex flex-col items-center gap-8'>
-					<div className="text-5xl font-light text-center">Welcome to Void</div>
+					<div className="text-5xl font-light text-center">Welcome to Statuz IDE</div>
 
-					{/* Slice of Void image */}
+					{/* Statuz logo */}
 					<div className='max-w-md w-full h-[30vh] mx-auto flex items-center justify-center'>
-						{!isLinux && <VoidIcon />}
+						{!isLinux && <StatuzIcon isDark={useIsDark()} />}
 					</div>
-
 
 					<FadeIn
 						delayMs={1000}
@@ -618,12 +664,18 @@ const VoidOnboardingContent = () => {
 			}
 		/>,
 
+		// Page 1: Add Providers
 		1: <OnboardingPageShell hasMaxWidth={false}
 			content={
 				<AddProvidersPage pageIndex={pageIndex} setPageIndex={setPageIndex} />
 			}
 		/>,
-		2: <OnboardingPageShell
+
+		// Page 2: Statuz Engine Configuration
+		2: <EngineConfigPage pageIndex={pageIndex} setPageIndex={setPageIndex} />,
+
+		// Page 3: Settings and Themes
+		3: <OnboardingPageShell
 
 			content={
 				<div>

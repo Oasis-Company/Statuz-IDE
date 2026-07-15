@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------------------------
- *  Copyright 2025 Glass Devtools, Inc. All rights reserved.
+ *  Copyright 2026 Statuz. All rights reserved.
  *  Licensed under the Apache License, Version 2.0. See LICENSE.txt for more information.
  *--------------------------------------------------------------------------------------*/
 
@@ -12,7 +12,7 @@ import { IMainProcessService } from '../../../../platform/ipc/common/mainProcess
 import { generateUuid } from '../../../../base/common/uuid.js';
 import { Event } from '../../../../base/common/event.js';
 import { Disposable } from '../../../../base/common/lifecycle.js';
-import { IVoidSettingsService } from './statuzSettingsService.js';
+import { IStatuzSettingsService } from './statuzSettingsService.js';
 import { IMCPService } from './mcpService.js';
 
 // calls channel to implement features
@@ -60,7 +60,7 @@ export class LLMMessageService extends Disposable implements ILLMMessageService 
 
 	constructor(
 		@IMainProcessService private readonly mainProcessService: IMainProcessService, // used as a renderer (only usable on client side)
-		@IVoidSettingsService private readonly voidSettingsService: IVoidSettingsService,
+		@IStatuzSettingsService private readonly voidSettingsService: IStatuzSettingsService,
 		// @INotificationService private readonly notificationService: INotificationService,
 		@IMCPService private readonly mcpService: IMCPService,
 	) {

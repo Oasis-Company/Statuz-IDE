@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------------------------
- *  Copyright 2025 Glass Devtools, Inc. All rights reserved.
+ *  Copyright 2026 Statuz. All rights reserved.
  *  Licensed under the Apache License, Version 2.0. See LICENSE.txt for more information.
  *--------------------------------------------------------------------------------------*/
 
@@ -24,7 +24,7 @@
 }
 
 
-/* Renamed from void-watermark-button to void-openfolder-button */
+/* Renamed to statuz-openfolder-button */
 .statuz-openfolder-button {
     padding: 8px 20px;
     background-color: #306dce;
@@ -94,13 +94,13 @@
 	opacity: 80%;
 }
 
-/* styles for all containers used by void */
+/* styles for all containers used by statuz */
 .statuz-scope {
 	--scrollbar-vertical-width: 8px;
 	--scrollbar-horizontal-height: 6px;
 }
 
-/* Target both void-scope and all its descendants with scrollbars */
+/* Target both statuz-scope and all its descendants with scrollbars */
 .statuz-scope,
 .statuz-scope * {
 	scrollbar-width: thin !important;
@@ -147,7 +147,7 @@
 	background-color: var(--statuz-bg-3) !important;
 }
 
-/* Add void-scrollable-element styles to match */
+/* Add statuz-scrollable-element styles to match */
 .statuz-scrollable-element {
 	background-color: var(--vscode-editor-background);
 	--scrollbar-vertical-width: 14px;

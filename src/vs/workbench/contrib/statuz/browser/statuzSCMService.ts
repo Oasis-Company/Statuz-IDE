@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------------------------
- *  Copyright 2025 Glass Devtools, Inc. All rights reserved.
+ *  Copyright 2026 Statuz. All rights reserved.
  *  Licensed under the Apache License, Version 2.0. See LICENSE.txt for more information.
  *--------------------------------------------------------------------------------------*/
 
@@ -9,9 +9,9 @@ import { Action2, MenuId, registerAction2 } from '../../../../platform/actions/c
 import { ContextKeyExpr, IContextKey, IContextKeyService } from '../../../../platform/contextkey/common/contextkey.js'
 import { ISCMService } from '../../scm/common/scm.js'
 import { ProxyChannel } from '../../../../base/parts/ipc/common/ipc.js'
-import { IVoidSCMService } from '../common/statuzSCMTypes.js'
+import { IStatuzSCMService } from '../common/statuzSCMTypes.js'
 import { IMainProcessService } from '../../../../platform/ipc/common/mainProcessService.js'
-import { IVoidSettingsService } from '../common/statuzSettingsService.js'
+import { IStatuzSettingsService } from '../common/statuzSettingsService.js'
 import { IConvertToLLMMessageService } from './convertToLLMMessageService.js'
 import { ILLMMessageService } from '../common/sendLLMMessageService.js'
 import { ModelSelection, OverridesOfModel, ModelSelectionOptions } from '../common/statuzSettingsTypes.js'
@@ -46,13 +46,13 @@ class GenerateCommitMessageService extends Disposable implements IGenerateCommit
 	private readonly execute = new ThrottledDelayer(300)
 	private llmRequestId: string | null = null
 	private currentRequestId: string | null = null
-	private voidSCM: IVoidSCMService
+	private voidSCM: IStatuzSCMService
 	private loadingContextKey: IContextKey<boolean>
 
 	constructor(
 		@ISCMService private readonly scmService: ISCMService,
 		@IMainProcessService mainProcessService: IMainProcessService,
-		@IVoidSettingsService private readonly voidSettingsService: IVoidSettingsService,
+		@IStatuzSettingsService private readonly voidSettingsService: IStatuzSettingsService,
 		@IConvertToLLMMessageService private readonly convertToLLMMessageService: IConvertToLLMMessageService,
 		@ILLMMessageService private readonly llmMessageService: ILLMMessageService,
 		@IContextKeyService private readonly contextKeyService: IContextKeyService,
@@ -60,7 +60,7 @@ class GenerateCommitMessageService extends Disposable implements IGenerateCommit
 	) {
 		super()
 		this.loadingContextKey = this.contextKeyService.createKey(loadingContextKey, false)
-		this.voidSCM = ProxyChannel.toService<IVoidSCMService>(mainProcessService.getChannel('void-channel-scm'))
+		this.voidSCM = ProxyChannel.toService<IStatuzSCMService>(mainProcessService.getChannel('void-channel-scm'))
 	}
 
 	override dispose() {

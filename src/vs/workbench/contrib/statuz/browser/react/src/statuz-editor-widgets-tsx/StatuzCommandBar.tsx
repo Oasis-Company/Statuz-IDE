@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------------------------
- *  Copyright 2025 Glass Devtools, Inc. All rights reserved.
+ *  Copyright 2026 Statuz. All rights reserved.
  *  Licensed under the Apache License, Version 2.0. See LICENSE.txt for more information.
  *--------------------------------------------------------------------------------------*/
 
@@ -10,26 +10,26 @@ import '../styles.css'
 import { useCallback, useEffect, useState, useRef } from 'react';
 import { ScrollType } from '../../../../../../../editor/common/editorCommon.js';
 import { acceptAllBg, acceptBorder, buttonFontSize, buttonTextColor, rejectAllBg, rejectBg, rejectBorder } from '../../../../common/helpers/colors.js';
-import { VoidCommandBarProps } from '../../../statuzCommandBarService.js';
+import { StatuzCommandBarProps } from '../../../statuzCommandBarService.js';
 import { Check, EllipsisVertical, Menu, MoveDown, MoveLeft, MoveRight, MoveUp, X } from 'lucide-react';
 import {
-	VOID_GOTO_NEXT_DIFF_ACTION_ID,
-	VOID_GOTO_PREV_DIFF_ACTION_ID,
-	VOID_GOTO_NEXT_URI_ACTION_ID,
-	VOID_GOTO_PREV_URI_ACTION_ID,
-	VOID_ACCEPT_FILE_ACTION_ID,
-	VOID_REJECT_FILE_ACTION_ID,
-	VOID_ACCEPT_ALL_DIFFS_ACTION_ID,
-	VOID_REJECT_ALL_DIFFS_ACTION_ID
+	STATUZ_GOTO_NEXT_DIFF_ACTION_ID,
+	STATUZ_GOTO_PREV_DIFF_ACTION_ID,
+	STATUZ_GOTO_NEXT_URI_ACTION_ID,
+	STATUZ_GOTO_PREV_URI_ACTION_ID,
+	STATUZ_ACCEPT_FILE_ACTION_ID,
+	STATUZ_REJECT_FILE_ACTION_ID,
+	STATUZ_ACCEPT_ALL_DIFFS_ACTION_ID,
+	STATUZ_REJECT_ALL_DIFFS_ACTION_ID
 } from '../../../actionIDs.js';
 
-export const VoidCommandBarMain = ({ uri, editor }: VoidCommandBarProps) => {
+export const StatuzCommandBarMain = ({ uri, editor }: StatuzCommandBarProps) => {
 	const isDark = useIsDark()
 
 	return <div
 		className={`@@void-scope ${isDark ? 'dark' : ''}`}
 	>
-		<VoidCommandBar uri={uri} editor={editor} />
+		<StatuzCommandBar uri={uri} editor={editor} />
 	</div>
 }
 
@@ -83,14 +83,14 @@ export const RejectAllButtonWrapper = ({ text, onClick, className, ...props }: {
 
 
 
-export const VoidCommandBar = ({ uri, editor }: VoidCommandBarProps) => {
+export const StatuzCommandBar = ({ uri, editor }: StatuzCommandBarProps) => {
 	const accessor = useAccessor()
 	const editCodeService = accessor.get('IEditCodeService')
 	const editorService = accessor.get('ICodeEditorService')
 	const metricsService = accessor.get('IMetricsService')
 	const commandService = accessor.get('ICommandService')
-	const commandBarService = accessor.get('IVoidCommandBarService')
-	const voidModelService = accessor.get('IVoidModelService')
+	const commandBarService = accessor.get('IStatuzCommandBarService')
+	const voidModelService = accessor.get('IStatuzModelService')
 	const keybindingService = accessor.get('IKeybindingService')
 	const { stateOfURI: commandBarState, sortedURIs: sortedCommandBarURIs } = useCommandBarState()
 	const [showAcceptRejectAllButtons, setShowAcceptRejectAllButtons] = useState(false)
@@ -171,14 +171,14 @@ export const VoidCommandBar = ({ uri, editor }: VoidCommandBarProps) => {
 
 
 
-	const _upKeybinding = keybindingService.lookupKeybinding(VOID_GOTO_PREV_DIFF_ACTION_ID);
-	const _downKeybinding = keybindingService.lookupKeybinding(VOID_GOTO_NEXT_DIFF_ACTION_ID);
-	const _leftKeybinding = keybindingService.lookupKeybinding(VOID_GOTO_PREV_URI_ACTION_ID);
-	const _rightKeybinding = keybindingService.lookupKeybinding(VOID_GOTO_NEXT_URI_ACTION_ID);
-	const _acceptFileKeybinding = keybindingService.lookupKeybinding(VOID_ACCEPT_FILE_ACTION_ID);
-	const _rejectFileKeybinding = keybindingService.lookupKeybinding(VOID_REJECT_FILE_ACTION_ID);
-	const _acceptAllKeybinding = keybindingService.lookupKeybinding(VOID_ACCEPT_ALL_DIFFS_ACTION_ID);
-	const _rejectAllKeybinding = keybindingService.lookupKeybinding(VOID_REJECT_ALL_DIFFS_ACTION_ID);
+	const _upKeybinding = keybindingService.lookupKeybinding(STATUZ_GOTO_PREV_DIFF_ACTION_ID);
+	const _downKeybinding = keybindingService.lookupKeybinding(STATUZ_GOTO_NEXT_DIFF_ACTION_ID);
+	const _leftKeybinding = keybindingService.lookupKeybinding(STATUZ_GOTO_PREV_URI_ACTION_ID);
+	const _rightKeybinding = keybindingService.lookupKeybinding(STATUZ_GOTO_NEXT_URI_ACTION_ID);
+	const _acceptFileKeybinding = keybindingService.lookupKeybinding(STATUZ_ACCEPT_FILE_ACTION_ID);
+	const _rejectFileKeybinding = keybindingService.lookupKeybinding(STATUZ_REJECT_FILE_ACTION_ID);
+	const _acceptAllKeybinding = keybindingService.lookupKeybinding(STATUZ_ACCEPT_ALL_DIFFS_ACTION_ID);
+	const _rejectAllKeybinding = keybindingService.lookupKeybinding(STATUZ_REJECT_ALL_DIFFS_ACTION_ID);
 
 	const upKeybindLabel = editCodeService.processRawKeybindingText(_upKeybinding?.getLabel() || '');
 	const downKeybindLabel = editCodeService.processRawKeybindingText(_downKeybinding?.getLabel() || '');
@@ -377,7 +377,3 @@ export const VoidCommandBar = ({ uri, editor }: VoidCommandBarProps) => {
 		</div>
 	)
 }
-
-
-
-

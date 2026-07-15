@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------------------------
- *  Copyright 2025 Glass Devtools, Inc. All rights reserved.
+ *  Copyright 2026 Statuz. All rights reserved.
  *  Licensed under the Apache License, Version 2.0. See LICENSE.txt for more information.
  *--------------------------------------------------------------------------------------*/
 
@@ -354,7 +354,7 @@ type InputBox2Props = {
 	onBlur?: (e: React.FocusEvent<HTMLTextAreaElement>) => void;
 	onChangeHeight?: (newHeight: number) => void;
 }
-export const VoidInputBox2 = forwardRef<HTMLTextAreaElement, InputBox2Props>(function X({ initValue, placeholder, multiline, enableAtToMention, fnsRef, className, onKeyDown, onFocus, onBlur, onChangeText }, ref) {
+export const StatuzInputBox2 = forwardRef<HTMLTextAreaElement, InputBox2Props>(function X({ initValue, placeholder, multiline, enableAtToMention, fnsRef, className, onKeyDown, onFocus, onBlur, onChangeText }, ref) {
 
 
 	// mirrors whatever is in ref
@@ -878,7 +878,7 @@ export const VoidInputBox2 = forwardRef<HTMLTextAreaElement, InputBox2Props>(fun
 })
 
 
-export const VoidSimpleInputBox = ({ value, onChangeValue, placeholder, className, disabled, passwordBlur, compact, ...inputProps }: {
+export const StatuzSimpleInputBox = ({ value, onChangeValue, placeholder, className, disabled, passwordBlur, compact, ...inputProps }: {
 	value: string;
 	onChangeValue: (value: string) => void;
 	placeholder: string;
@@ -942,7 +942,7 @@ export const VoidSimpleInputBox = ({ value, onChangeValue, placeholder, classNam
 };
 
 
-export const VoidInputBox = ({ onChangeText, onCreateInstance, inputBoxRef, placeholder, isPasswordField, multiline }: {
+export const StatuzInputBox = ({ onChangeText, onCreateInstance, inputBoxRef, placeholder, isPasswordField, multiline }: {
 	onChangeText: (value: string) => void;
 	styles?: Partial<IInputBoxStyles>,
 	onCreateInstance?: (instance: InputBox) => void | IDisposable[];
@@ -1004,7 +1004,7 @@ export const VoidInputBox = ({ onChangeText, onCreateInstance, inputBoxRef, plac
 
 
 
-export const VoidSlider = ({
+export const StatuzSlider = ({
 	value,
 	onChange,
 	size = 'md',
@@ -1165,7 +1165,7 @@ export const VoidSlider = ({
 
 
 
-export const VoidSwitch = ({
+export const StatuzSwitch = ({
 	value,
 	onChange,
 	size = 'md',
@@ -1217,7 +1217,7 @@ export const VoidSwitch = ({
 
 
 
-export const VoidCheckBox = ({ label, value, onClick, className }: { label: string, value: boolean, onClick: (checked: boolean) => void, className?: string }) => {
+export const StatuzCheckBox = ({ label, value, onClick, className }: { label: string, value: boolean, onClick: (checked: boolean) => void, className?: string }) => {
 	const divRef = useRef<HTMLDivElement | null>(null)
 	const instanceRef = useRef<Checkbox | null>(null)
 
@@ -1251,7 +1251,7 @@ export const VoidCheckBox = ({ label, value, onClick, className }: { label: stri
 
 
 
-export const VoidCustomDropdownBox = <T extends NonNullable<any>>({
+export const StatuzCustomDropdownBox = <T extends NonNullable<any>>({
 	options,
 	selectedOption,
 	onChangeOption,
@@ -1478,7 +1478,7 @@ export const VoidCustomDropdownBox = <T extends NonNullable<any>>({
 
 
 
-export const _VoidSelectBox = <T,>({ onChangeSelection, onCreateInstance, selectBoxRef, options, className }: {
+export const _StatuzSelectBox = <T,>({ onChangeSelection, onCreateInstance, selectBoxRef, options, className }: {
 	onChangeSelection: (value: T) => void;
 	onCreateInstance?: ((instance: SelectBox) => void | IDisposable[]);
 	selectBoxRef?: React.MutableRefObject<SelectBox | null>;
@@ -1716,7 +1716,7 @@ export const BlockCode = ({ initValue, language, maxHeight, showScrollbars }: Bl
 }
 
 
-export const VoidButtonBgDarken = ({ children, disabled, onClick, className }: { children: React.ReactNode; disabled?: boolean; onClick: () => void; className?: string }) => {
+export const StatuzButtonBgDarken = ({ children, disabled, onClick, className }: { children: React.ReactNode; disabled?: boolean; onClick: () => void; className?: string }) => {
 	return <button disabled={disabled}
 		className={`px-3 py-1 bg-black/10 dark:bg-white/10 rounded-sm overflow-hidden whitespace-nowrap flex items-center justify-center ${className || ''}`}
 		onClick={onClick}
@@ -1793,7 +1793,7 @@ export const VoidButtonBgDarken = ({ children, disabled, onClick, className }: {
 
 
 
-// export const VoidCheckBox = ({ onChangeChecked, initVal, label, checkboxRef, }: {
+// export const StatuzCheckBox = ({ onChangeChecked, initVal, label, checkboxRef, }: {
 // 	onChangeChecked: (checked: boolean) => void;
 // 	initVal: boolean;
 // 	checkboxRef: React.MutableRefObject<ObjectSettingCheckboxWidget | null>;
@@ -1960,7 +1960,7 @@ const SingleDiffEditor = ({ block, lang }: { block: ExtractedSearchReplaceBlock,
  *   - searchReplaceBlocks: string in search/replace format (from LLM)
  *   - language?: string (optional, fallback to 'plaintext')
  */
-export const VoidDiffEditor = ({ uri, searchReplaceBlocks, language }: { uri?: any, searchReplaceBlocks: string, language?: string }) => {
+export const StatuzDiffEditor = ({ uri, searchReplaceBlocks, language }: { uri?: any, searchReplaceBlocks: string, language?: string }) => {
 	const accessor = useAccessor();
 	const languageService = accessor.get('ILanguageService');
 

@@ -1,9 +1,9 @@
 /*--------------------------------------------------------------------------------------
- *  Copyright 2025 Glass Devtools, Inc. All rights reserved.
+ *  Copyright 2026 Statuz. All rights reserved.
  *  Licensed under the Apache License, Version 2.0. See LICENSE.txt for more information.
  *--------------------------------------------------------------------------------------*/
 
-import { IVoidSettingsService } from './statuzSettingsService.js';
+import { IStatuzSettingsService } from './statuzSettingsService.js';
 import { ILLMMessageService } from './sendLLMMessageService.js';
 import { Emitter, Event } from '../../../../base/common/event.js';
 import { Disposable, IDisposable } from '../../../../base/common/lifecycle.js';
@@ -80,7 +80,7 @@ export class RefreshModelService extends Disposable implements IRefreshModelServ
 
 
 	constructor(
-		@IVoidSettingsService private readonly voidSettingsService: IVoidSettingsService,
+		@IStatuzSettingsService private readonly voidSettingsService: IStatuzSettingsService,
 		@ILLMMessageService private readonly llmMessageService: ILLMMessageService,
 	) {
 		super()

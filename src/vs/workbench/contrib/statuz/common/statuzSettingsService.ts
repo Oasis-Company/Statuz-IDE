@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------------------------
- *  Copyright 2025 Glass Devtools, Inc. All rights reserved.
+ *  Copyright 2026 Statuz. All rights reserved.
  *  Licensed under the Apache License, Version 2.0. See LICENSE.txt for more information.
  *--------------------------------------------------------------------------------------*/
 
@@ -12,7 +12,7 @@ import { createDecorator } from '../../../../platform/instantiation/common/insta
 import { IStorageService, StorageScope, StorageTarget } from '../../../../platform/storage/common/storage.js';
 import { IMetricsService } from './metricsService.js';
 import { defaultProviderSettings, getModelCapabilities, ModelOverrides } from './modelCapabilities.js';
-import { VOID_SETTINGS_STORAGE_KEY } from './storageKeys.js';
+import { STATUZ_SETTINGS_STORAGE_KEY } from './storageKeys.js';
 import { defaultSettingsOfProvider, FeatureName, ProviderName, ModelSelectionOfFeature, SettingsOfProvider, SettingName, providerNames, ModelSelection, modelSelectionsEqual, featureNames, VoidStatefulModelInfo, GlobalSettings, GlobalSettingName, defaultGlobalSettings, ModelSelectionOptions, OptionsOfModelSelection, ChatMode, OverridesOfModel, defaultOverridesOfModel, MCPUserStateOfName as MCPUserStateOfName, MCPUserState } from './statuzSettingsTypes.js';
 
 
@@ -52,7 +52,7 @@ export type VoidSettingsState = {
 // type EventProp<T extends RealVoidSettings = RealVoidSettings> = T extends 'globalSettings' ? [T, keyof VoidSettingsState[T]] : T | 'all'
 
 
-export interface IVoidSettingsService {
+export interface IStatuzSettingsService {
 	readonly _serviceBrand: undefined;
 	readonly state: VoidSettingsState; // in order to play nicely with react, you should immutably change state
 	readonly waitForInitState: Promise<void>;
@@ -225,8 +225,8 @@ const defaultState = () => {
 }
 
 
-export const IVoidSettingsService = createDecorator<IVoidSettingsService>('VoidSettingsService');
-class VoidSettingsService extends Disposable implements IVoidSettingsService {
+export const IStatuzSettingsService = createDecorator<IStatuzSettingsService>('StatuzSettingsService');
+class StatuzSettingsService extends Disposable implements IStatuzSettingsService {
 	_serviceBrand: undefined;
 
 	private readonly _onDidChangeState = new Emitter<void>();
@@ -348,7 +348,7 @@ class VoidSettingsService extends Disposable implements IVoidSettingsService {
 
 
 	private async _readState(): Promise<VoidSettingsState> {
-		const encryptedState = this._storageService.get(VOID_SETTINGS_STORAGE_KEY, StorageScope.APPLICATION)
+		const encryptedState = this._storageService.get(STATUZ_SETTINGS_STORAGE_KEY, StorageScope.APPLICATION)
 
 		if (!encryptedState)
 			return defaultState()
@@ -362,7 +362,7 @@ class VoidSettingsService extends Disposable implements IVoidSettingsService {
 	private async _storeState() {
 		const state = this.state
 		const encryptedState = await this._encryptionService.encrypt(JSON.stringify(state))
-		this._storageService.store(VOID_SETTINGS_STORAGE_KEY, encryptedState, StorageScope.APPLICATION, StorageTarget.USER);
+		this._storageService.store(STATUZ_SETTINGS_STORAGE_KEY, encryptedState, StorageScope.APPLICATION, StorageTarget.USER);
 	}
 
 	setSettingOfProvider: SetSettingOfProviderFn = async (providerName, settingName, newVal) => {
@@ -612,4 +612,4 @@ class VoidSettingsService extends Disposable implements IVoidSettingsService {
 }
 
 
-registerSingleton(IVoidSettingsService, VoidSettingsService, InstantiationType.Eager);
+registerSingleton(IStatuzSettingsService, StatuzSettingsService, InstantiationType.Eager);

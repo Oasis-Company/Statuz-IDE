@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------------------------
- *  Copyright 2025 Glass Devtools, Inc. All rights reserved.
+ *  Copyright 2026 Statuz. All rights reserved.
  *  Licensed under the Apache License, Version 2.0. See LICENSE.txt for more information.
  *--------------------------------------------------------------------------------------*/
 
@@ -17,7 +17,7 @@ import { IMainProcessService } from '../../../../platform/ipc/common/mainProcess
 import { MCPServerOfName, MCPConfigFileJSON, MCPServer, MCPToolCallParams, RawMCPToolCall, MCPServerEventResponse } from './mcpServiceTypes.js';
 import { Event, Emitter } from '../../../../base/common/event.js';
 import { InternalToolInfo } from './prompt/prompts.js';
-import { IVoidSettingsService } from './statuzSettingsService.js';
+import { IStatuzSettingsService } from './statuzSettingsService.js';
 import { MCPUserStateOfName } from './statuzSettingsTypes.js';
 
 
@@ -81,7 +81,7 @@ class MCPService extends Disposable implements IMCPService {
 		@IProductService private readonly productService: IProductService,
 		@IEditorService private readonly editorService: IEditorService,
 		@IMainProcessService private readonly mainProcessService: IMainProcessService,
-		@IVoidSettingsService private readonly voidSettingsService: IVoidSettingsService,
+		@IStatuzSettingsService private readonly voidSettingsService: IStatuzSettingsService,
 	) {
 		super();
 		this.channel = this.mainProcessService.getChannel('void-channel-mcp')

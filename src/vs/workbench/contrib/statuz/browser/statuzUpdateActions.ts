@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------------------------
- *  Copyright 2025 Glass Devtools, Inc. All rights reserved.
+ *  Copyright 2026 Statuz. All rights reserved.
  *  Licensed under the Apache License, Version 2.0. See LICENSE.txt for more information.
  *--------------------------------------------------------------------------------------*/
 
@@ -10,7 +10,7 @@ import { localize2 } from '../../../../nls.js';
 import { Action2, registerAction2 } from '../../../../platform/actions/common/actions.js';
 import { INotificationActions, INotificationHandle, INotificationService } from '../../../../platform/notification/common/notification.js';
 import { IMetricsService } from '../common/metricsService.js';
-import { IVoidUpdateService } from '../common/statuzUpdateService.js';
+import { IStatuzUpdateService } from '../common/statuzUpdateService.js';
 import { IWorkbenchContribution, registerWorkbenchContribution2, WorkbenchPhase } from '../../../common/contributions.js';
 import * as dom from '../../../../base/browser/dom.js';
 import { IUpdateService } from '../../../../platform/update/common/update.js';
@@ -140,7 +140,7 @@ const notifyErrChecking = (notifService: INotificationService): INotificationHan
 const performVoidCheck = async (
 	explicit: boolean,
 	notifService: INotificationService,
-	voidUpdateService: IVoidUpdateService,
+	voidUpdateService: IStatuzUpdateService,
 	metricsService: IMetricsService,
 	updateService: IUpdateService,
 ): Promise<INotificationHandle | null> => {
@@ -181,7 +181,7 @@ registerAction2(class extends Action2 {
 		});
 	}
 	async run(accessor: ServicesAccessor): Promise<void> {
-		const voidUpdateService = accessor.get(IVoidUpdateService)
+		const voidUpdateService = accessor.get(IStatuzUpdateService)
 		const notifService = accessor.get(INotificationService)
 		const metricsService = accessor.get(IMetricsService)
 		const updateService = accessor.get(IUpdateService)
@@ -201,7 +201,7 @@ registerAction2(class extends Action2 {
 class VoidUpdateWorkbenchContribution extends Disposable implements IWorkbenchContribution {
 	static readonly ID = 'workbench.contrib.void.voidUpdate'
 	constructor(
-		@IVoidUpdateService voidUpdateService: IVoidUpdateService,
+		@IStatuzUpdateService voidUpdateService: IStatuzUpdateService,
 		@IMetricsService metricsService: IMetricsService,
 		@INotificationService notifService: INotificationService,
 		@IUpdateService updateService: IUpdateService,

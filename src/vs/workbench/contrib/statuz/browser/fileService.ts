@@ -7,16 +7,16 @@ import { IFileService } from '../../../../platform/files/common/files.js';
 import { IClipboardService } from '../../../../platform/clipboard/common/clipboardService.js';
 import { IDirectoryStrService } from '../common/directoryStrService.js';
 import { messageOfSelection } from '../common/prompt/prompts.js';
-import { IVoidModelService } from '../common/statuzModelService.js';
+import { IStatuzModelService } from '../common/statuzModelService.js';
 
 
 
 class FilePromptActionService extends Action2 {
-	private static readonly VOID_COPY_FILE_PROMPT_ID = 'void.copyfileprompt'
+	private static readonly STATUZ_COPY_FILE_PROMPT_ID = 'void.copyfileprompt'
 
 	constructor() {
 		super({
-			id: FilePromptActionService.VOID_COPY_FILE_PROMPT_ID,
+			id: FilePromptActionService.STATUZ_COPY_FILE_PROMPT_ID,
 			title: localize2('voidCopyPrompt', 'Void: Copy Prompt'),
 			menu: [{
 				id: MenuId.ExplorerContext,
@@ -31,7 +31,7 @@ class FilePromptActionService extends Action2 {
 			const fileService = accessor.get(IFileService);
 			const clipboardService = accessor.get(IClipboardService)
 			const directoryStrService = accessor.get(IDirectoryStrService)
-			const voidModelService = accessor.get(IVoidModelService)
+			const voidModelService = accessor.get(IStatuzModelService)
 
 			const stat = await fileService.stat(uri)
 

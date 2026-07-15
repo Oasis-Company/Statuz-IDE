@@ -126,12 +126,12 @@ import ErrorTelemetry from '../../platform/telemetry/electron-main/errorTelemetr
 // in theory this is not allowed
 // ignore the eslint errors below
 import { IMetricsService } from '../../workbench/contrib/statuz/common/metricsService.js';
-import { IVoidUpdateService } from '../../workbench/contrib/statuz/common/statuzUpdateService.js';
+import { IStatuzUpdateService } from '../../workbench/contrib/statuz/common/statuzUpdateService.js';
 import { MetricsMainService } from '../../workbench/contrib/statuz/electron-main/metricsMainService.js';
-import { VoidMainUpdateService } from '../../workbench/contrib/statuz/electron-main/statuzUpdateMainService.js';
+import { StatuzMainUpdateService } from '../../workbench/contrib/statuz/electron-main/statuzUpdateMainService.js';
 import { LLMMessageChannel } from '../../workbench/contrib/statuz/electron-main/sendLLMMessageChannel.js';
-import { VoidSCMService } from '../../workbench/contrib/statuz/electron-main/statuzSCMMainService.js';
-import { IVoidSCMService } from '../../workbench/contrib/statuz/common/statuzSCMTypes.js';
+import { StatuzSCMService } from '../../workbench/contrib/statuz/electron-main/statuzSCMMainService.js';
+import { IStatuzSCMService } from '../../workbench/contrib/statuz/common/statuzSCMTypes.js';
 import { MCPChannel } from '../../workbench/contrib/statuz/electron-main/mcpChannel.js';
 import { StatuzEngineChannel } from '../../workbench/contrib/statuz/electron-main/engine/statuzEngineChannel.js';
 /**
@@ -1104,8 +1104,8 @@ export class CodeApplication extends Disposable {
 
 		// Void main process services (required for services with a channel for comm between browser and electron-main (node))
 		services.set(IMetricsService, new SyncDescriptor(MetricsMainService, undefined, false));
-		services.set(IVoidUpdateService, new SyncDescriptor(VoidMainUpdateService, undefined, false));
-		services.set(IVoidSCMService, new SyncDescriptor(VoidSCMService, undefined, false));
+		services.set(IStatuzUpdateService, new SyncDescriptor(StatuzMainUpdateService, undefined, false));
+		services.set(IStatuzSCMService, new SyncDescriptor(StatuzSCMService, undefined, false));
 
 		// Default Extensions Profile Init
 		services.set(IExtensionsProfileScannerService, new SyncDescriptor(ExtensionsProfileScannerService, undefined, true));
@@ -1241,14 +1241,14 @@ export class CodeApplication extends Disposable {
 		const metricsChannel = ProxyChannel.fromService(accessor.get(IMetricsService), disposables);
 		mainProcessElectronServer.registerChannel('void-channel-metrics', metricsChannel);
 
-		const voidUpdatesChannel = ProxyChannel.fromService(accessor.get(IVoidUpdateService), disposables);
+		const voidUpdatesChannel = ProxyChannel.fromService(accessor.get(IStatuzUpdateService), disposables);
 		mainProcessElectronServer.registerChannel('void-channel-update', voidUpdatesChannel);
 
 		const sendLLMMessageChannel = new LLMMessageChannel(accessor.get(IMetricsService));
 		mainProcessElectronServer.registerChannel('void-channel-llmMessage', sendLLMMessageChannel);
 
 		// Void added this
-		const voidSCMChannel = ProxyChannel.fromService(accessor.get(IVoidSCMService), disposables);
+		const voidSCMChannel = ProxyChannel.fromService(accessor.get(IStatuzSCMService), disposables);
 		mainProcessElectronServer.registerChannel('void-channel-scm', voidSCMChannel);
 
 		// Void added this

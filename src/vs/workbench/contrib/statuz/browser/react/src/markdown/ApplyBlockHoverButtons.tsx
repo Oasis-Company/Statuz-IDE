@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------------------------
- *  Copyright 2025 Glass Devtools, Inc. All rights reserved.
+ *  Copyright 2026 Statuz. All rights reserved.
  *  Licensed under the Apache License, Version 2.0. See LICENSE.txt for more information.
  *--------------------------------------------------------------------------------------*/
 
@@ -141,7 +141,7 @@ const getUriBeingApplied = (applyBoxId: string) => {
 
 export const useApplyStreamState = ({ applyBoxId }: { applyBoxId: string }) => {
 	const accessor = useAccessor()
-	const voidCommandBarService = accessor.get('IVoidCommandBarService')
+	const voidCommandBarService = accessor.get('IStatuzCommandBarService')
 
 	const getStreamState = useCallback(() => {
 		const uri = getUriBeingApplied(applyBoxId)
@@ -198,7 +198,7 @@ const tooltipPropsForApplyBlock = ({ tooltipName, color = undefined, position = 
 
 export const useEditToolStreamState = ({ applyBoxId, uri }: { applyBoxId: string, uri: URI }) => {
 	const accessor = useAccessor()
-	const voidCommandBarService = accessor.get('IVoidCommandBarService')
+	const voidCommandBarService = accessor.get('IStatuzCommandBarService')
 	const [streamState, setStreamState] = useState(voidCommandBarService.getStreamState(uri))
 	// listen for stream updates on this box
 	useCommandBarURIListener(useCallback((uri_) => {
@@ -351,14 +351,14 @@ const ApplyButtonsForEdit = ({
 		setApplying(newApplyingUri)
 
 		if (!applyDonePromise) {
-			notificationService.info(`Void Error: We couldn't run Apply here. ${uri === 'current' ? 'This Apply block wants to run on the current file, but you might not have a file open.' : `This Apply block wants to run on ${uri.fsPath}, but it might not exist.`}`)
+			notificationService.info(`Statuz IDE Error: We couldn't run Apply here. ${uri === 'current' ? 'This Apply block wants to run on the current file, but you might not have a file open.' : `This Apply block wants to run on ${uri.fsPath}, but it might not exist.`}`)
 		}
 
 		// catch any errors by interrupting the stream
 		applyDonePromise?.catch(e => {
 			const uri = getUriBeingApplied(applyBoxId)
 			if (uri) editCodeService.interruptURIStreaming({ uri: uri })
-			notificationService.info(`Void Error: There was a problem running Apply: ${e}.`)
+			notificationService.info(`Statuz IDE Error: There was a problem running Apply: ${e}.`)
 
 		})
 		metricsService.capture('Apply Code', { length: codeStr.length }) // capture the length only

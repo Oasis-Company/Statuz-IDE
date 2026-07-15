@@ -11,7 +11,7 @@ type VoidModelType = {
 	editorModel: IResolvedTextEditorModel | null;
 };
 
-export interface IVoidModelService {
+export interface IStatuzModelService {
 	readonly _serviceBrand: undefined;
 	initializeModel(uri: URI): Promise<void>;
 	getModel(uri: URI): VoidModelType;
@@ -21,11 +21,11 @@ export interface IVoidModelService {
 
 }
 
-export const IVoidModelService = createDecorator<IVoidModelService>('voidVoidModelService');
+export const IStatuzModelService = createDecorator<IStatuzModelService>('statuzModelService');
 
-class VoidModelService extends Disposable implements IVoidModelService {
+class StatuzModelService extends Disposable implements IStatuzModelService {
 	_serviceBrand: undefined;
-	static readonly ID = 'voidVoidModelService';
+	static readonly ID = 'statuzModelService';
 	private readonly _modelRefOfURI: Record<string, IReference<IResolvedTextEditorModel>> = {};
 
 	constructor(
@@ -87,4 +87,4 @@ class VoidModelService extends Disposable implements IVoidModelService {
 	}
 }
 
-registerSingleton(IVoidModelService, VoidModelService, InstantiationType.Eager);
+registerSingleton(IStatuzModelService, StatuzModelService, InstantiationType.Eager);

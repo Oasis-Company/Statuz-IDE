@@ -149,7 +149,7 @@ The engine will be integrated into Statuz IDE via napi-rs native modules when re
 
 ## Origin & License
 
-Statuz IDE is a fork of [Void](https://github.com/voideditor/void), which is itself a fork of [VS Code](https://github.com/microsoft/vscode).
+Statuz IDE is a fork based on code originally from [Void](https://github.com/voideditor/void), which is itself a fork of [VS Code](https://github.com/microsoft/vscode).
 
 This project is licensed under the [MIT License](./LICENSE.txt). The VS Code portions are licensed under the [MIT License](./LICENSE-VS-Code.txt) as provided by Microsoft.
 

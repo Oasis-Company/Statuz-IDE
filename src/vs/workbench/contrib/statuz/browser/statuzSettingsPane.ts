@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------------------------
- *  Copyright 2025 Glass Devtools, Inc. All rights reserved.
+ *  Copyright 2026 Statuz. All rights reserved.
  *  Licensed under the Apache License, Version 2.0. See LICENSE.txt for more information.
  *--------------------------------------------------------------------------------------*/
 
@@ -23,7 +23,7 @@ import { URI } from '../../../../base/common/uri.js';
 import { ContextKeyExpr } from '../../../../platform/contextkey/common/contextkey.js';
 
 
-import { mountVoidSettings } from './react/out/statuz-settings-tsx/index.js'
+import { mountStatuzSettings } from './react/out/statuz-settings-tsx/index.js'
 import { Codicon } from '../../../../base/common/codicons.js';
 import { toDisposable } from '../../../../base/common/lifecycle.js';
 
@@ -90,7 +90,7 @@ class VoidSettingsPane extends EditorPane {
 
 		// Mount React into the scrollable content
 		this.instantiationService.invokeFunction(accessor => {
-			const disposeFn = mountVoidSettings(settingsElt, accessor)?.dispose;
+			const disposeFn = mountStatuzSettings(settingsElt, accessor)?.dispose;
 			this._register(toDisposable(() => disposeFn?.()))
 
 			// setTimeout(() => { // this is a complete hack and I don't really understand how scrollbar works here
@@ -118,11 +118,11 @@ Registry.as<IEditorPaneRegistry>(EditorExtensions.EditorPane).registerEditorPane
 
 
 // register the gear on the top right
-export const VOID_TOGGLE_SETTINGS_ACTION_ID = 'workbench.action.toggleVoidSettings'
+export const STATUZ_TOGGLE_SETTINGS_ACTION_ID = 'workbench.action.toggleVoidSettings'
 registerAction2(class extends Action2 {
 	constructor() {
 		super({
-			id: VOID_TOGGLE_SETTINGS_ACTION_ID,
+			id: STATUZ_TOGGLE_SETTINGS_ACTION_ID,
 			title: nls.localize2('voidSettings', "Void: Toggle Settings"),
 			icon: Codicon.settingsGear,
 			menu: [
@@ -167,11 +167,11 @@ registerAction2(class extends Action2 {
 
 
 
-export const VOID_OPEN_SETTINGS_ACTION_ID = 'workbench.action.openVoidSettings'
+export const STATUZ_OPEN_SETTINGS_ACTION_ID = 'workbench.action.openVoidSettings'
 registerAction2(class extends Action2 {
 	constructor() {
 		super({
-			id: VOID_OPEN_SETTINGS_ACTION_ID,
+			id: STATUZ_OPEN_SETTINGS_ACTION_ID,
 			title: nls.localize2('voidSettingsAction2', "Void: Open Settings"),
 			f1: true,
 			icon: Codicon.settingsGear,
@@ -201,7 +201,7 @@ registerAction2(class extends Action2 {
 MenuRegistry.appendMenuItem(MenuId.GlobalActivity, {
 	group: '0_command',
 	command: {
-		id: VOID_TOGGLE_SETTINGS_ACTION_ID,
+		id: STATUZ_TOGGLE_SETTINGS_ACTION_ID,
 		title: nls.localize('voidSettingsActionGear', "Void\'s Settings")
 	},
 	order: 1

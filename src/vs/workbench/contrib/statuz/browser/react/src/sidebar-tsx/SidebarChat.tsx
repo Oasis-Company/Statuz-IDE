@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------------------------
- *  Copyright 2025 Glass Devtools, Inc. All rights reserved.
+ *  Copyright 2026 Statuz. All rights reserved.
  *  Licensed under the Apache License, Version 2.0. See LICENSE.txt for more information.
  *--------------------------------------------------------------------------------------*/
 
@@ -13,11 +13,11 @@ import { ChatMarkdownRender, ChatMessageLocation, getApplyBoxId } from '../markd
 import { URI } from '../../../../../../../base/common/uri.js';
 import { IDisposable } from '../../../../../../../base/common/lifecycle.js';
 import { ErrorDisplay } from './ErrorDisplay.js';
-import { BlockCode, TextAreaFns, VoidCustomDropdownBox, VoidInputBox2, VoidSlider, VoidSwitch, VoidDiffEditor } from '../util/inputs.js';
+import { BlockCode, TextAreaFns, StatuzCustomDropdownBox, StatuzInputBox2, StatuzSlider, StatuzSwitch, StatuzDiffEditor } from '../util/inputs.js';
 import { ModelDropdown, } from '../statuz-settings-tsx/ModelDropdown.js';
 import { PastThreadsList } from './SidebarThreadSelector.js';
-import { VOID_CTRL_L_ACTION_ID } from '../../../actionIDs.js';
-import { VOID_OPEN_SETTINGS_ACTION_ID } from '../../../statuzSettingsPane.js';
+import { STATUZ_CTRL_L_ACTION_ID } from '../../../actionIDs.js';
+import { STATUZ_OPEN_SETTINGS_ACTION_ID } from '../../../statuzSettingsPane.js';
 import { ChatMode, displayInfoOfProviderName, FeatureName, isFeatureNameDisabled } from '../../../../../../../workbench/contrib/statuz/common/statuzSettingsTypes.js';
 import { ICommandService } from '../../../../../../../platform/commands/common/commands.js';
 import { WarningBox } from '../statuz-settings-tsx/WarningBox.js';
@@ -153,7 +153,7 @@ export const IconLoading = ({ className = '' }: { className?: string }) => {
 const ReasoningOptionSlider = ({ featureName }: { featureName: FeatureName }) => {
 	const accessor = useAccessor()
 
-	const voidSettingsService = accessor.get('IVoidSettingsService')
+	const voidSettingsService = accessor.get('IStatuzSettingsService')
 	const voidSettingsState = useSettingsState()
 
 	const modelSelection = voidSettingsState.modelSelectionOfFeature[featureName]
@@ -171,7 +171,7 @@ const ReasoningOptionSlider = ({ featureName }: { featureName: FeatureName }) =>
 	if (canTurnOffReasoning && !reasoningBudgetSlider) { // if it's just a on/off toggle without a power slider
 		return <div className='flex items-center gap-x-2'>
 			<span className='text-statuz-fg-3 text-xs pointer-events-none inline-block w-10 pr-1'>Thinking</span>
-			<VoidSwitch
+			<StatuzSwitch
 				size='xxs'
 				value={isReasoningEnabled}
 				onChange={(newVal) => {
@@ -195,7 +195,7 @@ const ReasoningOptionSlider = ({ featureName }: { featureName: FeatureName }) =>
 
 		return <div className='flex items-center gap-x-2'>
 			<span className='text-statuz-fg-3 text-xs pointer-events-none inline-block w-10 pr-1'>Thinking</span>
-			<VoidSlider
+			<StatuzSlider
 				width={50}
 				size='xs'
 				min={min}
@@ -226,7 +226,7 @@ const ReasoningOptionSlider = ({ featureName }: { featureName: FeatureName }) =>
 
 		return <div className='flex items-center gap-x-2'>
 			<span className='text-statuz-fg-3 text-xs pointer-events-none inline-block w-10 pr-1'>Thinking</span>
-			<VoidSlider
+			<StatuzSlider
 				width={30}
 				size='xs'
 				min={min}
@@ -263,7 +263,7 @@ const detailOfChatMode = {
 const ChatModeDropdown = ({ className }: { className: string }) => {
 	const accessor = useAccessor()
 
-	const voidSettingsService = accessor.get('IVoidSettingsService')
+	const voidSettingsService = accessor.get('IStatuzSettingsService')
 	const settingsState = useSettingsState()
 
 	const options: ChatMode[] = useMemo(() => ['normal', 'gather', 'agent'], [])
@@ -272,7 +272,7 @@ const ChatModeDropdown = ({ className }: { className: string }) => {
 		voidSettingsService.setGlobalSetting('chatMode', newVal)
 	}, [voidSettingsService])
 
-	return <VoidCustomDropdownBox
+	return <StatuzCustomDropdownBox
 		className={className}
 		options={options}
 		selectedOption={settingsState.globalSettings.chatMode}
@@ -289,7 +289,7 @@ const ChatModeDropdown = ({ className }: { className: string }) => {
 
 
 
-interface VoidChatAreaProps {
+interface StatuzChatAreaProps {
 	// Required
 	children: React.ReactNode; // This will be the input component
 
@@ -319,7 +319,7 @@ interface VoidChatAreaProps {
 	featureName: FeatureName;
 }
 
-export const VoidChatArea: React.FC<VoidChatAreaProps> = ({
+export const StatuzChatArea: React.FC<StatuzChatAreaProps> = ({
 	children,
 	onSubmit,
 	onAbort,
@@ -585,7 +585,7 @@ export const SelectedFiles = (
 
 	const accessor = useAccessor()
 	const commandService = accessor.get('ICommandService')
-	const modelReferenceService = accessor.get('IVoidModelService')
+	const modelReferenceService = accessor.get('IStatuzModelService')
 
 
 
@@ -1138,7 +1138,7 @@ const UserMessageComponent = ({ chatMessage, messageIdx, isCheckpointGhost, curr
 			return null
 		}
 
-		chatbubbleContents = <VoidChatArea
+		chatbubbleContents = <StatuzChatArea
 			featureName='Chat'
 			onSubmit={onSubmit}
 			onAbort={onAbort}
@@ -1149,7 +1149,7 @@ const UserMessageComponent = ({ chatMessage, messageIdx, isCheckpointGhost, curr
 			selections={stagingSelections}
 			setSelections={setStagingSelections}
 		>
-			<VoidInputBox2
+			<StatuzInputBox2
 				enableAtToMention
 				ref={setTextAreaRef}
 				className='min-h-[81px] max-h-[500px] px-0.5'
@@ -1166,7 +1166,7 @@ const UserMessageComponent = ({ chatMessage, messageIdx, isCheckpointGhost, curr
 				fnsRef={textAreaFnsRef}
 				multiline={true}
 			/>
-		</VoidChatArea>
+		</StatuzChatArea>
 	}
 
 	const isMsgAfterCheckpoint = currCheckpointIdx !== undefined && currCheckpointIdx === messageIdx - 1
@@ -1574,7 +1574,7 @@ const ToolRequestAcceptRejectButtons = ({ toolName }: { toolName: ToolName }) =>
 	const accessor = useAccessor()
 	const chatThreadsService = accessor.get('IChatThreadService')
 	const metricsService = accessor.get('IMetricsService')
-	const voidSettingsService = accessor.get('IVoidSettingsService')
+	const voidSettingsService = accessor.get('IStatuzSettingsService')
 	const voidSettingsState = useSettingsState()
 
 	const onAccept = useCallback(() => {
@@ -1671,7 +1671,7 @@ export const ListableToolItem = ({ name, onClick, isSmall, className, showDot }:
 const EditToolChildren = ({ uri, code, type }: { uri: URI | undefined, code: string, type: 'diff' | 'rewrite' }) => {
 
 	const content = type === 'diff' ?
-		<VoidDiffEditor uri={uri} searchReplaceBlocks={code} />
+		<StatuzDiffEditor uri={uri} searchReplaceBlocks={code} />
 		: <ChatMarkdownRender string={`\`\`\`\n${code}\n\`\`\``} codeURI={uri} chatMessageLocation={undefined} />
 
 	return <div className='!select-text cursor-auto'>
@@ -2944,7 +2944,7 @@ export const SidebarChat = () => {
 		await chatThreadsService.abortRunning(threadId)
 	}
 
-	const keybindingString = accessor.get('IKeybindingService').lookupKeybinding(VOID_CTRL_L_ACTION_ID)?.getLabel()
+	const keybindingString = accessor.get('IKeybindingService').lookupKeybinding(STATUZ_CTRL_L_ACTION_ID)?.getLabel()
 
 	const threadId = currentThread.id
 	const currCheckpointIdx = chatThreadsState.allThreads[threadId]?.state?.currCheckpointIdx ?? undefined  // if not exist, treat like checkpoint is last message (infinity)
@@ -3046,7 +3046,7 @@ export const SidebarChat = () => {
 					showDismiss={true}
 				/>
 
-				<WarningBox className='text-sm my-2 mx-4' onClick={() => { commandService.executeCommand(VOID_OPEN_SETTINGS_ACTION_ID) }} text='Open settings' />
+				<WarningBox className='text-sm my-2 mx-4' onClick={() => { commandService.executeCommand(STATUZ_OPEN_SETTINGS_ACTION_ID) }} text='Open settings' />
 			</div>
 		}
 	</ScrollToBottomContainer>
@@ -3063,7 +3063,7 @@ export const SidebarChat = () => {
 		}
 	}, [onSubmit, onAbort, isRunning])
 
-	const inputChatArea = <VoidChatArea
+	const inputChatArea = <StatuzChatArea
 		featureName='Chat'
 		onSubmit={() => onSubmit()}
 		onAbort={onAbort}
@@ -3075,7 +3075,7 @@ export const SidebarChat = () => {
 		setSelections={setSelections}
 		onClickAnywhere={() => { textAreaRef.current?.focus() }}
 	>
-		<VoidInputBox2
+		<StatuzInputBox2
 			enableAtToMention
 			className={`min-h-[81px] px-0.5 py-0.5`}
 			placeholder={`@ to mention, ${keybindingString ? `${keybindingString} to add a selection. ` : ''}Enter instructions...`}
@@ -3087,7 +3087,7 @@ export const SidebarChat = () => {
 			multiline={true}
 		/>
 
-	</VoidChatArea>
+	</StatuzChatArea>
 
 
 	const isLandingPage = previousMessages.length === 0

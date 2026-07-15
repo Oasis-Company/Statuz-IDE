@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------------------------
- *  Copyright 2025 Glass Devtools, Inc. All rights reserved.
+ *  Copyright 2026 Statuz. All rights reserved.
  *  Licensed under the Apache License, Version 2.0. See LICENSE.txt for more information.
  *--------------------------------------------------------------------------------------*/
 
@@ -7,14 +7,14 @@ import { Disposable } from '../../../../base/common/lifecycle.js';
 import { URI } from '../../../../base/common/uri.js';
 import { IWorkspaceContextService } from '../../../../platform/workspace/common/workspace.js';
 import { IWorkbenchContribution, registerWorkbenchContribution2, WorkbenchPhase } from '../../../common/contributions.js';
-import { IVoidModelService } from '../common/statuzModelService.js';
+import { IStatuzModelService } from '../common/statuzModelService.js';
 
 class ConvertContribWorkbenchContribution extends Disposable implements IWorkbenchContribution {
 	static readonly ID = 'workbench.contrib.void.convertcontrib'
 	_serviceBrand: undefined;
 
 	constructor(
-		@IVoidModelService private readonly voidModelService: IVoidModelService,
+		@IStatuzModelService private readonly voidModelService: IStatuzModelService,
 		@IWorkspaceContextService private readonly workspaceContext: IWorkspaceContextService,
 	) {
 		super()

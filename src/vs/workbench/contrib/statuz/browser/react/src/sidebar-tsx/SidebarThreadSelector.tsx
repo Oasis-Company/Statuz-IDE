@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------------------------
- *  Copyright 2025 Glass Devtools, Inc. All rights reserved.
+ *  Copyright 2026 Statuz. All rights reserved.
  *  Licensed under the Apache License, Version 2.0. See LICENSE.txt for more information.
  *--------------------------------------------------------------------------------------*/
 
@@ -204,7 +204,7 @@ const PastThreadElement = ({ pastThread, idx, hoveredIdx, setHoveredIdx, isRunni
 	// 	codeStr={async () => {
 	// 		return JSON.stringify(currentThread.messages, null, 2)
 	// 	}}
-	// 	toolTipName={`Copy As Void Chat`}
+	// 	toolTipName={`Copy As Statuz Chat`}
 	// />
 
 	let firstMsg = null;

@@ -9,11 +9,11 @@ import { ChatMessage } from '../common/chatThreadServiceTypes.js';
 import { getIsReasoningEnabledState, getReservedOutputTokenSpace, getModelCapabilities } from '../common/modelCapabilities.js';
 import { reParsedToolXMLString, chat_systemMessage } from '../common/prompt/prompts.js';
 import { AnthropicLLMChatMessage, AnthropicReasoning, GeminiLLMChatMessage, LLMChatMessage, LLMFIMMessage, OpenAILLMChatMessage, RawToolParamsObj } from '../common/sendLLMMessageTypes.js';
-import { IVoidSettingsService } from '../common/statuzSettingsService.js';
+import { IStatuzSettingsService } from '../common/statuzSettingsService.js';
 import { ChatMode, FeatureName, ModelSelection, ProviderName } from '../common/statuzSettingsTypes.js';
 import { IDirectoryStrService } from '../common/directoryStrService.js';
 import { ITerminalToolService } from './terminalToolService.js';
-import { IVoidModelService } from '../common/statuzModelService.js';
+import { IStatuzModelService } from '../common/statuzModelService.js';
 import { URI } from '../../../../base/common/uri.js';
 import { EndOfLinePreference } from '../../../../editor/common/model.js';
 import { ToolName } from '../common/toolsServiceTypes.js';
@@ -538,8 +538,8 @@ class ConvertToLLMMessageService extends Disposable implements IConvertToLLMMess
 		@IEditorService private readonly editorService: IEditorService,
 		@IDirectoryStrService private readonly directoryStrService: IDirectoryStrService,
 		@ITerminalToolService private readonly terminalToolService: ITerminalToolService,
-		@IVoidSettingsService private readonly voidSettingsService: IVoidSettingsService,
-		@IVoidModelService private readonly voidModelService: IVoidModelService,
+		@IStatuzSettingsService private readonly voidSettingsService: IStatuzSettingsService,
+		@IStatuzModelService private readonly voidModelService: IStatuzModelService,
 		@IMCPService private readonly mcpService: IMCPService,
 	) {
 		super()

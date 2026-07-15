@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------------------------
- *  Copyright 2025 Glass Devtools, Inc. All rights reserved.
+ *  Copyright 2026 Statuz. All rights reserved.
  *  Licensed under the Apache License, Version 2.0. See LICENSE.txt for more information.
  *--------------------------------------------------------------------------------------*/
 
@@ -24,9 +24,9 @@ import { Widget } from '../../../../base/browser/ui/widget.js';
 import { URI } from '../../../../base/common/uri.js';
 import { IConsistentEditorItemService, IConsistentItemService } from './helperServices/consistentItemService.js';
 import { voidPrefixAndSuffix, ctrlKStream_userMessage, ctrlKStream_systemMessage, defaultQuickEditFimTags, rewriteCode_systemMessage, rewriteCode_userMessage, searchReplaceGivenDescription_systemMessage, searchReplaceGivenDescription_userMessage, tripleTick, } from '../common/prompt/prompts.js';
-import { IVoidCommandBarService } from './statuzCommandBarService.js';
+import { IStatuzCommandBarService } from './statuzCommandBarService.js';
 import { IKeybindingService } from '../../../../platform/keybinding/common/keybinding.js';
-import { VOID_ACCEPT_DIFF_ACTION_ID, VOID_REJECT_DIFF_ACTION_ID } from './actionIDs.js';
+import { STATUZ_ACCEPT_DIFF_ACTION_ID, STATUZ_REJECT_DIFF_ACTION_ID } from './actionIDs.js';
 
 import { mountCtrlK } from './react/out/quick-edit-tsx/index.js'
 import { QuickEditPropsType } from './quickEditActions.js';
@@ -39,15 +39,15 @@ import { ILLMMessageService } from '../common/sendLLMMessageService.js';
 import { LLMChatMessage } from '../common/sendLLMMessageTypes.js';
 import { IMetricsService } from '../common/metricsService.js';
 import { IEditCodeService, AddCtrlKOpts, StartApplyingOpts, CallBeforeStartApplyingOpts, } from './editCodeServiceInterface.js';
-import { IVoidSettingsService } from '../common/statuzSettingsService.js';
+import { IStatuzSettingsService } from '../common/statuzSettingsService.js';
 import { FeatureName } from '../common/statuzSettingsTypes.js';
-import { IVoidModelService } from '../common/statuzModelService.js';
+import { IStatuzModelService } from '../common/statuzModelService.js';
 import { deepClone } from '../../../../base/common/objects.js';
 import { acceptBg, acceptBorder, buttonFontSize, buttonTextColor, rejectBg, rejectBorder } from '../common/helpers/colors.js';
 import { DiffArea, Diff, CtrlKZone, VoidFileSnapshot, DiffAreaSnapshotEntry, diffAreaSnapshotKeys, DiffZone, TrackingZone, ComputedDiff } from '../common/editCodeServiceTypes.js';
 import { IConvertToLLMMessageService } from './convertToLLMMessageService.js';
 // import { isMacintosh } from '../../../../base/common/platform.js';
-// import { VOID_OPEN_SETTINGS_ACTION_ID } from './statuzSettingsPane.js';
+// import { STATUZ_OPEN_SETTINGS_ACTION_ID } from './statuzSettingsPane.js';
 
 const numLinesOfStr = (str: string) => str.split('\n').length
 
@@ -192,9 +192,9 @@ class EditCodeService extends Disposable implements IEditCodeService {
 		@IMetricsService private readonly _metricsService: IMetricsService,
 		@INotificationService private readonly _notificationService: INotificationService,
 		// @ICommandService private readonly _commandService: ICommandService,
-		@IVoidSettingsService private readonly _settingsService: IVoidSettingsService,
+		@IStatuzSettingsService private readonly _settingsService: IStatuzSettingsService,
 		// @IFileService private readonly _fileService: IFileService,
-		@IVoidModelService private readonly _voidModelService: IVoidModelService,
+		@IStatuzModelService private readonly _voidModelService: IStatuzModelService,
 		@IConvertToLLMMessageService private readonly _convertToLLMMessageService: IConvertToLLMMessageService,
 	) {
 		super();
@@ -287,7 +287,7 @@ class EditCodeService extends Disposable implements IEditCodeService {
 	// 				label: `Open Void's settings`,
 	// 				tooltip: '',
 	// 				class: undefined,
-	// 				run: () => { this._commandService.executeCommand(VOID_OPEN_SETTINGS_ACTION_ID) }
+	// 				run: () => { this._commandService.executeCommand(STATUZ_OPEN_SETTINGS_ACTION_ID) }
 	// 			}]
 	// 		},
 	// 		source: details ? `(Hold ${isMacintosh ? 'Option' : 'Alt'} to hover) - ${details}\n\nIf this persists, feel free to [report](https://github.com/voideditor/void/issues/new) it.` : undefined
@@ -2305,7 +2305,7 @@ class AcceptRejectInlineWidget extends Widget implements IOverlayWidget {
 			startLine: number,
 			offsetLines: number
 		},
-		@IVoidCommandBarService private readonly _voidCommandBarService: IVoidCommandBarService,
+		@IStatuzCommandBarService private readonly _voidCommandBarService: IStatuzCommandBarService,
 		@IKeybindingService private readonly _keybindingService: IKeybindingService,
 		@IEditCodeService private readonly _editCodeService: IEditCodeService,
 	) {
@@ -2328,8 +2328,8 @@ class AcceptRejectInlineWidget extends Widget implements IOverlayWidget {
 		const lineHeight = editor.getOption(EditorOption.lineHeight);
 
 		const getAcceptRejectText = () => {
-			const acceptKeybinding = this._keybindingService.lookupKeybinding(VOID_ACCEPT_DIFF_ACTION_ID);
-			const rejectKeybinding = this._keybindingService.lookupKeybinding(VOID_REJECT_DIFF_ACTION_ID);
+			const acceptKeybinding = this._keybindingService.lookupKeybinding(STATUZ_ACCEPT_DIFF_ACTION_ID);
+			const rejectKeybinding = this._keybindingService.lookupKeybinding(STATUZ_REJECT_DIFF_ACTION_ID);
 
 			// Use the standalone function directly since we're in a nested class that
 			// can't access EditCodeService's methods

@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------------------------
- *  Copyright 2025 Glass Devtools, Inc. All rights reserved.
+ *  Copyright 2026 Statuz. All rights reserved.
  *  Licensed under the Apache License, Version 2.0. See LICENSE.txt for more information.
  *--------------------------------------------------------------------------------------*/
 
@@ -18,7 +18,7 @@ import { extractCodeFromRegular } from '../common/helpers/extractCodeFromResult.
 import { registerWorkbenchContribution2, WorkbenchPhase } from '../../../common/contributions.js';
 import { ILLMMessageService } from '../common/sendLLMMessageService.js';
 import { isWindows } from '../../../../base/common/platform.js';
-import { IVoidSettingsService } from '../common/statuzSettingsService.js';
+import { IStatuzSettingsService } from '../common/statuzSettingsService.js';
 import { FeatureName } from '../common/statuzSettingsTypes.js';
 import { IConvertToLLMMessageService } from './convertToLLMMessageService.js';
 // import { IContextGatheringService } from './contextGatheringService.js';
@@ -893,7 +893,7 @@ export class AutocompleteService extends Disposable implements IAutocompleteServ
 		@ILLMMessageService private readonly _llmMessageService: ILLMMessageService,
 		@IEditorService private readonly _editorService: IEditorService,
 		@IModelService private readonly _modelService: IModelService,
-		@IVoidSettingsService private readonly _settingsService: IVoidSettingsService,
+		@IStatuzSettingsService private readonly _settingsService: IStatuzSettingsService,
 		@IConvertToLLMMessageService private readonly _convertToLLMMessageService: IConvertToLLMMessageService
 		// @IContextGatheringService private readonly _contextGatheringService: IContextGatheringService,
 	) {
