@@ -44,3 +44,4 @@ electron-test.log
 
 # Generated extension lockfiles (npm regenerates them; tracked copies cause noisy diffs)
 extensions/**/package-lock.json
+.vscode/extensions/**/package-lock.json
