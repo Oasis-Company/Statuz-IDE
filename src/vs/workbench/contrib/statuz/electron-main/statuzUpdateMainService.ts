@@ -79,7 +79,7 @@ export class StatuzMainUpdateService extends Disposable implements IStatuzUpdate
 
 		if (this._updateService.state.type === StateType.Ready) {
 			// Update is ready
-			return { message: 'Restart Void to update!', action: 'restart' } as const
+			return { message: 'Restart Statuz IDE to update!', action: 'restart' } as const
 		}
 
 		if (this._updateService.state.type === StateType.Disabled) {
@@ -112,11 +112,11 @@ export class StatuzMainUpdateService extends Disposable implements IStatuzUpdate
 			if (explicit) {
 				if (response.ok) {
 					if (!isUpToDate) {
-						message = 'A new version of Void is available! Please reinstall (auto-updates are disabled on this OS) - it only takes a second!'
+						message = 'A new version of Statuz IDE is available! Please reinstall (auto-updates are disabled on this OS) - it only takes a second!'
 						action = 'reinstall'
 					}
 					else {
-						message = 'Void is up-to-date!'
+						message = 'Statuz IDE is up-to-date!'
 					}
 				}
 				else {
@@ -127,7 +127,7 @@ export class StatuzMainUpdateService extends Disposable implements IStatuzUpdate
 			// not explicit
 			else {
 				if (response.ok && !isUpToDate) {
-					message = 'A new version of Void is available! Please reinstall (auto-updates are disabled on this OS) - it only takes a second!'
+					message = 'A new version of Statuz IDE is available! Please reinstall (auto-updates are disabled on this OS) - it only takes a second!'
 					action = 'reinstall'
 				}
 				else {

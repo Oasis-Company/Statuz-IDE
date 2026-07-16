@@ -13,12 +13,10 @@ import { ColorScheme } from '../../../../../../../platform/theme/common/theme.js
 import ErrorBoundary from '../sidebar-tsx/ErrorBoundary.js';
 import { isLinux } from '../../../../../../../base/common/platform.js';
 
-const OVERRIDE_VALUE = false
-
 export const StatuzOnboarding = () => {
 
 	const statuzSettingsState = useSettingsState()
-	const isOnboardingComplete = statuzSettingsState.globalSettings.isOnboardingComplete || OVERRIDE_VALUE
+	const isOnboardingComplete = statuzSettingsState.globalSettings.isOnboardingComplete
 
 	const isDark = useIsDark()
 
@@ -45,7 +43,7 @@ const StatuzIcon = ({ isDark }: { isDark: boolean }) => {
 	const strokeColor = isDark ? '#FFFFFF' : '#000000';
 
 	return (
-		<svg viewBox="0 0 256 256" fill="none" className="w-full h-full" style={{ maxWidth: '220px', opacity: '50%' }}>
+		<svg viewBox="0 0 256 256" fill="none" className="w-full h-full" style={{ maxWidth: '220px', opacity: '85%' }}>
 			<line x1="40" y1="184" x2="144" y2="168" stroke={strokeColor} strokeWidth="8" strokeLinecap="round" />
 			<line x1="144" y1="168" x2="112" y2="72" stroke={strokeColor} strokeWidth="8" strokeLinecap="round" />
 			<line x1="112" y1="72" x2="216" y2="56" stroke={strokeColor} strokeWidth="8" strokeLinecap="round" />
@@ -78,6 +76,25 @@ const FadeIn = ({ children, className, delayMs = 0, durationMs, ...props }: { ch
 		</div>
 	)
 }
+
+const StepIndicator = ({ currentStep, totalSteps }: { currentStep: number; totalSteps: number }) => {
+	return (
+		<div className="flex items-center justify-center gap-2 mb-6">
+			{Array.from({ length: totalSteps }).map((_, i) => (
+				<div
+					key={i}
+					className={`h-1.5 rounded-full transition-all duration-300 ${
+						i === currentStep
+							? 'w-8 bg-[#0e70c0]'
+							: i < currentStep
+								? 'w-4 bg-emerald-500/70'
+								: 'w-4 bg-statuz-border-2'
+					}`}
+				/>
+			))}
+		</div>
+	);
+};
 
 // Onboarding
 
@@ -196,7 +213,7 @@ const AddProvidersPage = ({ pageIndex, setPageIndex }: { pageIndex: number, setP
 						Add {displayInfoOfProviderName(providerName).title}
 						{providerName === 'gemini' && (
 							<span
-								data-tooltip-id="void-tooltip-provider-info"
+								data-tooltip-id="statuz-tooltip-provider-info"
 								data-tooltip-content="Gemini 2.5 Pro offers 25 free messages a day, and Gemini 2.5 Flash offers 500. We recommend using models down the line as you run out of free credits."
 								data-tooltip-place="right"
 								className="ml-1 text-xs align-top text-blue-400"
@@ -204,7 +221,7 @@ const AddProvidersPage = ({ pageIndex, setPageIndex }: { pageIndex: number, setP
 						)}
 						{providerName === 'openRouter' && (
 							<span
-								data-tooltip-id="void-tooltip-provider-info"
+								data-tooltip-id="statuz-tooltip-provider-info"
 								data-tooltip-content="OpenRouter offers 50 free messages a day, and 1000 if you deposit $10. Only applies to models labeled ':free'."
 								data-tooltip-place="right"
 								className="ml-1 text-xs align-top text-blue-400"
@@ -292,9 +309,9 @@ const EngineConfigPage = ({ pageIndex, setPageIndex }: { pageIndex: number, setP
 				<div className="w-full max-w-md bg-statuz-bg-2/50 rounded-lg p-5 border border-statuz-border-4">
 					<div className="flex items-center justify-between mb-4">
 						<span className="text-sm font-medium">Engine Status</span>
-						<span className="flex items-center gap-2 text-sm text-amber-500">
-							<span className="w-2 h-2 rounded-full bg-amber-500 inline-block" />
-							Not Connected
+						<span className="flex items-center gap-2 text-sm text-[#0e70c0]">
+							<span className="w-2 h-2 rounded-full bg-[#0e70c0] inline-block animate-pulse" />
+							Preview
 						</span>
 					</div>
 
@@ -308,20 +325,19 @@ const EngineConfigPage = ({ pageIndex, setPageIndex }: { pageIndex: number, setP
 						{/* Engine version */}
 						<div className="flex items-center justify-between text-sm">
 							<span className="text-statuz-fg-3">Engine Version</span>
-							<span className="text-statuz-fg-2 font-mono text-xs">0.1.0 (stub)</span>
+							<span className="text-statuz-fg-2 font-mono text-xs">0.1.0</span>
 						</div>
 
 						{/* Native module status */}
 						<div className="flex items-center justify-between text-sm">
 							<span className="text-statuz-fg-3">Native Module</span>
-							<span className="text-statuz-fg-2 font-mono text-xs text-amber-500">Not integrated</span>
+							<span className="text-statuz-fg-2 font-mono text-xs text-[#0e70c0]">Coming soon</span>
 						</div>
 					</div>
 
 					<div className="mt-4 pt-4 border-t border-statuz-border-4">
 						<p className="text-xs text-statuz-fg-3 leading-relaxed">
-							The native engine module will be integrated in an upcoming milestone.
-							Until then, engine-dependent features will show placeholder states.
+							The Statuz Graph Engine enables advanced codebase analysis, semantic search, and intelligent refactoring. It will be available in an upcoming release.
 						</p>
 					</div>
 				</div>
@@ -374,7 +390,7 @@ const NextButton = ({ onClick, ...props }: { onClick: () => void } & React.Butto
 				} rounded text-black duration-600 transition-all
 			`}
 			{...disabled && {
-				'data-tooltip-id': 'void-tooltip',
+				'data-tooltip-id': 'statuz-tooltip',
 				"data-tooltip-content": 'Please enter all required fields or choose another provider', // (double-click to proceed anyway, can come back in Settings)
 				"data-tooltip-place": 'top',
 			}}
@@ -556,7 +572,7 @@ const StatuzOnboardingContent = () => {
 	}
 
 	const providerNamesOfWantToUseOption: { [wantToUseOption in WantToUseOption]: ProviderName[] } = {
-		smart: ['anthropic', 'openAI', 'gemini', 'openRouter'],
+		smart: ['gemini', 'anthropic', 'openAI', 'openRouter'],
 		private: ['ollama', 'vLLM', 'openAICompatible', 'lmStudio'],
 		cheap: ['gemini', 'deepseek', 'openRouter', 'ollama', 'vLLM'],
 		all: providerNames,
@@ -655,6 +671,7 @@ const StatuzOnboardingContent = () => {
 					>
 						<PrimaryActionButton
 							onClick={() => { setPageIndex(1) }}
+							ringSize="xl"
 						>
 							Get Started
 						</PrimaryActionButton>
@@ -695,6 +712,7 @@ const StatuzOnboardingContent = () => {
 
 
 	return <div key={pageIndex} className="w-full h-[80vh] text-left mx-auto flex flex-col items-center justify-center">
+		<StepIndicator currentStep={pageIndex} totalSteps={Object.keys(contentOfIdx).length} />
 		<ErrorBoundary>
 			{contentOfIdx[pageIndex]}
 		</ErrorBoundary>

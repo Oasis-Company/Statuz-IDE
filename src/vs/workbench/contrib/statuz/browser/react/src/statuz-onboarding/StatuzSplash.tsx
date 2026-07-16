@@ -26,10 +26,10 @@ const StatuzLogo = ({ isDark }: { isDark: boolean }) => {
 type SplashPhase = 'logo-in' | 'tagline-in' | 'hold' | 'fade-out' | 'done';
 
 const PHASE_DURATIONS: Record<SplashPhase, number> = {
-	'logo-in': 1000,       // Statuz logo fades in
-	'tagline-in': 800,     // "Powered by Statuz" fades in below
-	'hold': 1800,          // Both visible
-	'fade-out': 800,       // Everything fades out
+	'logo-in': 900,        // Statuz logo fades in
+	'tagline-in': 700,     // "Powered by Statuz" fades in below
+	'hold': 1600,          // Both visible
+	'fade-out': 700,       // Everything fades out
 	'done': 0,
 };
 

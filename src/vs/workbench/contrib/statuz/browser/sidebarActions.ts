@@ -61,10 +61,10 @@ export const roundRangeToLines = (range: IRange | null | undefined, options: { e
 
 
 
-const STATUZ_OPEN_SIDEBAR_ACTION_ID = 'void.sidebar.open'
+const STATUZ_OPEN_SIDEBAR_ACTION_ID = 'statuz.sidebar.open'
 registerAction2(class extends Action2 {
 	constructor() {
-		super({ id: STATUZ_OPEN_SIDEBAR_ACTION_ID, title: localize2('voidOpenSidebar', 'Void: Open Sidebar'), f1: true });
+		super({ id: STATUZ_OPEN_SIDEBAR_ACTION_ID, title: localize2('statuzOpenSidebar', 'Statuz: Open Sidebar'), f1: true });
 	}
 	async run(accessor: ServicesAccessor): Promise<void> {
 		const viewsService = accessor.get(IViewsService)
@@ -81,7 +81,7 @@ registerAction2(class extends Action2 {
 		super({
 			id: STATUZ_CTRL_L_ACTION_ID,
 			f1: true,
-			title: localize2('voidCmdL', 'Void: Add Selection to Chat'),
+			title: localize2('statuzCmdL', 'Statuz: Add Selection to Chat'),
 			keybinding: {
 				primary: KeyMod.CtrlCmd | KeyCode.KeyL,
 				weight: KeybindingWeight.VoidExtension
@@ -144,7 +144,7 @@ registerAction2(class extends Action2 {
 
 
 // New chat keybind + menu button
-const STATUZ_CMD_SHIFT_L_ACTION_ID = 'void.cmdShiftL'
+const STATUZ_CMD_SHIFT_L_ACTION_ID = 'statuz.cmdShiftL'
 registerAction2(class extends Action2 {
 	constructor() {
 		super({
@@ -209,8 +209,8 @@ registerAction2(class extends Action2 {
 registerAction2(class extends Action2 {
 	constructor() {
 		super({
-			id: 'void.historyAction',
-			title: 'View Past Chats',
+				id: 'statuz.historyAction',
+				title: 'View Past Chats',
 			icon: { id: 'history' },
 			menu: [{ id: MenuId.ViewTitle, group: 'navigation', when: ContextKeyExpr.equals('view', STATUZ_VIEW_ID), }]
 		});
@@ -239,8 +239,8 @@ registerAction2(class extends Action2 {
 registerAction2(class extends Action2 {
 	constructor() {
 		super({
-			id: 'void.settingsAction',
-			title: `Void's Settings`,
+				id: 'statuz.settingsAction',
+				title: `Statuz's Settings`,
 			icon: { id: 'settings-gear' },
 			menu: [{ id: MenuId.ViewTitle, group: 'navigation', when: ContextKeyExpr.equals('view', STATUZ_VIEW_ID), }]
 		});

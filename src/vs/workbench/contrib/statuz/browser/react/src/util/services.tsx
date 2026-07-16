@@ -6,7 +6,7 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { MCPUserState, RefreshableProviderName, SettingsOfProvider } from '../../../../../../../workbench/contrib/statuz/common/statuzSettingsTypes.js'
 import { DisposableStore, IDisposable } from '../../../../../../../base/common/lifecycle.js'
-import { VoidSettingsState } from '../../../../../../../workbench/contrib/statuz/common/statuzSettingsService.js'
+import { StatuzSettingsState } from '../../../../../../../workbench/contrib/statuz/common/statuzSettingsService.js'
 import { ColorScheme } from '../../../../../../../platform/theme/common/theme.js'
 import { RefreshModelStateOfProvider } from '../../../../../../../workbench/contrib/statuz/common/refreshModelService.js'
 
@@ -67,8 +67,8 @@ const chatThreadsStateListeners: Set<(s: ThreadsState) => void> = new Set()
 let chatThreadsStreamState: ThreadStreamState
 const chatThreadsStreamStateListeners: Set<(threadId: string) => void> = new Set()
 
-let settingsState: VoidSettingsState
-const settingsStateListeners: Set<(s: VoidSettingsState) => void> = new Set()
+let settingsState: StatuzSettingsState
+const settingsStateListeners: Set<(s: StatuzSettingsState) => void> = new Set()
 
 let refreshModelState: RefreshModelStateOfProvider
 const refreshModelStateListeners: Set<(s: RefreshModelStateOfProvider) => void> = new Set()

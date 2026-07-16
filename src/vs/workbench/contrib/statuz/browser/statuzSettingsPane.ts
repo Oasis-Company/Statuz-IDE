@@ -32,10 +32,10 @@ import { toDisposable } from '../../../../base/common/lifecycle.js';
 
 class VoidSettingsInput extends EditorInput {
 
-	static readonly ID: string = 'workbench.input.void.settings';
+	static readonly ID: string = 'workbench.input.statuz.settings';
 
 	static readonly RESOURCE = URI.from({ // I think this scheme is invalid, it just shuts up TS
-		scheme: 'void',  // Custom scheme for our editor (try Schemas.https)
+		scheme: 'statuz',  // Custom scheme for our editor (try Schemas.https)
 		path: 'settings'
 	})
 	readonly resource = VoidSettingsInput.RESOURCE;
@@ -49,7 +49,7 @@ class VoidSettingsInput extends EditorInput {
 	}
 
 	override getName(): string {
-		return nls.localize('voidSettingsInputsName', 'Void\'s Settings');
+		return nls.localize('statuzSettingsInputsName', 'Statuz\'s Settings');
 	}
 
 	override getIcon() {
@@ -112,18 +112,18 @@ class VoidSettingsPane extends EditorPane {
 
 // register Settings pane
 Registry.as<IEditorPaneRegistry>(EditorExtensions.EditorPane).registerEditorPane(
-	EditorPaneDescriptor.create(VoidSettingsPane, VoidSettingsPane.ID, nls.localize('VoidSettingsPane', "Void\'s Settings Pane")),
+	EditorPaneDescriptor.create(VoidSettingsPane, VoidSettingsPane.ID, nls.localize('StatuzSettingsPane', "Statuz\'s Settings Pane")),
 	[new SyncDescriptor(VoidSettingsInput)]
 );
 
 
 // register the gear on the top right
-export const STATUZ_TOGGLE_SETTINGS_ACTION_ID = 'workbench.action.toggleVoidSettings'
+export const STATUZ_TOGGLE_SETTINGS_ACTION_ID = 'workbench.action.toggleStatuzSettings'
 registerAction2(class extends Action2 {
 	constructor() {
 		super({
 			id: STATUZ_TOGGLE_SETTINGS_ACTION_ID,
-			title: nls.localize2('voidSettings', "Void: Toggle Settings"),
+			title: nls.localize2('statuzSettings', "Statuz: Toggle Settings"),
 			icon: Codicon.settingsGear,
 			menu: [
 				{
@@ -167,12 +167,12 @@ registerAction2(class extends Action2 {
 
 
 
-export const STATUZ_OPEN_SETTINGS_ACTION_ID = 'workbench.action.openVoidSettings'
+export const STATUZ_OPEN_SETTINGS_ACTION_ID = 'workbench.action.openStatuzSettings'
 registerAction2(class extends Action2 {
 	constructor() {
 		super({
 			id: STATUZ_OPEN_SETTINGS_ACTION_ID,
-			title: nls.localize2('voidSettingsAction2', "Void: Open Settings"),
+			title: nls.localize2('statuzSettingsAction2', "Statuz: Open Settings"),
 			f1: true,
 			icon: Codicon.settingsGear,
 		});
@@ -202,7 +202,7 @@ MenuRegistry.appendMenuItem(MenuId.GlobalActivity, {
 	group: '0_command',
 	command: {
 		id: STATUZ_TOGGLE_SETTINGS_ACTION_ID,
-		title: nls.localize('voidSettingsActionGear', "Void\'s Settings")
+		title: nls.localize('statuzSettingsActionGear', "Statuz\'s Settings")
 	},
 	order: 1
 });

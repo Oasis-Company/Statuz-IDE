@@ -159,8 +159,8 @@ export const defaultModelsOfProvider = {
 
 
 
-export type VoidStaticModelInfo = { // not stateful
-	// Void uses the information below to know how to handle each model.
+export type StatuzStaticModelInfo = { // not stateful
+	// Statuz IDE uses the information below to know how to handle each model.
 	// for some examples, see openAIModelOptions and anthropicModelOptions (below).
 
 	contextWindow: number; // input tokens
@@ -216,7 +216,7 @@ export const modelOverrideKeys = [
 ] as const
 
 export type ModelOverrides = Pick<
-	VoidStaticModelInfo,
+	StatuzStaticModelInfo,
 	(typeof modelOverrideKeys)[number]
 >
 
@@ -235,8 +235,8 @@ type ProviderReasoningIOSettings = {
 
 type VoidStaticProviderInfo = { // doesn't change (not stateful)
 	providerReasoningIOSettings?: ProviderReasoningIOSettings; // input/output settings around thinking (allowed to be empty) - only applied if the model supports reasoning output
-	modelOptions: { [key: string]: VoidStaticModelInfo };
-	modelOptionsFallback: (modelName: string, fallbackKnownValues?: Partial<VoidStaticModelInfo>) => (VoidStaticModelInfo & { modelName: string, recognizedModelName: string }) | null;
+	modelOptions: { [key: string]: StatuzStaticModelInfo };
+	modelOptionsFallback: (modelName: string, fallbackKnownValues?: Partial<StatuzStaticModelInfo>) => (StatuzStaticModelInfo & { modelName: string, recognizedModelName: string }) | null;
 }
 
 
@@ -249,7 +249,7 @@ const defaultModelOptions = {
 	supportsSystemMessage: false,
 	supportsFIM: false,
 	reasoningCapabilities: false,
-} as const satisfies VoidStaticModelInfo
+} as const satisfies StatuzStaticModelInfo
 
 // TODO!!! double check all context sizes below
 // TODO!!! add openrouter common models
@@ -385,7 +385,7 @@ const openSourceModelOptions_assumingOAICompat = {
 		reasoningCapabilities: false,
 		contextWindow: 1_000_000, reservedOutputTokenSpace: 32_000,
 	}
-} as const satisfies { [s: string]: Partial<VoidStaticModelInfo> }
+} as const satisfies { [s: string]: Partial<StatuzStaticModelInfo> }
 
 
 
@@ -395,8 +395,8 @@ const extensiveModelOptionsFallback: VoidStaticProviderInfo['modelOptionsFallbac
 
 	const lower = modelName.toLowerCase()
 
-	const toFallback = <T extends { [s: string]: Omit<VoidStaticModelInfo, 'cost' | 'downloadable'> },>(obj: T, recognizedModelName: string & keyof T)
-		: VoidStaticModelInfo & { modelName: string, recognizedModelName: string } => {
+	const toFallback = <T extends { [s: string]: Omit<StatuzStaticModelInfo, 'cost' | 'downloadable'> },>(obj: T, recognizedModelName: string & keyof T)
+		: StatuzStaticModelInfo & { modelName: string, recognizedModelName: string } => {
 
 		const opts = obj[recognizedModelName]
 		const supportsSystemMessage = opts.supportsSystemMessage === 'separated'
@@ -567,7 +567,7 @@ const anthropicModelOptions = {
 		supportsSystemMessage: 'separated',
 		reasoningCapabilities: false,
 	}
-} as const satisfies { [s: string]: VoidStaticModelInfo }
+} as const satisfies { [s: string]: StatuzStaticModelInfo }
 
 const anthropicSettings: VoidStaticProviderInfo = {
 	providerReasoningIOSettings: {
@@ -700,7 +700,7 @@ const openAIModelOptions = { // https://platform.openai.com/docs/pricing
 		supportsSystemMessage: 'system-role', // ??
 		reasoningCapabilities: false,
 	},
-} as const satisfies { [s: string]: VoidStaticModelInfo }
+} as const satisfies { [s: string]: StatuzStaticModelInfo }
 
 
 // https://platform.openai.com/docs/guides/reasoning?api-mode=chat
@@ -784,7 +784,7 @@ const xAIModelOptions = {
 		specialToolFormat: 'openai-style',
 		reasoningCapabilities: { supportsReasoning: true, canTurnOffReasoning: false, canIOReasoning: false, reasoningSlider: { type: 'effort_slider', values: ['low', 'high'], default: 'low' } },
 	},
-} as const satisfies { [s: string]: VoidStaticModelInfo }
+} as const satisfies { [s: string]: StatuzStaticModelInfo }
 
 const xAISettings: VoidStaticProviderInfo = {
 	modelOptions: xAIModelOptions,
@@ -915,7 +915,7 @@ const geminiModelOptions = { // https://ai.google.dev/gemini-api/docs/pricing
 		specialToolFormat: 'gemini-style',
 		reasoningCapabilities: false,
 	},
-} as const satisfies { [s: string]: VoidStaticModelInfo }
+} as const satisfies { [s: string]: StatuzStaticModelInfo }
 
 const geminiSettings: VoidStaticProviderInfo = {
 	modelOptions: geminiModelOptions,
@@ -940,7 +940,7 @@ const deepseekModelOptions = {
 		cost: { cache_read: .14, input: .55, output: 2.19, },
 		downloadable: false,
 	},
-} as const satisfies { [s: string]: VoidStaticModelInfo }
+} as const satisfies { [s: string]: StatuzStaticModelInfo }
 
 
 const deepseekSettings: VoidStaticProviderInfo = {
@@ -1030,7 +1030,7 @@ const mistralModelOptions = { // https://mistral.ai/products/la-plateforme#prici
 		supportsSystemMessage: 'system-role',
 		reasoningCapabilities: false,
 	},
-} as const satisfies { [s: string]: VoidStaticModelInfo }
+} as const satisfies { [s: string]: StatuzStaticModelInfo }
 
 const mistralSettings: VoidStaticProviderInfo = {
 	modelOptions: mistralModelOptions,
@@ -1079,7 +1079,7 @@ const groqModelOptions = { // https://console.groq.com/docs/models, https://groq
 		supportsSystemMessage: 'system-role',
 		reasoningCapabilities: { supportsReasoning: true, canIOReasoning: true, canTurnOffReasoning: false, openSourceThinkTags: ['<think>', '</think>'] }, // we're using reasoning_format:parsed so really don't need to know openSourceThinkTags
 	},
-} as const satisfies { [s: string]: VoidStaticModelInfo }
+} as const satisfies { [s: string]: StatuzStaticModelInfo }
 const groqSettings: VoidStaticProviderInfo = {
 	modelOptions: groqModelOptions,
 	modelOptionsFallback: (modelName) => { return null },
@@ -1101,7 +1101,7 @@ const groqSettings: VoidStaticProviderInfo = {
 
 // ---------------- GOOGLE VERTEX ----------------
 const googleVertexModelOptions = {
-} as const satisfies Record<string, VoidStaticModelInfo>
+} as const satisfies Record<string, StatuzStaticModelInfo>
 const googleVertexSettings: VoidStaticProviderInfo = {
 	modelOptions: googleVertexModelOptions,
 	modelOptionsFallback: (modelName) => { return null },
@@ -1112,7 +1112,7 @@ const googleVertexSettings: VoidStaticProviderInfo = {
 
 // ---------------- MICROSOFT AZURE ----------------
 const microsoftAzureModelOptions = {
-} as const satisfies Record<string, VoidStaticModelInfo>
+} as const satisfies Record<string, StatuzStaticModelInfo>
 const microsoftAzureSettings: VoidStaticProviderInfo = {
 	modelOptions: microsoftAzureModelOptions,
 	modelOptionsFallback: (modelName) => { return null },
@@ -1123,7 +1123,7 @@ const microsoftAzureSettings: VoidStaticProviderInfo = {
 
 // ---------------- AWS BEDROCK ----------------
 const awsBedrockModelOptions = {
-} as const satisfies Record<string, VoidStaticModelInfo>
+} as const satisfies Record<string, StatuzStaticModelInfo>
 
 const awsBedrockSettings: VoidStaticProviderInfo = {
 	modelOptions: awsBedrockModelOptions,
@@ -1209,7 +1209,7 @@ const ollamaModelOptions = {
 		reasoningCapabilities: false,
 	},
 
-} as const satisfies Record<string, VoidStaticModelInfo>
+} as const satisfies Record<string, StatuzStaticModelInfo>
 
 export const ollamaRecommendedModels = ['qwen2.5-coder:1.5b', 'llama3.1', 'qwq', 'deepseek-r1', 'devstral:latest'] as const satisfies (keyof typeof ollamaModelOptions)[]
 
@@ -1407,7 +1407,7 @@ const openRouterModelOptions_assumingOpenAICompat = {
 		cost: { input: 0.07, output: 0.16 },
 		downloadable: false,
 	}
-} as const satisfies { [s: string]: VoidStaticModelInfo }
+} as const satisfies { [s: string]: StatuzStaticModelInfo }
 
 const openRouterSettings: VoidStaticProviderInfo = {
 	modelOptions: openRouterModelOptions_assumingOpenAICompat,
@@ -1484,7 +1484,7 @@ export const getModelCapabilities = (
 	providerName: ProviderName,
 	modelName: string,
 	overridesOfModel: OverridesOfModel | undefined
-): VoidStaticModelInfo & (
+): StatuzStaticModelInfo & (
 	| { modelName: string; recognizedModelName: string; isUnrecognizedModel: false }
 	| { modelName: string; recognizedModelName?: undefined; isUnrecognizedModel: true }
 ) => {

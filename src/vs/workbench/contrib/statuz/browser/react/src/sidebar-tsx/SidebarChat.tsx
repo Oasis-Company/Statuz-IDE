@@ -425,7 +425,7 @@ export const ButtonSubmit = ({ className, disabled, ...props }: ButtonProps & Re
 			${disabled ? 'bg-vscode-disabled-fg cursor-default' : 'bg-white cursor-pointer'}
 			${className}
 		`}
-		// data-tooltip-id='void-tooltip'
+		// data-tooltip-id='statuz-tooltip'
 		// data-tooltip-content={'Send'}
 		// data-tooltip-place='left'
 		{...props}
@@ -666,7 +666,7 @@ export const SelectedFiles = (
 				>
 					{/* tooltip for file path */}
 					<span className="truncate overflow-hidden text-ellipsis"
-						data-tooltip-id='void-tooltip'
+						data-tooltip-id='statuz-tooltip'
 						data-tooltip-content={getRelative(selection.uri, accessor)}
 						data-tooltip-place='top'
 						data-tooltip-delay-show={3000}
@@ -812,7 +812,7 @@ const ToolHeaderWrapper = ({
 		`}
 		onClick={desc1OnClick}
 		{...desc1Info ? {
-			'data-tooltip-id': 'void-tooltip',
+			'data-tooltip-id': 'statuz-tooltip',
 			'data-tooltip-content': desc1Info,
 			'data-tooltip-place': 'top',
 			'data-tooltip-delay-show': 1000,
@@ -857,7 +857,7 @@ const ToolHeaderWrapper = ({
 						{info && <CircleEllipsis
 							className='ml-2 text-statuz-fg-4 opacity-60 flex-shrink-0'
 							size={14}
-							data-tooltip-id='void-tooltip'
+							data-tooltip-id='statuz-tooltip'
 							data-tooltip-content={info}
 							data-tooltip-place='top-end'
 						/>}
@@ -865,14 +865,14 @@ const ToolHeaderWrapper = ({
 						{isError && <AlertTriangle
 							className='text-statuz-warning opacity-90 flex-shrink-0'
 							size={14}
-							data-tooltip-id='void-tooltip'
+							data-tooltip-id='statuz-tooltip'
 							data-tooltip-content={'Error running tool'}
 							data-tooltip-place='top'
 						/>}
 						{isRejected && <Ban
 							className='text-statuz-fg-4 opacity-90 flex-shrink-0'
 							size={14}
-							data-tooltip-id='void-tooltip'
+							data-tooltip-id='statuz-tooltip'
 							data-tooltip-content={'Canceled'}
 							data-tooltip-place='top'
 						/>}
@@ -1201,7 +1201,7 @@ const UserMessageComponent = ({ chatMessage, messageIdx, isCheckpointGhost, curr
 
 		<div
 			className="absolute -top-1 -right-1 translate-x-0 -translate-y-0 z-1"
-		// data-tooltip-id='void-tooltip'
+		// data-tooltip-id='statuz-tooltip'
 		// data-tooltip-content='Edit message'
 		// data-tooltip-place='left'
 		>
@@ -2481,7 +2481,7 @@ const Checkpoint = ({ message, threadId, messageIdx, isCheckpointGhost, threadIs
 				})
 			}}
 			{...isDisabled ? {
-				'data-tooltip-id': 'void-tooltip',
+				'data-tooltip-id': 'statuz-tooltip',
 				'data-tooltip-content': `Disabled ${isRunning ? 'when running' : 'because another thread is running'}`,
 				'data-tooltip-place': 'top',
 			} : {}}
@@ -2594,7 +2594,7 @@ const CommandBarInChat = () => {
 	// 	<IconShell1
 	// 		Icon={CopyIcon}
 	// 		onClick={copyChatToClipboard}
-	// 		data-tooltip-id='void-tooltip'
+	// 		data-tooltip-id='statuz-tooltip'
 	// 		data-tooltip-place='top'
 	// 		data-tooltip-content='Copy chat JSON'
 	// 	/>
@@ -2672,7 +2672,7 @@ const CommandBarInChat = () => {
 					});
 				});
 			}}
-			data-tooltip-id='void-tooltip'
+			data-tooltip-id='statuz-tooltip'
 			data-tooltip-place='top'
 			data-tooltip-content='Reject all'
 		/>
@@ -2691,7 +2691,7 @@ const CommandBarInChat = () => {
 					});
 				});
 			}}
-			data-tooltip-id='void-tooltip'
+			data-tooltip-id='statuz-tooltip'
 			data-tooltip-place='top'
 			data-tooltip-content='Accept all'
 		/>
@@ -2739,14 +2739,14 @@ const CommandBarInChat = () => {
 			>
 				{/* <JumpToFileButton
 					uri={uri}
-					data-tooltip-id='void-tooltip'
+					data-tooltip-id='statuz-tooltip'
 					data-tooltip-place='top'
 					data-tooltip-content='Go to file'
 				/> */}
 				<IconShell1 // RejectAllButtonWrapper
 					Icon={X}
 					onClick={() => { editCodeService.acceptOrRejectAllDiffAreas({ uri, removeCtrlKs: true, behavior: "reject", _addToHistory: true, }); }}
-					data-tooltip-id='void-tooltip'
+					data-tooltip-id='statuz-tooltip'
 					data-tooltip-place='top'
 					data-tooltip-content='Reject file'
 
@@ -2754,7 +2754,7 @@ const CommandBarInChat = () => {
 				<IconShell1 // AcceptAllButtonWrapper
 					Icon={Check}
 					onClick={() => { editCodeService.acceptOrRejectAllDiffAreas({ uri, removeCtrlKs: true, behavior: "accept", _addToHistory: true, }); }}
-					data-tooltip-id='void-tooltip'
+					data-tooltip-id='statuz-tooltip'
 					data-tooltip-place='top'
 					data-tooltip-content='Accept file'
 				/>
@@ -3097,7 +3097,7 @@ export const SidebarChat = () => {
 		{[
 			'Summarize my codebase',
 			'How do types work in Rust?',
-			'Create a .voidrules file for me'
+			'Create a .statuzrules file for me'
 		].map((text, index) => (
 			<div
 				key={index}

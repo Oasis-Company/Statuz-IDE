@@ -57,7 +57,7 @@ export type ExtensionVirtualWorkspaceSupport = {
 
 export interface IProductConfiguration {
 	readonly version: string;
-	readonly voidVersion?: string;
+	readonly statuzVersion?: string;
 	readonly release?: string; // Statuz IDE - VSCodium added this, we add it for TS
 	readonly date?: string;
 	readonly quality?: string;

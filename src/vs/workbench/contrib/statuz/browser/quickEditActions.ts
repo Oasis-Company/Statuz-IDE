@@ -38,7 +38,7 @@ registerAction2(class extends Action2 {
 		super({
 			id: STATUZ_CTRL_K_ACTION_ID,
 			f1: true,
-			title: localize2('voidQuickEditAction', 'Void: Quick Edit'),
+			title: localize2('statuzQuickEditAction', 'Statuz: Quick Edit'),
 			keybinding: {
 				primary: KeyMod.CtrlCmd | KeyCode.KeyK,
 				weight: KeybindingWeight.VoidExtension,

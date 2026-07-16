@@ -101,14 +101,14 @@ class SidebarViewPane extends ViewPane {
 // const voidViewIcon = registerIcon('void-view-icon', voidThemeIcon, localize('voidViewIcon', 'View icon of the Void chat view.'));
 
 // called VIEWLET_ID in other places for some reason
-export const STATUZ_VIEW_CONTAINER_ID = 'workbench.view.void'
+export const STATUZ_VIEW_CONTAINER_ID = 'workbench.view.statuz'
 export const STATUZ_VIEW_ID = STATUZ_VIEW_CONTAINER_ID
 
 // Register view container
 const viewContainerRegistry = Registry.as<IViewContainersRegistry>(ViewContainerExtensions.ViewContainersRegistry);
 const container = viewContainerRegistry.registerViewContainer({
 	id: STATUZ_VIEW_CONTAINER_ID,
-	title: nls.localize2('statuzContainer', 'Chat'), // this is used to say "Void" (Ctrl + L)
+	title: nls.localize2('statuzContainer', 'Chat'), // this is used to say "Statuz" (Ctrl + L)
 	ctorDescriptor: new SyncDescriptor(ViewPaneContainer, [STATUZ_VIEW_CONTAINER_ID, {
 		mergeViewWithContainerWhenSingleView: true,
 		orientation: Orientation.HORIZONTAL,
@@ -130,7 +130,7 @@ viewsRegistry.registerViews([{
 	id: STATUZ_VIEW_ID,
 	hideByDefault: false, // start open
 	// containerIcon: voidViewIcon,
-	name: nls.localize2('voidChat', ''), // this says ... : CHAT
+	name: nls.localize2('statuzChat', ''), // this says ... : CHAT
 	ctorDescriptor: new SyncDescriptor(SidebarViewPane),
 	canToggleVisibility: false,
 	canMoveView: false, // can't move this out of its container
@@ -149,12 +149,12 @@ viewsRegistry.registerViews([{
 
 
 // open sidebar
-export const STATUZ_OPEN_SIDEBAR_ACTION_ID = 'void.openSidebar'
+export const STATUZ_OPEN_SIDEBAR_ACTION_ID = 'statuz.openSidebar'
 registerAction2(class extends Action2 {
 	constructor() {
 		super({
 			id: STATUZ_OPEN_SIDEBAR_ACTION_ID,
-			title: 'Open Void Sidebar',
+			title: 'Open Statuz Sidebar',
 		})
 	}
 	run(accessor: ServicesAccessor): void {
@@ -164,7 +164,7 @@ registerAction2(class extends Action2 {
 });
 
 export class SidebarStartContribution implements IWorkbenchContribution {
-	static readonly ID = 'workbench.contrib.startupVoidSidebar';
+	static readonly ID = 'workbench.contrib.startupStatuzSidebar';
 	constructor(
 		@ICommandService private readonly commandService: ICommandService,
 	) {

@@ -13,7 +13,7 @@ import { IStorageService, StorageScope, StorageTarget } from '../../../../platfo
 import { IMetricsService } from './metricsService.js';
 import { defaultProviderSettings, getModelCapabilities, ModelOverrides } from './modelCapabilities.js';
 import { STATUZ_SETTINGS_STORAGE_KEY } from './storageKeys.js';
-import { defaultSettingsOfProvider, FeatureName, ProviderName, ModelSelectionOfFeature, SettingsOfProvider, SettingName, providerNames, ModelSelection, modelSelectionsEqual, featureNames, VoidStatefulModelInfo, GlobalSettings, GlobalSettingName, defaultGlobalSettings, ModelSelectionOptions, OptionsOfModelSelection, ChatMode, OverridesOfModel, defaultOverridesOfModel, MCPUserStateOfName as MCPUserStateOfName, MCPUserState } from './statuzSettingsTypes.js';
+import { defaultSettingsOfProvider, FeatureName, ProviderName, ModelSelectionOfFeature, SettingsOfProvider, SettingName, providerNames, ModelSelection, modelSelectionsEqual, featureNames, StatuzStatefulModelInfo, GlobalSettings, GlobalSettingName, defaultGlobalSettings, ModelSelectionOptions, OptionsOfModelSelection, ChatMode, OverridesOfModel, defaultOverridesOfModel, MCPUserStateOfName as MCPUserStateOfName, MCPUserState } from './statuzSettingsTypes.js';
 
 
 // name is the name in the dropdown
@@ -37,7 +37,7 @@ type SetGlobalSettingFn = <T extends GlobalSettingName>(settingName: T, newVal: 
 type SetOptionsOfModelSelection = (featureName: FeatureName, providerName: ProviderName, modelName: string, newVal: Partial<ModelSelectionOptions>) => void
 
 
-export type VoidSettingsState = {
+export type StatuzSettingsState = {
 	readonly settingsOfProvider: SettingsOfProvider; // optionsOfProvider
 	readonly modelSelectionOfFeature: ModelSelectionOfFeature; // stateOfFeature
 	readonly optionsOfModelSelection: OptionsOfModelSelection;
@@ -48,13 +48,13 @@ export type VoidSettingsState = {
 	readonly _modelOptions: ModelOption[] // computed based on the two above items
 }
 
-// type RealVoidSettings = Exclude<keyof VoidSettingsState, '_modelOptions'>
-// type EventProp<T extends RealVoidSettings = RealVoidSettings> = T extends 'globalSettings' ? [T, keyof VoidSettingsState[T]] : T | 'all'
+// type RealVoidSettings = Exclude<keyof StatuzSettingsState, '_modelOptions'>
+// type EventProp<T extends RealVoidSettings = RealVoidSettings> = T extends 'globalSettings' ? [T, keyof StatuzSettingsState[T]] : T | 'all'
 
 
 export interface IStatuzSettingsService {
 	readonly _serviceBrand: undefined;
-	readonly state: VoidSettingsState; // in order to play nicely with react, you should immutably change state
+	readonly state: StatuzSettingsState; // in order to play nicely with react, you should immutably change state
 	readonly waitForInitState: Promise<void>;
 
 	onDidChangeState: Event<void>;
@@ -68,7 +68,7 @@ export interface IStatuzSettingsService {
 	// setting to undefined CLEARS it, unlike others:
 	setOverridesOfModel(providerName: ProviderName, modelName: string, overrides: Partial<ModelOverrides> | undefined): Promise<void>;
 
-	dangerousSetState(newState: VoidSettingsState): Promise<void>;
+	dangerousSetState(newState: StatuzSettingsState): Promise<void>;
 	resetState(): Promise<void>;
 
 	setAutodetectedModels(providerName: ProviderName, modelNames: string[], logging: object): void;
@@ -84,10 +84,10 @@ export interface IStatuzSettingsService {
 
 
 
-const _modelsWithSwappedInNewModels = (options: { existingModels: VoidStatefulModelInfo[], models: string[], type: 'autodetected' | 'default' }) => {
+const _modelsWithSwappedInNewModels = (options: { existingModels: StatuzStatefulModelInfo[], models: string[], type: 'autodetected' | 'default' }) => {
 	const { existingModels, models, type } = options
 
-	const existingModelsMap: Record<string, VoidStatefulModelInfo> = {}
+	const existingModelsMap: Record<string, StatuzStatefulModelInfo> = {}
 	for (const existingModel of existingModels) {
 		existingModelsMap[existingModel.modelName] = existingModel
 	}
@@ -120,7 +120,7 @@ export const modelFilterOfFeatureName: {
 }
 
 
-const _stateWithMergedDefaultModels = (state: VoidSettingsState): VoidSettingsState => {
+const _stateWithMergedDefaultModels = (state: StatuzSettingsState): StatuzSettingsState => {
 	let newSettingsOfProvider = state.settingsOfProvider
 
 	// recompute default models
@@ -143,7 +143,7 @@ const _stateWithMergedDefaultModels = (state: VoidSettingsState): VoidSettingsSt
 	}
 }
 
-const _validatedModelState = (state: Omit<VoidSettingsState, '_modelOptions'>): VoidSettingsState => {
+const _validatedModelState = (state: Omit<StatuzSettingsState, '_modelOptions'>): StatuzSettingsState => {
 
 	let newSettingsOfProvider = state.settingsOfProvider
 
@@ -202,7 +202,7 @@ const _validatedModelState = (state: Omit<VoidSettingsState, '_modelOptions'>): 
 		modelSelectionOfFeature: newModelSelectionOfFeature,
 		overridesOfModel: state.overridesOfModel,
 		_modelOptions: newModelOptions,
-	} satisfies VoidSettingsState
+	} satisfies StatuzSettingsState
 
 	return newState
 }
@@ -212,7 +212,7 @@ const _validatedModelState = (state: Omit<VoidSettingsState, '_modelOptions'>): 
 
 
 const defaultState = () => {
-	const d: VoidSettingsState = {
+	const d: StatuzSettingsState = {
 		settingsOfProvider: deepClone(defaultSettingsOfProvider),
 		modelSelectionOfFeature: { 'Chat': null, 'Ctrl+K': null, 'Autocomplete': null, 'Apply': null, 'SCM': null },
 		globalSettings: deepClone(defaultGlobalSettings),
@@ -232,7 +232,7 @@ class StatuzSettingsService extends Disposable implements IStatuzSettingsService
 	private readonly _onDidChangeState = new Emitter<void>();
 	readonly onDidChangeState: Event<void> = this._onDidChangeState.event; // this is primarily for use in react, so react can listen + update on state changes
 
-	state: VoidSettingsState;
+	state: StatuzSettingsState;
 
 	private readonly _resolver: () => void
 	waitForInitState: Promise<void> // await this if you need a valid state initially
@@ -258,7 +258,7 @@ class StatuzSettingsService extends Disposable implements IStatuzSettingsService
 
 
 
-	dangerousSetState = async (newState: VoidSettingsState) => {
+	dangerousSetState = async (newState: StatuzSettingsState) => {
 		this.state = _validatedModelState(newState)
 		await this._storeState()
 		this._onDidChangeState.fire()
@@ -273,7 +273,7 @@ class StatuzSettingsService extends Disposable implements IStatuzSettingsService
 
 
 	async readAndInitializeState() {
-		let readS: VoidSettingsState
+		let readS: StatuzSettingsState
 		try {
 			readS = await this._readState();
 			// 1.0.3 addition, remove when enough users have had this code run
@@ -347,7 +347,7 @@ class StatuzSettingsService extends Disposable implements IStatuzSettingsService
 	}
 
 
-	private async _readState(): Promise<VoidSettingsState> {
+	private async _readState(): Promise<StatuzSettingsState> {
 		const encryptedState = this._storageService.get(STATUZ_SETTINGS_STORAGE_KEY, StorageScope.APPLICATION)
 
 		if (!encryptedState)
@@ -410,7 +410,7 @@ class StatuzSettingsService extends Disposable implements IStatuzSettingsService
 	}
 
 	setGlobalSetting: SetGlobalSettingFn = async (settingName, newVal) => {
-		const newState: VoidSettingsState = {
+		const newState: StatuzSettingsState = {
 			...this.state,
 			globalSettings: {
 				...this.state.globalSettings,
@@ -429,7 +429,7 @@ class StatuzSettingsService extends Disposable implements IStatuzSettingsService
 
 
 	setModelSelectionOfFeature: SetModelSelectionOfFeatureFn = async (featureName, newVal) => {
-		const newState: VoidSettingsState = {
+		const newState: StatuzSettingsState = {
 			...this.state,
 			modelSelectionOfFeature: {
 				...this.state.modelSelectionOfFeature,
@@ -452,7 +452,7 @@ class StatuzSettingsService extends Disposable implements IStatuzSettingsService
 
 
 	setOptionsOfModelSelection = async (featureName: FeatureName, providerName: ProviderName, modelName: string, newVal: Partial<ModelSelectionOptions>) => {
-		const newState: VoidSettingsState = {
+		const newState: StatuzSettingsState = {
 			...this.state,
 			optionsOfModelSelection: {
 				...this.state.optionsOfModelSelection,
@@ -475,7 +475,7 @@ class StatuzSettingsService extends Disposable implements IStatuzSettingsService
 	}
 
 	setOverridesOfModel = async (providerName: ProviderName, modelName: string, overrides: Partial<ModelOverrides> | undefined) => {
-		const newState: VoidSettingsState = {
+		const newState: StatuzSettingsState = {
 			...this.state,
 			overridesOfModel: {
 				...this.state.overridesOfModel,
@@ -522,7 +522,7 @@ class StatuzSettingsService extends Disposable implements IStatuzSettingsService
 		const modelIdx = models.findIndex(m => m.modelName === modelName)
 		if (modelIdx === -1) return
 		const newIsHidden = !models[modelIdx].isHidden
-		const newModels: VoidStatefulModelInfo[] = [
+		const newModels: StatuzStatefulModelInfo[] = [
 			...models.slice(0, modelIdx),
 			{ ...models[modelIdx], isHidden: newIsHidden },
 			...models.slice(modelIdx + 1, Infinity)
@@ -562,7 +562,7 @@ class StatuzSettingsService extends Disposable implements IStatuzSettingsService
 
 	// MCP Server State
 	private _setMCPUserStateOfName = async (newStates: MCPUserStateOfName) => {
-		const newState: VoidSettingsState = {
+		const newState: StatuzSettingsState = {
 			...this.state,
 			mcpUserStateOfName: {
 				...this.state.mcpUserStateOfName,
