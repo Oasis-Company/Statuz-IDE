@@ -11,6 +11,12 @@ import './editCodeService.js'
 import './sidebarActions.js'
 import './sidebarPane.js'
 
+// register Dashboard pane (Activity Bar)
+import './dashboardPane.js'
+
+// register Sandboxer Board pane (Activity Bar)
+import './boardPane.js'
+
 // register quick edit (Ctrl+K)
 import './quickEditActions.js'
 
