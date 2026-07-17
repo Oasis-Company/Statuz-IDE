@@ -1,0 +1,1460 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Statuz IDE 法律合规 — 执行方案</title>
+<style>
+/* ===== FONTS ===== */
+@font-face {
+  font-family: 'Inter';
+  src: url('./_shared/fonts/InstrumentSans-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Inter';
+  src: url('./_shared/fonts/InstrumentSans-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Inter Mono';
+  src: url('./_shared/fonts/JetBrainsMono-Regular.ttf') format('truetype');
+  font-weight: 400;
+}
+@font-face {
+  font-family: 'Inter Mono';
+  src: url('./_shared/fonts/JetBrainsMono-Bold.ttf') format('truetype');
+  font-weight: 700;
+}
+
+/* ===== VARIABLES ===== */
+:root {
+  --bg: #0a0e1a;
+  --bg2: #141829;
+  --ink: #e2e4e9;
+  --muted: #7b8296;
+  --rule: #252a3a;
+  --accent: #3b82f6;
+  --accent2: #10b981;
+  --critical: #ef4444;
+  --high: #f97316;
+  --medium: #f59e0b;
+  --low: #3b82f6;
+  --code-bg: #0d1117;
+  --del: #f85149;
+  --add: #3fb950;
+}
+
+/* ===== RESET ===== */
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans SC', sans-serif;
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--ink);
+  background: var(--bg);
+}
+
+.container { max-width: 960px; margin: 0 auto; padding: 0 2rem; }
+
+/* ===== HERO ===== */
+.hero {
+  background: linear-gradient(180deg, #0d1a2d 0%, var(--bg) 100%);
+  padding: 5rem 0 4rem;
+  border-bottom: 1px solid var(--rule);
+  text-align: center;
+}
+.hero .badge {
+  display: inline-block;
+  padding: 4px 16px;
+  border-radius: 100px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: rgba(16,185,129,0.12);
+  color: var(--accent2);
+  margin-bottom: 1.5rem;
+}
+.hero h1 {
+  font-size: 2.4rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.75rem;
+  color: #fff;
+}
+.hero .subtitle {
+  font-size: 1.05rem;
+  color: var(--muted);
+  max-width: 640px;
+  margin: 0 auto 2rem;
+}
+.hero .meta {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  font-size: 0.8rem;
+  color: var(--muted);
+  flex-wrap: wrap;
+}
+
+/* ===== SECTIONS ===== */
+section {
+  padding: 2.5rem 0;
+  border-bottom: 1px solid var(--rule);
+}
+section:last-of-type { border-bottom: none; }
+
+h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 0.5rem;
+  letter-spacing: -0.01em;
+}
+h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--ink);
+  margin: 1.8rem 0 0.6rem;
+}
+h4 {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: #fff;
+  margin: 1.2rem 0 0.4rem;
+}
+p { margin: 0.5rem 0; color: var(--ink); }
+strong { color: #fff; }
+
+/* ===== SEVERITY BADGES ===== */
+.sev {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.sev-critical { background: rgba(239,68,68,0.15); color: #ef4444; }
+.sev-high    { background: rgba(249,115,22,0.15); color: #f97316; }
+.sev-medium  { background: rgba(245,158,11,0.15); color: #f59e0b; }
+.sev-low     { background: rgba(59,130,246,0.15); color: #3b82f6; }
+
+/* ===== SCORECARD ===== */
+.scorecard {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin: 2rem 0;
+}
+.scorecard .card {
+  background: var(--bg2);
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  padding: 1.25rem;
+  text-align: center;
+}
+.scorecard .card .num {
+  font-size: 2.5rem;
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 0.25rem;
+}
+.scorecard .card .label {
+  font-size: 0.75rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* ===== BLOCKQUOTE ===== */
+blockquote {
+  border-left: 3px solid var(--accent);
+  padding: 0.75rem 1.25rem;
+  margin: 1.5rem 0;
+  background: rgba(59,130,246,0.04);
+  border-radius: 0 6px 6px 0;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+/* ===== FIX BLOCK ===== */
+.fix-block {
+  background: var(--bg2);
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  margin: 1.2rem 0;
+  overflow: hidden;
+}
+.fix-block.critical { border-left: 4px solid var(--critical); }
+.fix-block.high     { border-left: 4px solid var(--high); }
+.fix-block.medium   { border-left: 4px solid var(--medium); }
+.fix-block.low      { border-left: 4px solid var(--low); }
+
+.fix-block .fix-header {
+  padding: 1rem 1.5rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  border-bottom: 1px solid var(--rule);
+  cursor: default;
+}
+.fix-block .fix-header .fix-id {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+.fix-block.critical .fix-id { background: rgba(239,68,68,0.15); color: var(--critical); }
+.fix-block.high .fix-id     { background: rgba(249,115,22,0.15); color: var(--high); }
+.fix-block.medium .fix-id   { background: rgba(245,158,11,0.15); color: var(--medium); }
+.fix-block.low .fix-id      { background: rgba(59,130,246,0.15); color: var(--low); }
+
+.fix-block .fix-header .fix-title { flex: 1; }
+.fix-block .fix-header h4 { margin: 0; font-size: 0.95rem; }
+.fix-block .fix-header .fix-meta { font-size: 0.75rem; color: var(--muted); margin-top: 0.2rem; }
+
+.fix-block .fix-body { padding: 1rem 1.5rem; }
+
+.fix-block .fix-body .file {
+  font-family: 'Inter Mono', 'Consolas', 'Courier New', monospace;
+  font-size: 0.8rem;
+  color: var(--accent);
+  background: rgba(59,130,246,0.08);
+  padding: 2px 6px;
+  border-radius: 3px;
+  display: inline-block;
+  margin: 0.2rem 0;
+}
+
+.code-block {
+  background: var(--code-bg);
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  padding: 0.8rem 1rem;
+  margin: 0.5rem 0;
+  font-family: 'Inter Mono', 'Consolas', 'Courier New', monospace;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  overflow-x: auto;
+  white-space: pre;
+}
+.code-block .del { color: var(--del); }
+.code-block .add { color: var(--add); }
+.code-block .ctx { color: var(--muted); }
+
+.fix-block .fix-body .verify {
+  margin-top: 0.8rem;
+  padding: 0.5rem 0.75rem;
+  background: rgba(59,130,246,0.06);
+  border-radius: 4px;
+  font-size: 0.82rem;
+  border-left: 2px solid var(--accent);
+}
+.fix-block .fix-body .verify strong { color: var(--accent); }
+
+.fix-block .fix-body .risk {
+  margin-top: 0.6rem;
+  padding: 0.5rem 0.75rem;
+  background: rgba(245,158,11,0.06);
+  border-radius: 4px;
+  font-size: 0.82rem;
+  border-left: 2px solid var(--medium);
+}
+.fix-block .fix-body .risk strong { color: var(--medium); }
+
+/* ===== TABLE ===== */
+.table-wrap {
+  overflow-x: auto;
+  margin: 1rem 0;
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+}
+thead { background: var(--bg2); }
+th {
+  text-align: left;
+  padding: 0.5rem 0.75rem;
+  font-weight: 600;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+  border-bottom: 1px solid var(--rule);
+  white-space: nowrap;
+}
+td {
+  padding: 0.45rem 0.75rem;
+  border-bottom: 1px solid rgba(37,42,58,0.5);
+  color: var(--ink);
+}
+tr:last-child td { border-bottom: none; }
+td code {
+  font-family: 'Inter Mono', 'Consolas', 'Courier New', monospace;
+  font-size: 0.8rem;
+  color: var(--accent);
+}
+
+/* ===== TIMELINE ===== */
+.timeline { margin: 1.5rem 0; }
+.timeline .phase {
+  display: flex;
+  gap: 1.5rem;
+  padding: 1rem 0;
+  border-bottom: 1px solid rgba(37,42,58,0.5);
+}
+.timeline .phase:last-child { border-bottom: none; }
+.timeline .phase .tag {
+  flex-shrink: 0;
+  width: 100px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 6px 0;
+  text-align: center;
+  border-radius: 4px;
+}
+.tag.now    { background: rgba(239,68,68,0.15); color: var(--critical); }
+.tag.commit { background: rgba(16,185,129,0.15); color: var(--accent2); }
+.timeline .phase .desc { font-size: 0.88rem; color: var(--muted); }
+.timeline .phase .desc strong { color: #fff; }
+
+/* ===== COMMIT LIST ===== */
+.commit-list {
+  list-style: none;
+  margin: 1rem 0;
+}
+.commit-list li {
+  padding: 0.5rem 0.75rem;
+  margin: 0.3rem 0;
+  background: var(--bg2);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  font-family: 'Inter Mono', 'Consolas', 'Courier New', monospace;
+  font-size: 0.8rem;
+  color: var(--ink);
+}
+.commit-list li .c-hash {
+  color: var(--accent);
+  margin-right: 0.5rem;
+}
+
+/* ===== FOOTER ===== */
+footer {
+  padding: 3rem 0;
+  text-align: center;
+  border-top: 1px solid var(--rule);
+  margin-top: 2rem;
+}
+footer p { font-size: 0.8rem; color: var(--muted); }
+footer .disclaimer {
+  font-size: 0.75rem;
+  color: var(--muted);
+  margin-top: 1rem;
+  padding: 1rem;
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  background: var(--bg2);
+  text-align: left;
+  max-width: 720px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .hero { padding: 3rem 0 2.5rem; }
+  .hero h1 { font-size: 1.6rem; }
+  .hero .meta { gap: 1rem; }
+  .scorecard { grid-template-columns: repeat(2, 1fr); }
+  .container { padding: 0 1rem; }
+  .fix-block .fix-header { padding: 0.75rem 1rem; }
+  .fix-block .fix-body { padding: 0.75rem 1rem; }
+  .timeline .phase { flex-direction: column; gap: 0.5rem; }
+  .timeline .phase .tag { width: auto; }
+  section { padding: 1.5rem 0; }
+}
+
+@media (max-width: 480px) {
+  .scorecard { grid-template-columns: 1fr; }
+  .hero h1 { font-size: 1.3rem; }
+}
+
+@media print {
+  .hero { padding: 2rem 0; }
+  .fix-block { break-inside: avoid; page-break-inside: avoid; }
+  body { font-size: 12px; }
+  .code-block { font-size: 0.7rem; }
+}
+
+/* ===== SCROLLBAR ===== */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--rule); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+</style>
+</head>
+<body>
+
+<!-- ====== HERO ====== -->
+<div class="hero">
+  <div class="container">
+    <div class="badge">LEGAL COMPLIANCE</div>
+    <h1>Statuz IDE 法律合规 &mdash; 执行方案</h1>
+    <p class="subtitle">针对全部 33 个法律问题的精确修复方案，每个修复包含具体代码变更、验证命令和风险评估</p>
+    <div class="meta">
+      <span><strong>制定日期：</strong>2026-07-17</span>
+      <span><strong>目标：</strong>公开分发前零 P0/P1 问题</span>
+      <span><strong>预计工期：</strong>2-3 周</span>
+    </div>
+  </div>
+</div>
+
+<!-- ====== SUMMARY ====== -->
+<section>
+  <div class="container">
+    <h2>修复概览</h2>
+    <div class="scorecard">
+      <div class="card"><div class="num" style="color:var(--critical)">9</div><div class="label">P0 &mdash; 立即修复</div></div>
+      <div class="card"><div class="num" style="color:var(--high)">11</div><div class="label">P1 &mdash; 两周内修复</div></div>
+      <div class="card"><div class="num" style="color:var(--medium)">8</div><div class="label">P2 &mdash; 发布前修复</div></div>
+      <div class="card"><div class="num" style="color:var(--low)">5</div><div class="label">P3 &mdash; 持续改进</div></div>
+    </div>
+    <blockquote>
+      <strong>执行原则：</strong>每个修复必须可独立验证、可独立回滚、可独立提交。修复顺序严格按优先级排列 &mdash; P0 全部完成后才能开始 P1。每个修复包含精确的 search/replace 代码块、验证命令和风险评估。
+    </blockquote>
+  </div>
+</section>
+
+<!-- ====== P0 ====== -->
+<section>
+  <div class="container">
+    <h2>P0 &mdash; 立即修复 <span class="sev sev-critical">9 项</span></h2>
+
+    <!-- FIX-01 -->
+    <div class="fix-block critical">
+      <div class="fix-header"><div class="fix-id">01</div><div class="fix-title"><h4>FIX-01: 统一许可证声明</h4><div class="fix-meta">将所有许可证声明从 MIT 统一为 Apache-2.0，并准确描述双重许可结构</div></div></div>
+      <div class="fix-body">
+        <p><strong>受影响文件：</strong> <span class="file">package.json</span> <span class="file">product.json</span> <span class="file">README.md</span></p>
+        <p><strong>变更 1 &mdash; package.json (第 6 行)：</strong></p>
+        <div class="code-block"><span class="del">"license": "MIT"</span>
+<span class="add">"license": "Apache-2.0"</span></div>
+        <p><strong>变更 2 &mdash; product.json (第 10 行附近)：</strong></p>
+        <div class="code-block"><span class="del">"licenseName": "MIT"</span>
+<span class="add">"licenseName": "Apache-2.0"</span></div>
+        <p><strong>变更 3 &mdash; README.md：</strong></p>
+        <div class="code-block"><span class="del">This project is licensed under the MIT License</span>
+<span class="add">This project is a derivative work of Visual Studio Code.
+VS Code portions &rarr; MIT License.
+All Statuz additions &rarr; Apache License 2.0.</span></div>
+        <div class="verify"><strong>验证：</strong>grep 检查所有文件中的 license 声明一致性<div class="code-block"><span class="ctx">grep -rn '"license"' package.json product.json</span>
+<span class="ctx">grep -A3 "Apache" README.md</span></div></div>
+        <div class="risk"><strong>风险评估：</strong>低风险。纯文本修改，不影响运行时行为。</div>
+      </div>
+    </div>
+
+    <!-- FIX-02 -->
+    <div class="fix-block critical">
+      <div class="fix-header"><div class="fix-id">02</div><div class="fix-title"><h4>FIX-02: H.264/AVC 专利处置</h4><div class="fix-meta">移除 H.264 编码器以规避 MPEG-LA 专利风险，或添加显式警告</div></div></div>
+      <div class="fix-body">
+        <p><strong>受影响文件：</strong> <span class="file">cgmanifest.json</span></p>
+        <p><strong>方案 A (推荐)：移除 H.264 编码器，仅保留解码器</strong></p>
+        <div class="code-block"><span class="ctx">// 在 cgmanifest.json 中移除 H.264 编码器注册条目</span>
+<span class="del">"component": { "type": "git", "git": { "name": "openh264", ... } }</span>
+<span class="add">// 条目已移除 - 仅保留解码功能</span></div>
+        <p><strong>方案 B：添加显式警告文件</strong></p>
+        <div class="code-block"><span class="add">H.264/AVC PATENT NOTICE
+USE OF H.264/AVC MAY REQUIRE A PATENT LICENSE FROM MPEG-LA.
+https://www.mpegla.com/programs/avc-h-264/</span></div>
+        <div class="verify"><strong>验证：</strong>确认 cgmanifest.json 中移除 H.264 注册<div class="code-block"><span class="ctx">grep -i "openh264\|h264" cgmanifest.json</span></div></div>
+        <div class="risk"><strong>风险评估：</strong>中风险。移除编码器可能影响部分用户的视频编码功能。</div>
+      </div>
+    </div>
+
+    <!-- FIX-03 -->
+    <div class="fix-block critical">
+      <div class="fix-header"><div class="fix-id">03</div><div class="fix-title"><h4>FIX-03: ffmpeg LGPL-2.1+ 合规</h4><div class="fix-meta">提供 ffmpeg 源码获取链接，声明动态链接与可替换性</div></div></div>
+      <div class="fix-body">
+        <p><strong>新增文件：</strong> <span class="file">FFMPEG_LGPL_NOTICE.txt</span></p>
+        <div class="code-block"><span class="add">FFMPEG LGPL NOTICE
+This software uses ffmpeg libraries licensed under LGPL-2.1+.
+Source code: https://ffmpeg.org/download.html
+Dynamic Linking: ffmpeg is dynamically linked. Users may replace the
+ffmpeg shared libraries (.so/.dll/.dylib) with their own modified versions.
+For more information: https://www.gnu.org/licenses/lgpl-2.1.html</span></div>
+        <div class="verify"><strong>验证：</strong>确认文件存在且内容完整<div class="code-block"><span class="ctx">test -f FFMPEG_LGPL_NOTICE.txt && echo "OK"</span></div></div>
+        <div class="risk"><strong>风险评估：</strong>低风险。仅新增文档文件，不含代码变更。</div>
+      </div>
+    </div>
+
+    <!-- FIX-04 -->
+    <div class="fix-block critical">
+      <div class="fix-header"><div class="fix-id">04</div><div class="fix-title"><h4>FIX-04: 断开 voideditor 更新依赖</h4><div class="fix-meta">将更新源从 voideditor 切换到 Oasis-Company/Statuz-IDE</div></div></div>
+      <div class="fix-body">
+        <p><strong>受影响文件：</strong> <span class="file">src/vs/workbench/contrib/statuz/electron-main/statuzUpdateMainService.ts</span></p>
+        <p><strong>变更 1 &mdash; 第 98 行：</strong></p>
+        <div class="code-block"><span class="del">const repo = 'voideditor/binaries';</span>
+<span class="add">const repo = 'Oasis-Company/Statuz-IDE';</span></div>
+        <p><strong>变更 2 &mdash; 第 82 行 (已正确，验证确认)：</strong></p>
+        <div class="code-block"><span class="add">'Restart Statuz IDE to update!'</span></div>
+        <div class="verify"><strong>验证：</strong>grep 检查无 voideditor 引用<div class="code-block"><span class="ctx">grep -rn "voideditor" src/vs/workbench/contrib/statuz/</span></div></div>
+        <div class="risk"><strong>风险评估：</strong>高风险。更新 URL 错误将导致自动更新功能完全失效。部署前必须进行端到端测试。</div>
+      </div>
+    </div>
+
+    <!-- FIX-05 -->
+    <div class="fix-block critical">
+      <div class="fix-header"><div class="fix-id">05</div><div class="fix-title"><h4>FIX-05: 清除 Microsoft 商标 (15+ 处)</h4><div class="fix-meta">在所有用户可见位置移除 "Visual Studio Code" 和 "VS Code" 商标引用</div></div></div>
+      <div class="fix-body">
+        <p><strong>受影响文件 (6 个)：</strong>
+          <span class="file">src/vs/code/browser/workbench/callback.html</span>
+          <span class="file">src/vs/main.ts</span>
+          <span class="file">src/vs/workbench/contrib/welcomeWalkthrough/...</span>
+          <span class="file">src/vs/workbench/contrib/extensions/...</span>
+          <span class="file">src/vs/workbench/contrib/welcomeGettingStarted/...</span>
+          <span class="file">src/vs/server/nodes/server.cli.ts</span>
+        </p>
+        <div class="code-block"><span class="del">"Visual Studio Code"</span> <span class="ctx">&rarr;</span> <span class="add">"Statuz IDE"</span>
+<span class="del">"VS Code"</span> <span class="ctx">&rarr;</span> <span class="add">"Statuz IDE"</span></div>
+        <div class="verify"><strong>验证：</strong>grep 确认无残留 (排除注释和 API 类型定义)<div class="code-block"><span class="ctx">grep -rn "Visual Studio Code\|VS Code" src/ --include="*.ts" --include="*.html"</span></div></div>
+        <div class="risk"><strong>风险评估：</strong>中风险。需逐一确认每一处修改均在用户可见文本中。</div>
+      </div>
+    </div>
+
+    <!-- FIX-06 -->
+    <div class="fix-block critical">
+      <div class="fix-header"><div class="fix-id">06</div><div class="fix-title"><h4>FIX-06: 修复 Glass Devtools 版权声明</h4><div class="fix-meta">将 4 个文件中的 "Glass Devtools, Inc." 替换为 "Oasis Company"</div></div></div>
+      <div class="fix-body">
+        <p><strong>受影响文件 (4 个)：</strong>
+          <span class="file">VoidTooltip.tsx</span> <span class="file">VoidOnboarding.tsx</span>
+          <span class="file">VoidCommandBar.tsx</span> <span class="file">VoidSelectionHelper.tsx</span>
+        </p>
+        <div class="code-block"><span class="del">Copyright 2025 Glass Devtools, Inc.</span>
+<span class="add">Copyright 2025-2026 Oasis Company</span></div>
+        <div class="verify"><strong>验证：</strong>grep 检查无 Glass Devtools 残留<div class="code-block"><span class="ctx">grep -rn "Glass Devtools" src/vs/workbench/contrib/statuz/browser/react/</span></div></div>
+        <div class="risk"><strong>风险评估：</strong>低风险。版权声明纯文本替换，不影响功能。</div>
+      </div>
+    </div>
+
+    <!-- FIX-07 -->
+    <div class="fix-block critical">
+      <div class="fix-header"><div class="fix-id">07</div><div class="fix-title"><h4>FIX-07: 为缺失版权声明的文件添加版权头 (21 个文件)</h4><div class="fix-meta">为所有 statuz 核心文件添加标准 Apache-2.0 版权头</div></div></div>
+      <div class="fix-body">
+        <p><strong>受影响文件：</strong> 5 个核心文件 + 16 个 react/src2/ 文件</p>
+        <p><strong>核心文件：</strong> <span class="file">fileService.ts</span> <span class="file">contextGatheringService.ts</span> <span class="file">actionIDs.ts</span> <span class="file">util.ts</span> <span class="file">directoryStrTypes.ts</span></p>
+        <div class="code-block"><span class="add">/*--------------------------------------------------------------------------------------
+ *  Copyright 2026 Statuz. All rights reserved.
+ *  Licensed under the Apache License, Version 2.0.
+ *  See LICENSE.txt for more information.
+ *--------------------------------------------------------------------------------------*/</span></div>
+        <div class="verify"><strong>验证：</strong>grep 检查所有文件均有版权声明<div class="code-block"><span class="ctx">for f in $(find src/vs/workbench/contrib/statuz/ -name "*.ts" -o -name "*.tsx"); do
+  grep -L "Copyright\|Apache" "$f" && echo "MISSING: $f"
+done</span></div></div>
+        <div class="risk"><strong>风险评估：</strong>低风险。仅添加注释头，不影响功能。</div>
+      </div>
+    </div>
+
+    <!-- FIX-08 -->
+    <div class="fix-block critical">
+      <div class="fix-header"><div class="fix-id">08</div><div class="fix-title"><h4>FIX-08: Sandboxer 移植代码添加原始版权声明</h4><div class="fix-meta">在 board/ 目录下 19 个文件中添加 Sandboxer 原始版权归属</div></div></div>
+      <div class="fix-body">
+        <p><strong>受影响文件：</strong> <span class="file">browser/board/</span> 目录下 19 个文件</p>
+        <div class="code-block"><span class="add">// Ported from Sandboxer.
+// Original work Copyright [待确认] [Sandboxer Author].
+// Licensed under [待确认].</span></div>
+        <p><strong>前提条件：</strong>需要先确认 Sandboxer 的许可证和原作者信息。</p>
+        <div class="verify"><strong>验证：</strong>grep 检查 board/ 目录下所有文件包含 "Ported from Sandboxer"<div class="code-block"><span class="ctx">grep -rn "Ported from Sandboxer" src/vs/workbench/contrib/statuz/browser/board/</span></div></div>
+        <div class="risk"><strong>风险评估：</strong>中风险。前提是确认 Sandboxer 许可证兼容性。</div>
+      </div>
+    </div>
+
+    <!-- FIX-09 -->
+    <div class="fix-block critical">
+      <div class="fix-header"><div class="fix-id">09</div><div class="fix-title"><h4>FIX-09: 扩展许可证补充</h4><div class="fix-meta">为 open-remote-ssh 和 open-remote-wsl 扩展补充 license 与 publisher 字段</div></div></div>
+      <div class="fix-body">
+        <p><strong>受影响文件：</strong>
+          <span class="file">extensions/open-remote-ssh/package.json</span>
+          <span class="file">extensions/open-remote-wsl/package.json</span>
+        </p>
+        <p><strong>变更 1 &mdash; open-remote-ssh/package.json：</strong></p>
+        <div class="code-block"><span class="add">"license": "MIT",
+"publisher": "statuz"</span>
+<span class="del">"serverDownloadUrlTemplate": "https://github.com/voideditor/binaries/..."</span>
+<span class="add">"serverDownloadUrlTemplate": "https://github.com/Oasis-Company/Statuz-IDE/..."</span></div>
+        <p><strong>变更 2 &mdash; open-remote-wsl/package.json：</strong></p>
+        <div class="code-block"><span class="add">"license": "MIT",
+"publisher": "statuz"</span>
+<span class="del">voideditor/binaries</span>
+<span class="add">Oasis-Company/Statuz-IDE</span></div>
+        <div class="verify"><strong>验证：</strong>检查两个 package.json 的 license 字段非空<div class="code-block"><span class="ctx">node -e "console.log(require('./extensions/open-remote-ssh/package.json').license)"</span></div></div>
+        <div class="risk"><strong>风险评估：</strong>中风险。扩展的 serverDownloadUrlTemplate 变更需确认新 URL 可正确解析。</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ====== P1 ====== -->
+<section>
+  <div class="container">
+    <h2>P1 &mdash; 两周内修复 <span class="sev sev-high">11 项</span></h2>
+
+    <!-- FIX-10 -->
+    <div class="fix-block high">
+      <div class="fix-header">
+        <div class="fix-id">10</div>
+        <div class="fix-title">
+          <h4>FIX-10: PostHog 遥测改为 opt-in</h4>
+          <div class="fix-meta">将遥测默认行为从 opt-out 改为 opt-in，并创建 PRIVACY.md</div>
+        </div>
+      </div>
+      <div class="fix-body">
+        <p><strong>受影响文件：</strong> <span class="file">electron-main/metricsMainService.ts</span></p>
+        <p><strong>修改初始化逻辑：</strong></p>
+        <div class="code-block"><span class="ctx">// 修改前：默认启用，用户可 opt-out</span>
+<span class="del">private _optOut: boolean = false;</span>
+
+<span class="ctx">// 修改后：默认禁用，用户主动开启后才收集</span>
+<span class="add">private _optOut: boolean = true;  // 默认 opt-out，需用户主动开启</span></div>
+        <p><strong>新增文件：</strong> <span class="file">PRIVACY.md</span> (参见 FIX-20)</p>
+        <div class="verify">
+          <strong>验证：</strong>确认默认行为为 opt-out
+          <div class="code-block"><span class="ctx"># 确认默认值为 true</span>
+grep "_optOut.*=.*true" electron-main/metricsMainService.ts</div>
+        </div>
+        <div class="risk">
+          <strong>风险评估：</strong>低风险。遥测数据量将大幅减少，影响产品数据分析能力。
+        </div>
+      </div>
+    </div>
+
+    <!-- FIX-11 -->
+    <div class="fix-block high">
+      <div class="fix-header">
+        <div class="fix-id">11</div>
+        <div class="fix-title">
+          <h4>FIX-11: Microsoft 1DS 遥测审查</h4>
+          <div class="fix-meta">评估是否真正需要 Microsoft 1DS 遥测，如需保留则添加用户告知</div>
+        </div>
+      </div>
+      <div class="fix-body">
+        <p><strong>评估流程：</strong></p>
+        <ol style="margin:0.5rem 0 0.5rem 1.5rem; color:var(--ink);">
+          <li>确认 1DS SDK 是否仍在代码中引用</li>
+          <li>评估移除 1DS 对功能的影响</li>
+          <li>若保留：添加明确的用户告知和 opt-out 选项</li>
+          <li>若移除：清理所有相关代码和依赖</li>
+        </ol>
+        <div class="verify">
+          <strong>验证：</strong>
+          <div class="code-block"><span class="ctx"># 检查 1DS 相关引用</span>
+grep -rn "1DS\|one-ds\|OneDS" src/ --include="*.ts"</div>
+        </div>
+        <div class="risk">
+          <strong>风险评估：</strong>中风险。移除 1DS 可能影响崩溃报告和诊断数据收集。
+        </div>
+      </div>
+    </div>
+
+    <!-- FIX-12 -->
+    <div class="fix-block high">
+      <div class="fix-header">
+        <div class="fix-id">12</div>
+        <div class="fix-title">
+          <h4>FIX-12: Void 品牌清理 &mdash; UI 文本 (30+ 处)</h4>
+          <div class="fix-meta">将所有用户可见的 "Void Side Bar" 替换为 "Auxiliary Side Bar"</div>
+        </div>
+      </div>
+      <div class="fix-body">
+        <p><strong>变更模式：</strong></p>
+        <div class="code-block"><span class="del">"Void Side Bar"</span>  <span class="ctx">&rarr;</span>  <span class="add">"Auxiliary Side Bar"</span>
+<span class="del">"Void"</span>            <span class="ctx">&rarr;</span>  <span class="add">"Statuz"</span> <span class="ctx">(品牌上下文中)</span></div>
+        <div class="verify">
+          <strong>验证：</strong>
+          <div class="code-block"><span class="ctx"># 确认无用户可见的 "Void" 文本</span>
+grep -rn '"Void\|"Void Side Bar' src/ --include="*.ts" --include="*.tsx" --include="*.html"</div>
+        </div>
+        <div class="risk">
+          <strong>风险评估：</strong>低风险。纯 UI 文本替换，不影响功能逻辑。
+        </div>
+      </div>
+    </div>
+
+    <!-- FIX-13 -->
+    <div class="fix-block high">
+      <div class="fix-header">
+        <div class="fix-id">13</div>
+        <div class="fix-title">
+          <h4>FIX-13: .voidrules &rarr; .statuzrules</h4>
+          <div class="fix-meta">将规则文件扩展名从 .voidrules 改为 .statuzrules</div>
+        </div>
+      </div>
+      <div class="fix-body">
+        <p><strong>受影响文件：</strong> <span class="file">convertToLLMMessageService.ts</span></p>
+        <div class="code-block"><span class="del">const rulesFile = '.voidrules';</span>
+<span class="add">const rulesFile = '.statuzrules';</span></div>
+        <div class="verify">
+          <strong>验证：</strong>
+          <div class="code-block"><span class="ctx"># 确认无 .voidrules 引用</span>
+grep -rn "\.voidrules" src/</div>
+        </div>
+        <div class="risk">
+          <strong>风险评估：</strong>中风险。需要确保现有用户项目中的 .voidrules 文件能被迁移或兼容识别。
+        </div>
+      </div>
+    </div>
+
+    <!-- FIX-14 -->
+    <div class="fix-block high">
+      <div class="fix-header">
+        <div class="fix-id">14</div>
+        <div class="fix-title">
+          <h4>FIX-14: IPC Channel 重命名</h4>
+          <div class="fix-meta">将 void-channel-* 重命名为 statuz-channel-*</div>
+        </div>
+      </div>
+      <div class="fix-body">
+        <p><strong>变更模式：</strong></p>
+        <div class="code-block"><span class="del">'void-channel-'</span>  <span class="ctx">&rarr;</span>  <span class="add">'statuz-channel-'</span>
+<span class="del">`void-channel-${id}`</span>  <span class="ctx">&rarr;</span>  <span class="add">`statuz-channel-${id}`</span></div>
+        <div class="verify">
+          <strong>验证：</strong>
+          <div class="code-block"><span class="ctx"># 确认无 void-channel 引用</span>
+grep -rn "void-channel" src/</div>
+        </div>
+        <div class="risk">
+          <strong>风险评估：</strong>中风险。IPC channel 名称变更需确保所有发送方和接收方同步更新，否则会导致通信失败。
+        </div>
+      </div>
+    </div>
+
+    <!-- FIX-15 -->
+    <div class="fix-block high">
+      <div class="fix-header">
+        <div class="fix-id">15</div>
+        <div class="fix-title">
+          <h4>FIX-15: Void* 类型名重命名 (6 个)</h4>
+          <div class="fix-meta">将 Void* 类型名改为 Statuz* 类型名</div>
+        </div>
+      </div>
+      <div class="fix-body">
+        <p><strong>变更模式：</strong></p>
+        <div class="code-block"><span class="del">VoidSettings</span>    <span class="ctx">&rarr;</span> <span class="add">StatuzSettings</span>
+<span class="del">VoidConfig</span>      <span class="ctx">&rarr;</span> <span class="add">StatuzConfig</span>
+<span class="del">VoidState</span>       <span class="ctx">&rarr;</span> <span class="add">StatuzState</span>
+<span class="del">VoidEvent</span>       <span class="ctx">&rarr;</span> <span class="add">StatuzEvent</span>
+<span class="del">VoidCommand</span>     <span class="ctx">&rarr;</span> <span class="add">StatuzCommand</span>
+<span class="del">VoidResponse</span>    <span class="ctx">&rarr;</span> <span class="add">StatuzResponse</span></div>
+        <div class="verify">
+          <strong>验证：</strong>
+          <div class="code-block"><span class="ctx"># 确认无 Void* 类型定义</span>
+grep -rn "interface Void\|type Void\|class Void" src/vs/workbench/contrib/statuz/</div>
+        </div>
+        <div class="risk">
+          <strong>风险评估：</strong>中风险。类型重命名影响范围广，需确保所有引用处同步更新，TypeScript 编译检查可辅助验证。
+        </div>
+      </div>
+    </div>
+
+    <!-- FIX-16 -->
+    <div class="fix-block high">
+      <div class="fix-header">
+        <div class="fix-id">16</div>
+        <div class="fix-title">
+          <h4>FIX-16: void* 变量名重命名 (10+ 处)</h4>
+          <div class="fix-meta">将 void* 变量名改为 statuz* 变量名</div>
+        </div>
+      </div>
+      <div class="fix-body">
+        <p><strong>变更模式：</strong></p>
+        <div class="code-block"><span class="del">voidSettings</span>    <span class="ctx">&rarr;</span> <span class="add">statuzSettings</span>
+<span class="del">voidConfig</span>      <span class="ctx">&rarr;</span> <span class="add">statuzConfig</span>
+<span class="del">voidState</span>       <span class="ctx">&rarr;</span> <span class="add">statuzState</span>
+<span class="del">voidEvent</span>       <span class="ctx">&rarr;</span> <span class="add">statuzEvent</span></div>
+        <div class="verify">
+          <strong>验证：</strong>
+          <div class="code-block"><span class="ctx"># 确认无 void* 变量名 (排除关键字 void)</span>
+grep -rn "\bvoid[A-Z]" src/vs/workbench/contrib/statuz/</div>
+        </div>
+        <div class="risk">
+          <strong>风险评估：</strong>中风险。变量名变更影响范围广，TypeScript 编译检查可辅助验证。
+        </div>
+      </div>
+    </div>
+
+    <!-- FIX-17 -->
+    <div class="fix-block high">
+      <div class="fix-header">
+        <div class="fix-id">17</div>
+        <div class="fix-title">
+          <h4>FIX-17: 清理 "Void changed this" 等注释</h4>
+          <div class="fix-meta">删除所有 "Void changed this" 等标识性注释</div>
+        </div>
+      </div>
+      <div class="fix-body">
+        <p><strong>变更模式：</strong></p>
+        <div class="code-block"><span class="del">// Void changed this</span>
+<span class="del">// Void modification</span>
+<span class="del">// FIXME: Void added this</span>
+<span class="add">// (removed)</span></div>
+        <div class="verify">
+          <strong>验证：</strong>
+          <div class="code-block"><span class="ctx"># 确认无 Void 注释残留</span>
+grep -rn "Void changed\|Void modification\|Void added" src/</div>
+        </div>
+        <div class="risk">
+          <strong>风险评估：</strong>低风险。仅删除注释，不影响功能。
+        </div>
+      </div>
+    </div>
+
+    <!-- FIX-18 -->
+    <div class="fix-block high">
+      <div class="fix-header">
+        <div class="fix-id">18</div>
+        <div class="fix-title">
+          <h4>FIX-18: 扩展市场 URL 评估</h4>
+          <div class="fix-meta">保持 marketplace.visualstudio.com 但添加 open-vsx.org 备用</div>
+        </div>
+      </div>
+      <div class="fix-body">
+        <p><strong>方案：</strong></p>
+        <div class="code-block"><span class="ctx">// 主市场</span>
+<span class="add">const EXTENSION_MARKETPLACE = 'https://marketplace.visualstudio.com';</span>
+<span class="ctx">// 备用市场</span>
+<span class="add">const EXTENSION_MARKETPLACE_FALLBACK = 'https://open-vsx.org';</span>
+<span class="ctx">// 用户可配置</span>
+<span class="add">const userMarketplace = config.get('extensions.marketplace');</span></div>
+        <div class="verify">
+          <strong>验证：</strong>
+          <div class="code-block"><span class="ctx"># 确认市场 URL 配置正确</span>
+grep -rn "marketplace\|open-vsx" src/vs/workbench/contrib/extensions/</div>
+        </div>
+        <div class="risk">
+          <strong>风险评估：</strong>低风险。添加备用市场不影响主市场功能。
+        </div>
+      </div>
+    </div>
+
+    <!-- FIX-19 -->
+    <div class="fix-block high">
+      <div class="fix-header">
+        <div class="fix-id">19</div>
+        <div class="fix-title">
+          <h4>FIX-19: Oasis Company 法律实体确认</h4>
+          <div class="fix-meta">确认 Oasis Company 的注册状态，必要时调整版权声明</div>
+        </div>
+      </div>
+      <div class="fix-body">
+        <p><strong>待确认事项：</strong></p>
+        <ol style="margin:0.5rem 0 0.5rem 1.5rem; color:var(--ink);">
+          <li>Oasis Company 是否已在相关司法管辖区合法注册</li>
+          <li>注册名称是否与 "Oasis Company" 完全一致</li>
+          <li>是否需要使用完整法定名称</li>
+          <li>商标注册状态</li>
+        </ol>
+        <div class="risk">
+          <strong>风险评估：</strong>中风险。若实体未注册，版权声明需调整为个人名义或重新注册后更新。
+        </div>
+      </div>
+    </div>
+
+    <!-- FIX-20 -->
+    <div class="fix-block high">
+      <div class="fix-header">
+        <div class="fix-id">20</div>
+        <div class="fix-title">
+          <h4>FIX-20: 创建 PRIVACY.md</h4>
+          <div class="fix-meta">说明数据收集范围、用途、opt-out 方式</div>
+        </div>
+      </div>
+      <div class="fix-body">
+        <p><strong>新增文件：</strong> <span class="file">PRIVACY.md</span></p>
+        <div class="code-block"><span class="add"># Privacy Policy for Statuz IDE
+
+## Data Collection
+
+Statuz IDE collects the following data ONLY when explicitly enabled
+by the user:
+
+1. **Telemetry Data** (opt-in only)
+   - Feature usage statistics
+   - Performance metrics
+   - Error/crash reports
+   - NO personal data, NO file contents, NO keystrokes
+
+2. **Extension Marketplace**
+   - Extension search queries (anonymized)
+   - Installation counts (aggregated)
+
+## How to Opt Out
+
+All data collection is OFF by default. To enable:
+Settings &gt; Telemetry &gt; Enable Telemetry
+
+## Third-Party Services
+
+- PostHog (analytics, opt-in only)
+- Microsoft 1DS (crash reporting, if enabled)
+
+## Data Retention
+
+Telemetry data is retained for a maximum of 90 days.
+
+## Contact
+
+For privacy concerns, contact: privacy@statuz.dev</span></div>
+        <div class="verify">
+          <strong>验证：</strong>
+          <div class="code-block"><span class="ctx"># 确认文件存在</span>
+test -f PRIVACY.md &amp;&amp; echo "OK"</div>
+        </div>
+        <div class="risk">
+          <strong>风险评估：</strong>低风险。仅新增文档文件。
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ====== P2 ====== -->
+<section>
+  <div class="container">
+    <h2>P2 &mdash; 发布前修复 <span class="sev sev-medium">8 项</span></h2>
+
+    <!-- FIX-21 -->
+    <div class="fix-block medium">
+      <div class="fix-header">
+        <div class="fix-id">21</div>
+        <div class="fix-title">
+          <h4>FIX-21: LICENSE-VS-Code.txt 替换 Void 为 Statuz</h4>
+          <div class="fix-meta">将 LICENSE 文件中的 "Void" 引用替换为 "Statuz"</div>
+        </div>
+      </div>
+      <div class="fix-body">
+        <p><strong>受影响文件：</strong> <span class="file">LICENSE-VS-Code.txt</span></p>
+        <div class="code-block"><span class="del">Void</span> <span class="ctx">&rarr;</span> <span class="add">Statuz</span></div>
+        <div class="verify">
+          <strong>验证：</strong>
+          <div class="code-block"><span class="ctx"># 确认无 Void 残留</span>
+grep -i "void" LICENSE-VS-Code.txt</div>
+        </div>
+        <div class="risk"><strong>风险评估：</strong>低风险。纯文本替换。</div>
+      </div>
+    </div>
+
+    <!-- FIX-22 -->
+    <div class="fix-block medium">
+      <div class="fix-header">
+        <div class="fix-id">22</div>
+        <div class="fix-title">
+          <h4>FIX-22: README 许可证描述完善</h4>
+          <div class="fix-meta">完善 README.md 中的许可证描述，明确双重许可结构</div>
+        </div>
+      </div>
+      <div class="fix-body">
+        <p><strong>受影响文件：</strong> <span class="file">README.md</span></p>
+        <p>在 README 中新增许可证章节，明确说明 VS Code 基础代码适用 MIT，Statuz 新增代码适用 Apache-2.0。</p>
+        <div class="verify">
+          <strong>验证：</strong>
+          <div class="code-block"><span class="ctx"># 确认 README 包含许可证描述</span>
+grep -A5 "License\|许可证" README.md</div>
+        </div>
+        <div class="risk"><strong>风险评估：</strong>低风险。文档修改。</div>
+      </div>
+    </div>
+
+    <!-- FIX-23 -->
+    <div class="fix-block medium">
+      <div class="fix-header">
+        <div class="fix-id">23</div>
+        <div class="fix-title">
+          <h4>FIX-23: cgmanifest.json 补充 license 字段</h4>
+          <div class="fix-meta">为 cgmanifest.json 中的组件注册补充 license 字段</div>
+        </div>
+      </div>
+      <div class="fix-body">
+        <p><strong>受影响文件：</strong> <span class="file">cgmanifest.json</span></p>
+        <p>为每个注册的组件添加明确的 license 字段，确保所有第三方组件的许可证信息完整可追溯。</p>
+        <div class="verify">
+          <strong>验证：</strong>
+          <div class="code-block"><span class="ctx"># 确认每个注册都有 license 字段</span>
+node -e "const c=require('./cgmanifest.json');console.log(c.registrations.filter(r=>!r.license).length===0?'OK':'MISSING')"</div>
+        </div>
+        <div class="risk"><strong>风险评估：</strong>低风险。元数据补充。</div>
+      </div>
+    </div>
+
+    <!-- FIX-24 -->
+    <div class="fix-block medium">
+      <div class="fix-header">
+        <div class="fix-id">24</div>
+        <div class="fix-title">
+          <h4>FIX-24: @mistralai/mistralai license 字段</h4>
+          <div class="fix-meta">确认并补充 @mistralai/mistralai 包的 license 声明</div>
+        </div>
+      </div>
+      <div class="fix-body">
+        <p><strong>受影响文件：</strong> <span class="file">package.json</span> (或相关依赖配置)</p>
+        <p>检查 @mistralai/mistralai 包的许可证信息，确保在 package.json 或第三方许可文件中正确声明。</p>
+        <div class="verify">
+          <strong>验证：</strong>
+          <div class="code-block"><span class="ctx"># 检查包的许可证</span>
+node -e "console.log(require('./node_modules/@mistralai/mistralai/package.json').license)"</div>
+        </div>
+        <div class="risk"><strong>风险评估：</strong>低风险。依赖声明补充。</div>
+      </div>
+    </div>
+
+    <!-- FIX-25 -->
+    <div class="fix-block medium">
+      <div class="fix-header">
+        <div class="fix-id">25</div>
+        <div class="fix-title">
+          <h4>FIX-25: 创建 CONTRIBUTING.md</h4>
+          <div class="fix-meta">创建贡献指南，包含 CLA/DCO 要求和许可证说明</div>
+        </div>
+      </div>
+      <div class="fix-body">
+        <p><strong>新增文件：</strong> <span class="file">CONTRIBUTING.md</span></p>
+        <div class="code-block"><span class="add"># Contributing to Statuz IDE
+
+## License Agreement
+
+By contributing to this project, you agree that your contributions
+will be licensed under the Apache License, Version 2.0.
+
+## Developer Certificate of Origin (DCO)
+
+All commits must include a Signed-off-by line:
+    Signed-off-by: Your Name &lt;your@email.com&gt;
+
+## Pull Request Process
+
+1. Open an issue describing the change
+2. Fork and create a feature branch
+3. Add tests for new functionality
+4. Ensure all tests pass
+5. Submit a PR referencing the issue</span></div>
+        <div class="verify">
+          <strong>验证：</strong>
+          <div class="code-block"><span class="ctx"># 确认文件存在</span>
+test -f CONTRIBUTING.md &amp;&amp; echo "OK"</div>
+        </div>
+        <div class="risk"><strong>风险评估：</strong>低风险。仅新增文档。</div>
+      </div>
+    </div>
+
+    <!-- FIX-26 -->
+    <div class="fix-block medium">
+      <div class="fix-header">
+        <div class="fix-id">26</div>
+        <div class="fix-title">
+          <h4>FIX-26: 清理注释中 Void 标注</h4>
+          <div class="fix-meta">清理代码注释中残留的 "Void" 品牌标注</div>
+        </div>
+      </div>
+      <div class="fix-body">
+        <p><strong>变更模式：</strong></p>
+        <div class="code-block"><span class="del">// @Void</span>     <span class="ctx">&rarr;</span> <span class="add">// @Statuz</span>
+<span class="del">// @void</span>     <span class="ctx">&rarr;</span> <span class="add">// @statuz</span>
+<span class="del">/* Void */</span>   <span class="ctx">&rarr;</span> <span class="add">/* Statuz */</span></div>
+        <div class="verify">
+          <strong>验证：</strong>
+          <div class="code-block"><span class="ctx"># 确认无 Void 标注残留</span>
+grep -rn "@Void\|@void\|/\* Void" src/</div>
+        </div>
+        <div class="risk"><strong>风险评估：</strong>低风险。注释文本替换。</div>
+      </div>
+    </div>
+
+    <!-- FIX-27 -->
+    <div class="fix-block medium">
+      <div class="fix-header">
+        <div class="fix-id">27</div>
+        <div class="fix-title">
+          <h4>FIX-27: 评估 code.visualstudio.com 链接</h4>
+          <div class="fix-meta">审查代码中对 code.visualstudio.com 域名的引用</div>
+        </div>
+      </div>
+      <div class="fix-body">
+        <p><strong>评估流程：</strong></p>
+        <ol style="margin:0.5rem 0 0.5rem 1.5rem; color:var(--ink);">
+          <li>搜索所有对 code.visualstudio.com 的引用</li>
+          <li>区分文档链接 vs 功能依赖</li>
+          <li>文档链接：保留但添加说明</li>
+          <li>功能依赖：评估替换为自有服务的可行性</li>
+        </ol>
+        <div class="verify">
+          <strong>验证：</strong>
+          <div class="code-block"><span class="ctx"># 列出所有 code.visualstudio.com 引用</span>
+grep -rn "code\.visualstudio\.com" src/</div>
+        </div>
+        <div class="risk"><strong>风险评估：</strong>低风险。URL 审查。</div>
+      </div>
+    </div>
+
+    <!-- FIX-28 -->
+    <div class="fix-block medium">
+      <div class="fix-header">
+        <div class="fix-id">28</div>
+        <div class="fix-title">
+          <h4>FIX-28: docs/ 文档添加版权声明</h4>
+          <div class="fix-meta">为 docs/ 目录下的文档文件添加版权声明</div>
+        </div>
+      </div>
+      <div class="fix-body">
+        <p><strong>受影响文件：</strong> <span class="file">docs/</span> 目录下所有 .md 文件</p>
+        <div class="code-block"><span class="add">&lt;!--
+  Copyright 2026 Statuz. All rights reserved.
+  Licensed under the Apache License, Version 2.0.
+--&gt;</span></div>
+        <div class="verify">
+          <strong>验证：</strong>
+          <div class="code-block"><span class="ctx"># 确认所有文档文件有版权声明</span>
+for f in $(find docs/ -name "*.md"); do
+  grep -L "Copyright\|Apache" "$f" &amp;&amp; echo "MISSING: $f"
+done</div>
+        </div>
+        <div class="risk"><strong>风险评估：</strong>低风险。文档修改。</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ====== P3 ====== -->
+<section>
+  <div class="container">
+    <h2>P3 &mdash; 持续改进 <span class="sev sev-low">5 项</span></h2>
+
+    <!-- FIX-29 -->
+    <div class="fix-block low">
+      <div class="fix-header">
+        <div class="fix-id">29</div>
+        <div class="fix-title">
+          <h4>FIX-29: 统一代码风格中品牌引用</h4>
+          <div class="fix-meta">确保所有字符串常量和配置中的品牌名称为 "Statuz"</div>
+        </div>
+      </div>
+      <div class="fix-body">
+        <p><strong>影响范围：</strong>全项目字符串常量和配置项</p>
+        <div class="verify">
+          <strong>验证：</strong>
+          <div class="code-block"><span class="ctx"># 搜索可能遗漏的 Void 品牌引用</span>
+grep -rn "\"Void\|'Void" src/ --include="*.ts" --include="*.tsx" --include="*.json"</div>
+        </div>
+        <div class="risk"><strong>风险评估：</strong>低风险。品牌一致性改进。</div>
+      </div>
+    </div>
+
+    <!-- FIX-30 -->
+    <div class="fix-block low">
+      <div class="fix-header">
+        <div class="fix-id">30</div>
+        <div class="fix-title">
+          <h4>FIX-30: 更新 .mailmap 文件</h4>
+          <div class="fix-meta">更新 .mailmap 反映正确的作者归属</div>
+        </div>
+      </div>
+      <div class="fix-body">
+        <p><strong>受影响文件：</strong> <span class="file">.mailmap</span></p>
+        <p>确保所有贡献者的邮箱映射正确，移除 Void 相关的旧邮箱别名。</p>
+        <div class="risk"><strong>风险评估：</strong>低风险。元数据更新。</div>
+      </div>
+    </div>
+
+    <!-- FIX-31 -->
+    <div class="fix-block low">
+      <div class="fix-header">
+        <div class="fix-id">31</div>
+        <div class="fix-title">
+          <h4>FIX-31: 审查 package.json 的 author/contributors 字段</h4>
+          <div class="fix-meta">确保 package.json 中的作者信息准确</div>
+        </div>
+      </div>
+      <div class="fix-body">
+        <p><strong>受影响文件：</strong> <span class="file">package.json</span></p>
+        <div class="code-block"><span class="ctx">// 审查并更新</span>
+<span class="add">"author": {
+  "name": "Oasis Company",
+  "email": "contact@statuz.dev"
+}</span></div>
+        <div class="risk"><strong>风险评估：</strong>低风险。元数据更新。</div>
+      </div>
+    </div>
+
+    <!-- FIX-32 -->
+    <div class="fix-block low">
+      <div class="fix-header">
+        <div class="fix-id">32</div>
+        <div class="fix-title">
+          <h4>FIX-32: 建立 CI/CD 法律合规检查</h4>
+          <div class="fix-meta">在 CI 流水线中添加自动化合规检查步骤</div>
+        </div>
+      </div>
+      <div class="fix-body">
+        <p><strong>新增文件：</strong> <span class="file">.github/workflows/compliance-check.yml</span></p>
+        <div class="code-block"><span class="add">name: Legal Compliance Check
+on: [push, pull_request]
+jobs:
+  compliance:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run compliance verification
+        run: node verification.cjs</span></div>
+        <div class="risk"><strong>风险评估：</strong>低风险。CI 配置添加。</div>
+      </div>
+    </div>
+
+    <!-- FIX-33 -->
+    <div class="fix-block low">
+      <div class="fix-header">
+        <div class="fix-id">33</div>
+        <div class="fix-title">
+          <h4>FIX-33: 法律合规文档索引</h4>
+          <div class="fix-meta">创建文档索引，汇总所有法律合规相关文件</div>
+        </div>
+      </div>
+      <div class="fix-body">
+        <p><strong>新增文件：</strong> <span class="file">LEGAL.md</span></p>
+        <div class="code-block"><span class="add"># Legal Documentation Index
+
+- [LICENSE.txt](./LICENSE.txt) - Apache License 2.0
+- [LICENSE-VS-Code.txt](./LICENSE-VS-Code.txt) - VS Code MIT License
+- [PRIVACY.md](./PRIVACY.md) - Privacy Policy
+- [CONTRIBUTING.md](./CONTRIBUTING.md) - Contributor Guide
+- [FFMPEG_LGPL_NOTICE.txt](./FFMPEG_LGPL_NOTICE.txt) - ffmpeg LGPL Notice
+- [H264_PATENT_NOTICE.txt](./H264_PATENT_NOTICE.txt) - H.264 Patent Notice
+- [cgmanifest.json](./cgmanifest.json) - Third-Party Component Registration
+
+For questions, contact: legal@statuz.dev</span></div>
+        <div class="risk"><strong>风险评估：</strong>低风险。文档索引。</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ====== GIT COMMIT STRATEGY ====== -->
+<section>
+  <div class="container">
+    <h2>Git 提交策略</h2>
+    <p>P0 修复每个对应一个独立提交，共 9 个提交。提交信息格式严格遵循 Conventional Commits 规范。</p>
+
+    <h3>提交顺序</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>#</th><th>提交信息</th><th>对应修复</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>1</td><td><code>fix(legal): unify license to Apache-2.0</code></td><td>FIX-01</td></tr>
+          <tr><td>2</td><td><code>fix(legal): remove H.264 encoder, add patent notice</code></td><td>FIX-02</td></tr>
+          <tr><td>3</td><td><code>fix(legal): add ffmpeg LGPL-2.1+ compliance notice</code></td><td>FIX-03</td></tr>
+          <tr><td>4</td><td><code>fix(legal): disconnect voideditor update dependency</code></td><td>FIX-04</td></tr>
+          <tr><td>5</td><td><code>fix(legal): remove Microsoft trademarks (15+ occurrences)</code></td><td>FIX-05</td></tr>
+          <tr><td>6</td><td><code>fix(legal): replace Glass Devtools copyright with Oasis Company</code></td><td>FIX-06</td></tr>
+          <tr><td>7</td><td><code>fix(legal): add copyright headers to 21 files</code></td><td>FIX-07</td></tr>
+          <tr><td>8</td><td><code>fix(legal): add Sandboxer attribution to board/ files</code></td><td>FIX-08</td></tr>
+          <tr><td>9</td><td><code>fix(legal): add license and publisher to extensions</code></td><td>FIX-09</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>提交时间线</h3>
+    <div class="timeline">
+      <div class="phase">
+        <div class="tag now">第 1 周</div>
+        <div class="desc"><strong>FIX-01 到 FIX-05</strong> &mdash; 许可证统一、专利处置、更新依赖、商标清理</div>
+      </div>
+      <div class="phase">
+        <div class="tag now">第 2 周</div>
+        <div class="desc"><strong>FIX-06 到 FIX-09</strong> &mdash; 版权声明修复、扩展许可证补充</div>
+      </div>
+      <div class="phase">
+        <div class="tag commit">第 3 周</div>
+        <div class="desc"><strong>P1 修复</strong> &mdash; 品牌清理、遥测调整、隐私策略</div>
+      </div>
+    </div>
+
+    <blockquote>
+      <strong>提交规范：</strong>每个提交必须独立可构建、可测试、可回滚。提交前运行 <code>npm run compile</code> 确认无编译错误。提交信息使用 <code>fix(legal):</code> 前缀统一标识。
+    </blockquote>
+  </div>
+</section>
+
+<!-- ====== VERIFICATION SCRIPT ====== -->
+<section>
+  <div class="container">
+    <h2>验证脚本</h2>
+    <p>创建 <span class="file">verification.cjs</span> 脚本，自动化验证所有修复是否完成。</p>
+
+    <div class="code-block"><span class="add">#!/usr/bin/env node
+/**
+ * Statuz IDE Legal Compliance Verification Script
+ * Usage: node verification.cjs
+ * Exit code 0 = all checks pass, non-zero = failures found
+ */
+'use strict';
+
+const fs = require('fs');
+const path = require('path');
+const { execSync } = require('child_process');
+
+let failures = 0;
+const root = path.resolve(__dirname);
+
+function check(name, fn) {
+  try {
+    const result = fn();
+    if (result === true || result === 0) {
+      console.log('  [PASS] ' + name);
+    } else {
+      console.log('  [FAIL] ' + name + ' - ' + (result || 'check failed'));
+      failures++;
+    }
+  } catch (e) {
+    console.log('  [FAIL] ' + name + ' - ' + e.message);
+    failures++;
+  }
+}
+
+function grep(pattern, filePattern) {
+  try {
+    const result = execSync(
+      'grep -rn "' + pattern + '" ' + filePattern + ' 2&gt;nul',
+      { cwd: root, encoding: 'utf8', maxBuffer: 10 * 1024 * 1024 }
+    );
+    return result.trim() || '';
+  } catch (e) {
+    return '';
+  }
+}
+
+function fileExists(f) {
+  return fs.existsSync(path.join(root, f));
+}
+
+console.log('\\n=== Statuz IDE Legal Compliance Verification ===\\n');
+
+// 1. License Consistency
+console.log('--- License Consistency ---');
+check('package.json license is Apache-2.0', () =&gt; {
+  const pkg = JSON.parse(fs.readFileSync(path.join(root, 'package.json'), 'utf8'));
+  return pkg.license === 'Apache-2.0';
+});
+check('product.json licenseName is Apache-2.0', () =&gt; {
+  const prod = JSON.parse(fs.readFileSync(path.join(root, 'product.json'), 'utf8'));
+  return prod.licenseName === 'Apache-2.0';
+});
+check('README.md contains Apache license description', () =&gt; {
+  const readme = fs.readFileSync(path.join(root, 'README.md'), 'utf8');
+  return readme.includes('Apache License 2.0') || readme.includes('Apache-2.0');
+});
+
+// 2. No Glass Devtools Copyright
+console.log('\\n--- Glass Devtools Copyright ---');
+check('No "Glass Devtools" in statuz module', () =&gt; {
+  const r = grep('Glass Devtools', 'src/vs/workbench/contrib/statuz');
+  return r === '' ? true : 'Found: ' + r.substring(0, 200);
+});
+
+// 3. No Void Trademark Residue
+console.log('\\n--- Void Trademark Residue ---');
+check('No "Void Side Bar" in UI text', () =&gt; {
+  const r = grep('Void Side Bar', 'src/');
+  return r === '' ? true : 'Found: ' + r.substring(0, 200);
+});
+check('No "Void changed" comments', () =&gt; {
+  const r = grep('Void changed', 'src/');
+  return r === '' ? true : 'Found: ' + r.substring(0, 200);
+});
+check('No voideditor references in statuz module', () =&gt; {
+  const r = grep('voideditor', 'src/vs/workbench/contrib/statuz');
+  return r === '' ? true : 'Found: ' + r.substring(0, 200);
+});
+
+// 4. Copyright Headers
+console.log('\\n--- Copyright Headers ---');
+check('All statuz .ts files have copyright', () =&gt; {
+  const files = execSync(
+    'find src/vs/workbench/contrib/statuz/ -name "*.ts" -o -name "*.tsx" | head -200',
+    { cwd: root, encoding: 'utf8' }
+  ).trim().split('\\n').filter(Boolean);
+  const missing = files.filter(f =&gt; {
+    const content = fs.readFileSync(path.join(root, f), 'utf8');
+    return !content.includes('Copyright') &amp;&amp; !content.includes('Apache');
+  });
+  return missing.length === 0 ? true : 'Missing: ' + missing.join(', ');
+});
+
+// 5. Compliance Files
+console.log('\\n--- Compliance Files ---');
+check('FFMPEG_LGPL_NOTICE.txt exists', () =&gt; fileExists('FFMPEG_LGPL_NOTICE.txt'));
+check('PRIVACY.md exists', () =&gt; fileExists('PRIVACY.md'));
+check('CONTRIBUTING.md exists', () =&gt; fileExists('CONTRIBUTING.md'));
+check('LEGAL.md exists', () =&gt; fileExists('LEGAL.md'));
+
+// 6. Extension Licenses
+console.log('\\n--- Extension Licenses ---');
+check('open-remote-ssh has license', () =&gt; {
+  const pkg = JSON.parse(fs.readFileSync(
+    path.join(root, 'extensions/open-remote-ssh/package.json'), 'utf8'
+  ));
+  return !!pkg.license;
+});
+check('open-remote-wsl has license', () =&gt; {
+  const pkg = JSON.parse(fs.readFileSync(
+    path.join(root, 'extensions/open-remote-wsl/package.json'), 'utf8'
+  ));
+  return !!pkg.license;
+});
+
+// Summary
+console.log('\\n=== Verification Complete ===');
+console.log('Failures: ' + failures);
+if (failures &gt; 0) {
+  console.log('SOME CHECKS FAILED. Review the output above.');
+  process.exit(1);
+} else {
+  console.log('All checks passed!');
+  process.exit(0);
+}</span></div>
+
+    <div class="verify">
+      <strong>运行方式：</strong>
+      <div class="code-block"><span class="ctx">node verification.cjs</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== FOOTER ====== -->
+<footer>
+  <div class="container">
+    <p>Statuz IDE 法律合规执行方案 &mdash; 制定日期 2026-07-17</p>
+    <div class="disclaimer">
+      <strong>免责声明：</strong>本文档仅供参考，不构成法律建议。所有修复方案均应经过合格法律顾问审查后方可执行。本文档中的代码变更仅为示意，实际修改需在代码库中逐项实施并根据实际情况调整。\"Statuz\" 和 \"Oasis Company\" 为假定商标和实体名称，其法律地位需另行确认。本文档不保证完全合规，使用者应自行承担实施风险。
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
