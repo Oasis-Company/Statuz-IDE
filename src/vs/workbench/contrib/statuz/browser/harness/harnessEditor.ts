@@ -53,106 +53,9 @@ import { HarnessDetailPanel } from './harnessDetailPanel.js';
 import { IAgentManagementService } from '../agentManagementService.js';
 import { IAgentSkillItem, IAgentSkillFilter } from '../agentManagement.types.js';
 
-/* ─── Sample Data ────────────────────────────────────────── */
+/* ─── Data ───────────────────────────────────────────────── */
 
-const SAMPLE_ITEMS: IAgentSkillItem[] = [
-	{
-		id: 'typescript-reviewer', name: 'TypeScript Reviewer', type: 'agent',
-		description: 'Expert TypeScript/JavaScript code reviewer specializing in type safety, async correctness, and idiomatic patterns.',
-		version: '2.1.0', author: 'ECC Team', state: 'enabled',
-		iconCodicon: 'codicon-review', installPath: '~/.trae/agents/typescript-reviewer/',
-		config: { strictness: 'high' }, lastUsed: Date.now() - 3600000, usageCount: 128,
-		tags: ['typescript', 'review', 'code-quality'], category: 'Agent Engineering'
-	},
-	{
-		id: 'react-reviewer', name: 'React Reviewer', type: 'agent',
-		description: 'Specialized React code reviewer covering hooks, component patterns, performance, and accessibility.',
-		version: '1.8.0', author: 'ECC Team', state: 'enabled',
-		iconCodicon: 'codicon-review', installPath: '~/.trae/agents/react-reviewer/',
-		config: { strictness: 'moderate' }, lastUsed: Date.now() - 7200000, usageCount: 95,
-		tags: ['react', 'review', 'frontend'], category: 'Agent Engineering'
-	},
-	{
-		id: 'agent-arch-audit', name: 'Agent Architecture Audit', type: 'skill',
-		description: 'Full-stack diagnostic for agent and LLM applications. Audits the 12-layer agent stack for wrapper regression and memory pollution.',
-		version: '1.0.0', author: 'ECC Team', state: 'enabled',
-		iconCodicon: 'codicon-symbol-struct', installPath: '~/.trae/skills/agent-arch-audit/',
-		config: { depth: 'full' }, lastUsed: Date.now() - 86400000, usageCount: 47,
-		tags: ['agent', 'diagnostic', 'audit'], category: 'Agent Engineering'
-	},
-	{
-		id: 'harness-construction', name: 'Harness Construction', type: 'skill',
-		description: 'Design and optimize AI agent action spaces, tool definitions, and observation formatting for higher completion rates.',
-		version: '1.2.0', author: 'ECC Team', state: 'enabled',
-		iconCodicon: 'codicon-tools', installPath: '~/.trae/skills/harness-construction/',
-		config: { architecture: 'react', toolGranularity: 'medium' }, lastUsed: Date.now() - 43200000, usageCount: 23,
-		tags: ['agent', 'optimization', 'design'], category: 'Agent Engineering'
-	},
-	{
-		id: 'api-design', name: 'API Design', type: 'skill',
-		description: 'REST API design patterns including resource naming, status codes, pagination, error responses, and versioning.',
-		version: '2.0.0', author: 'ECC Team', state: 'enabled',
-		iconCodicon: 'codicon-link', installPath: '~/.trae/skills/api-design/',
-		config: { format: 'openapi' }, lastUsed: Date.now() - 172800000, usageCount: 156,
-		tags: ['api', 'rest', 'design'], category: 'Development Foundations'
-	},
-	{
-		id: 'coding-standards', name: 'Coding Standards', type: 'rule',
-		description: 'Baseline cross-project coding conventions for naming, readability, immutability, and code-quality review.',
-		version: '1.5.0', author: 'ECC Team', state: 'enabled',
-		iconCodicon: 'codicon-checklist', installPath: '~/.trae/rules/coding-standards/',
-		config: { strictness: 'high' }, lastUsed: Date.now() - 259200000, usageCount: 203,
-		tags: ['standards', 'linting'], category: 'Development Foundations'
-	},
-	{
-		id: 'react-patterns', name: 'React Patterns', type: 'skill',
-		description: 'React 18/19 patterns including hooks discipline, server/client component boundaries, Suspense, and state management.',
-		version: '3.0.0', author: 'ECC Team', state: 'disabled',
-		iconCodicon: 'codicon-symbol-namespace', installPath: '~/.trae/skills/react-patterns/',
-		config: { version: '19' }, lastUsed: Date.now() - 604800000, usageCount: 67,
-		tags: ['react', 'frontend', 'patterns'], category: 'Frontend & UI'
-	},
-	{
-		id: 'e2e-testing', name: 'E2E Testing', type: 'skill',
-		description: 'Playwright E2E testing patterns, Page Object Model, configuration, CI/CD integration, and flaky test strategies.',
-		version: '1.3.0', author: 'ECC Team', state: 'disabled',
-		iconCodicon: 'codicon-beaker', installPath: '~/.trae/skills/e2e-testing/',
-		config: { framework: 'playwright' }, lastUsed: Date.now() - 1209600000, usageCount: 34,
-		tags: ['testing', 'e2e', 'playwright'], category: 'Testing & Quality'
-	},
-	{
-		id: 'security-review', name: 'Security Review', type: 'skill',
-		description: 'Comprehensive security checklist for authentication, input validation, secrets, API endpoints, and payment features.',
-		version: '1.1.0', author: 'ECC Team', state: 'enabled',
-		iconCodicon: 'codicon-shield', installPath: '~/.trae/skills/security-review/',
-		config: { scanDepth: 'deep' }, lastUsed: Date.now() - 1800000, usageCount: 89,
-		tags: ['security', 'audit', 'best-practices'], category: 'Testing & Quality'
-	},
-	{
-		id: 'blueprint', name: 'Blueprint', type: 'skill',
-		description: 'Turn a one-line objective into a step-by-step construction plan for multi-session, multi-agent engineering projects.',
-		version: '1.0.0', author: 'ECC Team', state: 'enabled',
-		iconCodicon: 'codicon-map', installPath: '~/.trae/skills/blueprint/',
-		config: { format: 'detailed' }, lastUsed: Date.now() - 86400000, usageCount: 42,
-		tags: ['planning', 'architecture', 'multi-agent'], category: 'Planning & Architecture'
-	},
-	{
-		id: 'ecc-catalog', name: 'ECC Catalog', type: 'command',
-		description: 'Browse and manage the full ECC (Everything Claude Code) catalog of agents, skills, commands, and rules.',
-		version: '1.0.0', author: 'ECC Team', state: 'enabled',
-		iconCodicon: 'codicon-package', installPath: '~/.trae/commands/ecc-catalog/',
-		config: { autoRefresh: true }, lastUsed: Date.now() - 14400000, usageCount: 12,
-		tags: ['ecc', 'catalog', 'management'], category: 'Operations'
-	},
-	{
-		id: 'cost-tracking', name: 'Cost Tracking', type: 'skill',
-		description: 'Track and report token usage, spending, and budgets. Views cost breakdowns by project, tool, session, or date.',
-		version: '0.9.0', author: 'ECC Team', state: 'disabled',
-		iconCodicon: 'codicon-credit-card', installPath: '~/.trae/skills/cost-tracking/',
-		config: { budget: 50 }, lastUsed: Date.now() - 604800000, usageCount: 18,
-		tags: ['cost', 'tracking', 'analytics'], category: 'Operations'
-	},
-];
+// All data is served by agentManagementService.ts
 
 /* ─── HarnessEditor ──────────────────────────────────────── */
 
@@ -170,7 +73,6 @@ export class HarnessEditor extends EditorPane {
 	private cardGridContainer!: HTMLElement;
 	private detailPanelContainer!: HTMLElement;
 
-	private items: IAgentSkillItem[] = SAMPLE_ITEMS;
 	private currentTab: 'catalog' | 'installed' | 'harness' | 'config' = 'catalog';
 	private currentFilter: IAgentSkillFilter = {
 		query: '', type: 'all', state: 'all',
@@ -286,9 +188,10 @@ export class HarnessEditor extends EditorPane {
 	private renderCatalogView(): void {
 		this.sidebarContainer.style.display = '';
 		this.detailPanelContainer.style.display = '';
-		this.sidebar.show(this.items);
-		this.cardGrid.render(this.items, this.currentFilter);
-		this.statusBar.update(this.items.length, 12, 8);
+		const items = this.agentMgmtService.getItems();
+		this.cardGrid.render(items, this.currentFilter);
+		const enabled = items.filter(i => i.state === 'enabled').length;
+		this.statusBar.update(items.length, enabled, enabled);
 	}
 
 	// ─── Installed View ─────────────────────────────────────
@@ -296,10 +199,10 @@ export class HarnessEditor extends EditorPane {
 	private renderInstalledView(): void {
 		this.sidebarContainer.style.display = '';
 		this.detailPanelContainer.style.display = '';
-		const installed = this.items.filter(i => i.state === 'enabled' || i.state === 'error');
-		this.sidebar.show(installed);
+		const items = this.agentMgmtService.getItems();
+		const installed = items.filter(i => i.state === 'enabled' || i.state === 'error');
 		this.cardGrid.render(installed, this.currentFilter);
-		this.statusBar.update(this.items.length, installed.length, installed.filter(i => i.state === 'enabled').length);
+		this.statusBar.update(items.length, installed.length, installed.filter(i => i.state === 'enabled').length);
 	}
 
 	// ─── Harness Dashboard ──────────────────────────────────
@@ -307,8 +210,10 @@ export class HarnessEditor extends EditorPane {
 	private renderHarnessDashboard(): void {
 		this.sidebarContainer.style.display = 'none';
 		this.detailPanelContainer.style.display = 'none';
-		this.cardGrid.renderDashboard(this.items);
-		this.statusBar.update(this.items.length, 12, 8);
+		const items = this.agentMgmtService.getItems();
+		this.cardGrid.renderDashboard(items);
+		const enabled = items.filter(i => i.state === 'enabled').length;
+		this.statusBar.update(items.length, enabled, enabled);
 	}
 
 	// ─── Config View ────────────────────────────────────────
@@ -317,14 +222,16 @@ export class HarnessEditor extends EditorPane {
 		this.sidebarContainer.style.display = 'none';
 		this.detailPanelContainer.style.display = 'none';
 		this.cardGrid.renderConfigView();
-		this.statusBar.update(this.items.length, 12, 8);
+		const items = this.agentMgmtService.getItems();
+		const enabled = items.filter(i => i.state === 'enabled').length;
+		this.statusBar.update(items.length, enabled, enabled);
 	}
 
 	// ─── Filter & Select ────────────────────────────────────
 
 	private onFilterChange(filter: IAgentSkillFilter): void {
 		this.currentFilter = filter;
-		this.cardGrid.render(this.items, this.currentFilter);
+		this.cardGrid.render(this.agentMgmtService.getItems(), this.currentFilter);
 	}
 
 	private onCardSelect(item: IAgentSkillItem): void {
@@ -338,22 +245,19 @@ export class HarnessEditor extends EditorPane {
 
 	// ─── Actions ────────────────────────────────────────────
 
-	private handleInstall(_id: string): void {
-		// TODO: Phase 3 — actual install to .trae/
-		console.log('[Harness] Install:', _id);
+	private handleInstall(id: string): void {
+		this.agentMgmtService.installItem(id);
 	}
 
-	private handleUninstall(_id: string): void {
-		// TODO: Phase 3 — actual uninstall from .trae/
-		console.log('[Harness] Uninstall:', _id);
+	private handleUninstall(id: string): void {
+		this.agentMgmtService.uninstallItem(id);
 	}
 
 	private handleToggle(id: string, state: 'enabled' | 'disabled'): void {
 		this.agentMgmtService.setItemState(id, state);
-		const item = this.items.find(i => i.id === id);
+		const item = this.agentMgmtService.getItem(id);
 		if (item) {
-			item.state = state;
-			this.cardGrid.render(this.items, this.currentFilter);
+			this.cardGrid.render(this.agentMgmtService.getItems(), this.currentFilter);
 			this.detailPanel.show(item, {
 				onInstall: (i) => this.handleInstall(i),
 				onUninstall: (i) => this.handleUninstall(i),
@@ -365,10 +269,6 @@ export class HarnessEditor extends EditorPane {
 
 	private handleConfigSave(id: string, config: Record<string, any>): void {
 		this.agentMgmtService.updateConfig(id, config);
-		const item = this.items.find(i => i.id === id);
-		if (item) {
-			item.config = { ...item.config, ...config };
-		}
 	}
 
 	// ─── Dispose ────────────────────────────────────────────

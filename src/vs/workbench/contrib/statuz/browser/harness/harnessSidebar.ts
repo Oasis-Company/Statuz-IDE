@@ -5,7 +5,7 @@
 
 import { append, $, clearNode, addDisposableListener } from '../../../../../base/browser/dom.js';
 import { Disposable } from '../../../../../base/common/lifecycle.js';
-import { IAgentSkillItem, IAgentSkillFilter, AgentSkillType, ItemState } from '../agentManagement.types.js';
+import { IAgentSkillFilter, AgentSkillType, ItemState } from '../agentManagement.types.js';
 
 export class HarnessSidebar extends Disposable {
 
@@ -193,10 +193,6 @@ export class HarnessSidebar extends Disposable {
 			this.currentFilter.sortBy = this.sortSelect.value as 'name' | 'lastUsed' | 'usageCount' | 'state';
 			this.emitFilter();
 		}));
-	}
-
-	show(_items: IAgentSkillItem[]): void {
-		// items stored for future use
 	}
 
 	private emitFilter(): void {

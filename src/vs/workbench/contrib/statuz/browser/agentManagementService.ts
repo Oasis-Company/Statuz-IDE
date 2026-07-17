@@ -17,6 +17,8 @@ export interface IAgentManagementService {
 	getItem(id: string): IAgentSkillItem | undefined;
 	setItemState(id: string, state: ItemState): void;
 	updateConfig(id: string, config: Record<string, any>): void;
+	installItem(id: string): Promise<void>;
+	uninstallItem(id: string): Promise<void>;
 	refresh(): void;
 }
 
@@ -223,6 +225,24 @@ export class AgentManagementService implements IAgentManagementService {
 		const item = this.items.find(i => i.id === id);
 		if (item) {
 			item.config = { ...item.config, ...config };
+			this._onDidChangeItems.fire();
+		}
+	}
+
+	async installItem(id: string): Promise<void> {
+		// TODO: Phase 3 — real install via EccInstallService
+		const item = this.items.find(i => i.id === id);
+		if (item) {
+			item.state = 'enabled';
+			this._onDidChangeItems.fire();
+		}
+	}
+
+	async uninstallItem(id: string): Promise<void> {
+		// TODO: Phase 3 — real uninstall via EccInstallService
+		const item = this.items.find(i => i.id === id);
+		if (item) {
+			item.state = 'disabled';
 			this._onDidChangeItems.fire();
 		}
 	}
