@@ -1,7 +1,7 @@
-/*---------------------------------------------------------------------------------------------
- *  Copyright (c) Microsoft Corporation. All rights reserved.
- *  Licensed under the MIT License. See License.txt in the project root for license information.
- *--------------------------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------------------
+ *  Copyright 2026 Statuz. All rights reserved.
+ *  Licensed under the Apache License, Version 2.0. See LICENSE.txt for more information.
+ *--------------------------------------------------------------------------------------*/
 
 import { append, $, clearNode } from '../../../../../base/browser/dom.js';
 import { Disposable } from '../../../../../base/common/lifecycle.js';
@@ -184,7 +184,7 @@ export class HarnessCardGrid extends Disposable {
 			: 'No items found';
 	}
 
-	renderDashboard(items: IAgentSkillItem[]): void {
+	renderDashboard(items: IAgentSkillItem[], actions?: { onInstallRecommended?: () => void; onCheckUpdates?: () => void }): void {
 		clearNode(this.container);
 
 		const dashboard = append(this.container, $('.harness-dashboard'));
@@ -219,18 +219,18 @@ export class HarnessCardGrid extends Disposable {
 
 		// Quick actions
 		const quickActions = append(dashboard, $('.harness-dashboard-quick-actions'));
-		const actions = [
-			{ icon: 'codicon-package', label: 'Browse Catalog', action: () => { /* tab switch handled externally */ } },
-			{ icon: 'codicon-cloud-download', label: 'Install Recommended', action: () => {} },
-			{ icon: 'codicon-sync', label: 'Check for Updates', action: () => {} },
-			{ icon: 'codicon-settings-gear', label: 'Configure Settings', action: () => {} },
+		const actionItems = [
+			{ icon: 'codicon-package', label: 'Browse Catalog', handler: () => { /* tab switch handled externally */ } },
+			{ icon: 'codicon-cloud-download', label: 'Install Recommended', handler: actions?.onInstallRecommended ?? (() => {}) },
+			{ icon: 'codicon-sync', label: 'Check for Updates', handler: actions?.onCheckUpdates ?? (() => {}) },
+			{ icon: 'codicon-settings-gear', label: 'Configure Settings', handler: () => {} },
 		];
 
-		actions.forEach(a => {
+		actionItems.forEach(a => {
 			const btn = append(quickActions, $('button.harness-dashboard-quick-btn'));
 			append(btn, $('span.codicon')).className = `codicon ${a.icon}`;
 			append(btn, document.createTextNode(` ${a.label}`));
-			btn.addEventListener('click', a.action);
+			btn.addEventListener('click', a.handler);
 		});
 	}
 

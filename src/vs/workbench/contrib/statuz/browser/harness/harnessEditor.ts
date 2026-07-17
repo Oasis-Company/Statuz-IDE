@@ -1,7 +1,7 @@
-/*---------------------------------------------------------------------------------------------
- *  Copyright (c) Microsoft Corporation. All rights reserved.
- *  Licensed under the MIT License. See License.txt in the project root for license information.
- *--------------------------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------------------
+ *  Copyright 2026 Statuz. All rights reserved.
+ *  Licensed under the Apache License, Version 2.0. See LICENSE.txt for more information.
+ *--------------------------------------------------------------------------------------*/
 
 import './harness.css';
 
@@ -211,7 +211,18 @@ export class HarnessEditor extends EditorPane {
 		this.sidebarContainer.style.display = 'none';
 		this.detailPanelContainer.style.display = 'none';
 		const items = this.agentMgmtService.getItems();
-		this.cardGrid.renderDashboard(items);
+		this.cardGrid.renderDashboard(items, {
+			onInstallRecommended: () => {
+				// Install all disabled items
+				items.filter(i => i.state === 'disabled').forEach(i => {
+					this.handleInstall(i.id);
+				});
+			},
+			onCheckUpdates: () => {
+				// Trigger refresh and show status
+				this.statusBar.update(items.length, items.filter(i => i.state === 'enabled').length, items.filter(i => i.state === 'enabled').length);
+			},
+		});
 		const enabled = items.filter(i => i.state === 'enabled').length;
 		this.statusBar.update(items.length, enabled, enabled);
 	}
