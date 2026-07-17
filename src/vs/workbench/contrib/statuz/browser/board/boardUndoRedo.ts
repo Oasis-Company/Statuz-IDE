@@ -3,6 +3,7 @@
  *  Licensed under the Apache License, Version 2.0.
  *  Ported from Sandboxer src/components/flow/hooks/useBoardUndoRedo.ts
  *  Adapted: React hooks (useRef → class field, useState → external callback)
+ *  Original work Copyright (c) Sandboxer authors. Licensed under the MIT License.
  *--------------------------------------------------------------------------------------------*/
 
 import type { FlowNodeLayout, FlowEdgeData, StoredViewport } from './boardTypes.js';
