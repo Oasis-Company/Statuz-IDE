@@ -1,0 +1,28 @@
+FFMPEG LGPL NOTICE
+
+Statuz IDE distributes ffmpeg (version 5.1.git) under the terms of the
+GNU Lesser General Public License version 2.1 or later (LGPL-2.1+).
+
+FFmpeg is dynamically linked — it is distributed as a separate shared
+library (.dll/.so/.dylib) and is not statically linked into the Statuz
+IDE executable. You may replace the bundled ffmpeg library with your
+own build or a modified version.
+
+Source code for the exact version of ffmpeg distributed with this
+release can be obtained from:
+
+    https://ffmpeg.org/download.html
+
+The full text of the LGPL-2.1 license can be found at:
+
+    https://www.gnu.org/licenses/lgpl-2.1.html
+
+Statuz IDE itself makes no modifications to the ffmpeg source code.
+The library is used as-is from the upstream ffmpeg project.
+
+If you require the source code on physical media, please contact the
+maintainers via the project repository:
+https://github.com/Oasis-Company/Statuz-IDE
+
+This offer is valid for three years from the date of distribution of
+this product.
