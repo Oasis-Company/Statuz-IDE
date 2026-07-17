@@ -236,12 +236,12 @@ function createCopilotSetupStep(id: string, button: string, when: string, includ
 export const walkthroughs: GettingStartedWalkthroughContent = [
 	{
 		id: 'Setup',
-		title: localize('gettingStarted.setup.title', "Get Started with VS Code"),
+		title: localize('gettingStarted.setup.title', "Get Started with Statuz IDE"),
 		description: localize('gettingStarted.setup.description', "Customize your editor, learn the basics, and start coding"),
 		isFeatured: true,
 		icon: setupIcon,
 		when: '!isWeb',
-		walkthroughPageTitle: localize('gettingStarted.setup.walkthroughPageTitle', 'Setup VS Code'),
+		walkthroughPageTitle: localize('gettingStarted.setup.walkthroughPageTitle', 'Setup Statuz IDE'),
 		next: 'Beginner',
 		content: {
 			type: 'steps',
@@ -262,7 +262,7 @@ export const walkthroughs: GettingStartedWalkthroughContent = [
 				{
 					id: 'extensionsWeb',
 					title: localize('gettingStarted.extensions.title', "Code with extensions"),
-					description: localize('gettingStarted.extensionsWeb.description.interpolated', "Extensions are VS Code's power-ups. A growing number are becoming available in the web.\n{0}", Button(localize('browsePopularWeb', "Browse Popular Web Extensions"), 'command:workbench.extensions.action.showPopularExtensions')),
+					description: localize('gettingStarted.extensionsWeb.description.interpolated', "Extensions are Statuz IDE's power-ups. A growing number are becoming available in the web.\n{0}", Button(localize('browsePopularWeb', "Browse Popular Web Extensions"), 'command:workbench.extensions.action.showPopularExtensions')),
 					when: 'workspacePlatform == \'webworker\'',
 					media: {
 						type: 'svg', altText: 'VS Code extension marketplace with featured language extensions', path: 'extensions-web.svg'
@@ -358,7 +358,7 @@ export const walkthroughs: GettingStartedWalkthroughContent = [
 		icon: setupIcon,
 		when: 'isWeb',
 		next: 'Beginner',
-		walkthroughPageTitle: localize('gettingStarted.setupWeb.walkthroughPageTitle', 'Setup VS Code Web'),
+		walkthroughPageTitle: localize('gettingStarted.setupWeb.walkthroughPageTitle', 'Setup Statuz IDE Web'),
 		content: {
 			type: 'steps',
 			steps: [
@@ -444,7 +444,7 @@ export const walkthroughs: GettingStartedWalkthroughContent = [
 		icon: setupIcon,
 		when: CONTEXT_ACCESSIBILITY_MODE_ENABLED.key,
 		next: 'Setup',
-		walkthroughPageTitle: localize('gettingStarted.setupAccessibility.walkthroughPageTitle', 'Setup VS Code Accessibility'),
+		walkthroughPageTitle: localize('gettingStarted.setupAccessibility.walkthroughPageTitle', 'Setup Statuz IDE Accessibility'),
 		content: {
 			type: 'steps',
 			steps: [
@@ -548,7 +548,7 @@ export const walkthroughs: GettingStartedWalkthroughContent = [
 				{
 					id: 'extensions',
 					title: localize('gettingStarted.extensions.title', "Code with extensions"),
-					description: localize('gettingStarted.extensions.description.interpolated', "Extensions are VS Code's power-ups. They range from handy productivity hacks, expanding out-of-the-box features, to adding completely new capabilities.\n{0}", Button(localize('browsePopular', "Browse Popular Extensions"), 'command:workbench.extensions.action.showPopularExtensions')),
+					description: localize('gettingStarted.extensions.description.interpolated', "Extensions are Statuz IDE's power-ups. They range from handy productivity hacks, expanding out-of-the-box features, to adding completely new capabilities.\n{0}", Button(localize('browsePopular', "Browse Popular Extensions"), 'command:workbench.extensions.action.showPopularExtensions')),
 					when: 'workspacePlatform != \'webworker\'',
 					media: {
 						type: 'svg', altText: 'VS Code extension marketplace with featured language extensions', path: 'extensions.svg'
