@@ -1,4 +1,7 @@
-
+/*--------------------------------------------------------------------------------------
+ *  Copyright 2026 Statuz. All rights reserved.
+ *  Licensed under the Apache License, Version 2.0. See LICENSE.txt for more information.
+ *--------------------------------------------------------------------------------------*/
 export const separateOutFirstLine = (content: string): [string, string] | [string, undefined] => {
 	const newLineIdx = content.indexOf('\r\n')
 	if (newLineIdx !== -1) {
