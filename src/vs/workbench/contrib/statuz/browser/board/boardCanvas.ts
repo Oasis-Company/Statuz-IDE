@@ -4,10 +4,20 @@
  *  Native SVG canvas for Board — replaces React Flow with VS Code-native SVG
  *--------------------------------------------------------------------------------------------*/
 
-import type { FlowNodeLayout, FlowEdgeData, SandboxCard, Constitution } from './boardTypes.js';
+import type { FlowEdgeData, SandboxCard, Constitution } from './boardTypes.js';
 import { renderConstitutionNode, renderStrategyCardNode, renderDecisionNode } from './boardNodes.js';
+import {
+	renderEdgePath, renderEdgeLabel, renderConnectionHandles,
+	renderTempEdge, findNodeAtPosition,
+	createConnectState, EDGE_COLORS,
+} from './boardEdges.js';
+import type { ConnectState, PortPosition } from './boardEdges.js';
 import type { BoardStateManager } from './boardStateManager.js';
 import type { BoardUndoRedo, BoardSnapshot } from './boardUndoRedo.js';
+import type { IContextMenuService } from '../../../../../platform/contextview/browser/contextView.js';
+import { Action } from '../../../../../base/common/actions.js';
+import { StandardMouseEvent } from '../../../../../base/browser/mouseEvent.js';
+import type { IContextMenuDelegate } from '../../../../../base/browser/contextmenu.js';
 
 /* ─── Types ──────────────────────────────────────────────── */
 
@@ -20,9 +30,14 @@ export interface BoardCanvasData {
 export interface BoardCanvasCallbacks {
 	onNodeDoubleClick?: (nodeId: string, nodeType: string) => void;
 	onAddEdge?: (source: string, target: string, type: FlowEdgeData['type']) => void;
-	onRemoveEdge?: (id: string) => void;
+	onRemoveEdge?: (edgeId: string) => void;
 	onAddCard?: (type: string) => void;
+	onAddDecision?: () => void;
+	onRemoveNode?: (nodeId: string, nodeType: string) => void;
+	onDuplicateNode?: (nodeId: string) => void;
+	onEditNode?: (nodeId: string, nodeType: string) => void;
 	onLayoutChange?: (layout: 'column' | 'dagre' | 'manual') => void;
+	onFitView?: () => void;
 }
 
 /* ─── Constants ──────────────────────────────────────────── */
@@ -37,12 +52,14 @@ export class BoardCanvas {
 	private boardGroup: SVGGElement;
 	private edgeGroup: SVGGElement;
 	private nodeGroup: SVGGElement;
+	private tempEdgeGroup: SVGGElement;
 	private defs: SVGDefsElement;
 
 	private stateManager: BoardStateManager;
 	private undoRedo: BoardUndoRedo;
 	private data: BoardCanvasData;
 	private callbacks: BoardCanvasCallbacks;
+	private contextMenuService: IContextMenuService;
 
 	// Interaction state
 	private isPanning = false;
@@ -51,6 +68,10 @@ export class BoardCanvas {
 	private dragStart = { x: 0, y: 0 };
 	private dragNodeStartPos = { x: 0, y: 0 };
 	private selectedNodeIds: Set<string> = new Set();
+	private selectedEdgeId: string | null = null;
+
+	// Drag-to-connect state
+	private connectState: ConnectState = createConnectState();
 
 	// Viewport
 	private viewBox = { x: 0, y: 0, width: 1200, height: 800 };
@@ -60,12 +81,14 @@ export class BoardCanvas {
 		stateManager: BoardStateManager,
 		undoRedo: BoardUndoRedo,
 		data: BoardCanvasData,
+		contextMenuService: IContextMenuService,
 		callbacks: BoardCanvasCallbacks = {},
 	) {
 		this.container = container;
 		this.stateManager = stateManager;
 		this.undoRedo = undoRedo;
 		this.data = data;
+		this.contextMenuService = contextMenuService;
 		this.callbacks = callbacks;
 
 		// Create SVG structure
@@ -74,9 +97,11 @@ export class BoardCanvas {
 		this.svg.appendChild(this.defs);
 		this.edgeGroup = this.createGroup('board-edges');
 		this.nodeGroup = this.createGroup('board-nodes');
+		this.tempEdgeGroup = this.createGroup('board-temp-edges');
 		this.boardGroup = this.createGroup('board-root');
 		this.boardGroup.appendChild(this.edgeGroup);
 		this.boardGroup.appendChild(this.nodeGroup);
+		this.boardGroup.appendChild(this.tempEdgeGroup);
 		this.svg.appendChild(this.boardGroup);
 
 		container.appendChild(this.svg);
@@ -125,18 +150,10 @@ export class BoardCanvas {
 
 	private getArrowMarkers(): string {
 		const types = ['informs', 'constrains', 'contradicts', 'validates', 'extends'];
-		const colors: Record<string, string> = {
-			informs: '#a8a29e',
-			constrains: '#f59e0b',
-			contradicts: '#ef4444',
-			validates: '#10b981',
-			extends: '#3b82f6',
-		};
-
 		return types.map(type => `
 			<marker id="arrow-${type}" viewBox="0 0 8 8" refX="7" refY="4"
 				markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto">
-				<path d="M1 1 L7 4 L1 7 Z" fill="${colors[type]}" />
+				<path d="M1 1 L7 4 L1 7 Z" fill="${EDGE_COLORS[type]}" />
 			</marker>
 		`).join('');
 	}
@@ -169,13 +186,22 @@ export class BoardCanvas {
 		this.applyViewBox();
 	}
 
+	/* ─── SVG-to-Client Coordinate Conversion ──────────────── */
+
+	private clientToSvg(clientX: number, clientY: number): { x: number; y: number } {
+		const rect = this.svg.getBoundingClientRect();
+		return {
+			x: this.viewBox.x + (clientX - rect.left) * (this.viewBox.width / rect.width),
+			y: this.viewBox.y + (clientY - rect.top) * (this.viewBox.height / rect.height),
+		};
+	}
+
 	/* ─── Events ───────────────────────────────────────────── */
 
 	private bindEvents(): void {
 		this.svg.addEventListener('mousedown', this.onMouseDown);
-		this.svg.addEventListener('mousemove', this.onMouseMove);
-		this.svg.addEventListener('mouseup', this.onMouseUp);
-		this.svg.addEventListener('mouseleave', this.onMouseUp);
+		window.addEventListener('mousemove', this.onMouseMove);
+		window.addEventListener('mouseup', this.onMouseUp);
 		this.svg.addEventListener('wheel', this.onWheel, { passive: false });
 		this.svg.addEventListener('dblclick', this.onDoubleClick);
 		this.svg.addEventListener('contextmenu', this.onContextMenu);
@@ -184,19 +210,33 @@ export class BoardCanvas {
 
 	unbind(): void {
 		this.svg.removeEventListener('mousedown', this.onMouseDown);
-		this.svg.removeEventListener('mousemove', this.onMouseMove);
-		this.svg.removeEventListener('mouseup', this.onMouseUp);
-		this.svg.removeEventListener('mouseleave', this.onMouseUp);
+		window.removeEventListener('mousemove', this.onMouseMove);
+		window.removeEventListener('mouseup', this.onMouseUp);
 		this.svg.removeEventListener('wheel', this.onWheel);
 		this.svg.removeEventListener('dblclick', this.onDoubleClick);
 		this.svg.removeEventListener('contextmenu', this.onContextMenu);
 		document.removeEventListener('keydown', this.onKeyDown);
 	}
 
-	/* ─── Mouse: Pan ───────────────────────────────────────── */
+	/* ─── Mouse: Down ──────────────────────────────────────── */
 
 	private readonly onMouseDown = (e: MouseEvent): void => {
 		const target = e.target as Element;
+
+		// Check if clicking on a connection handle
+		const handle = target.closest('.board-connection-handle') as SVGElement;
+		if (handle) {
+			this.startConnection(handle, e);
+			return;
+		}
+
+		// Check if clicking on an edge
+		const edgeEl = target.closest('[data-edge-id]') as SVGElement;
+		if (edgeEl) {
+			this.selectEdge(edgeEl.getAttribute('data-edge-id')!);
+			e.preventDefault();
+			return;
+		}
 
 		// Check if clicking on a node (for drag)
 		const nodeEl = target.closest('[data-node-id]') as SVGElement;
@@ -210,11 +250,25 @@ export class BoardCanvas {
 			this.isPanning = true;
 			this.dragStart = { x: e.clientX, y: e.clientY };
 			this.svg.style.cursor = 'grabbing';
+			this.selectedEdgeId = null;
+			this.render();
 			e.preventDefault();
 		}
 	};
 
+	/* ─── Mouse: Move ──────────────────────────────────────── */
+
 	private readonly onMouseMove = (e: MouseEvent): void => {
+		// Drag-to-connect
+		if (this.connectState.active) {
+			const svgPos = this.clientToSvg(e.clientX, e.clientY);
+			this.connectState.currentX = svgPos.x;
+			this.connectState.currentY = svgPos.y;
+			this.renderTempEdge();
+			return;
+		}
+
+		// Pan
 		if (this.isPanning) {
 			const dx = (e.clientX - this.dragStart.x) * (this.viewBox.width / this.svg.clientWidth);
 			const dy = (e.clientY - this.dragStart.y) * (this.viewBox.height / this.svg.clientHeight);
@@ -225,13 +279,13 @@ export class BoardCanvas {
 			return;
 		}
 
+		// Node drag
 		if (this.isDraggingNode && this.dragNodeId) {
 			const dx = (e.clientX - this.dragStart.x) * (this.viewBox.width / this.svg.clientWidth);
 			const dy = (e.clientY - this.dragStart.y) * (this.viewBox.height / this.svg.clientHeight);
 			const newX = this.dragNodeStartPos.x + dx;
 			const newY = this.dragNodeStartPos.y + dy;
 
-			// Update all selected nodes
 			for (const nodeId of this.selectedNodeIds) {
 				const nodeEl = this.nodeGroup.querySelector(`[data-node-id="${nodeId}"]`);
 				if (nodeEl) {
@@ -246,7 +300,7 @@ export class BoardCanvas {
 			return;
 		}
 
-		// Connection handle hover
+		// Cursor feedback
 		const handle = (e.target as Element).closest('.board-connection-handle');
 		if (handle) {
 			this.svg.style.cursor = 'crosshair';
@@ -255,18 +309,25 @@ export class BoardCanvas {
 		}
 	};
 
+	/* ─── Mouse: Up ────────────────────────────────────────── */
+
 	private readonly onMouseUp = (e: MouseEvent): void => {
+		// Finish drag-to-connect
+		if (this.connectState.active) {
+			this.finishConnection(e);
+			return;
+		}
+
+		// Finish node drag
 		if (this.isDraggingNode && this.dragNodeId) {
 			const dx = (e.clientX - this.dragStart.x) * (this.viewBox.width / this.svg.clientWidth);
 			const dy = (e.clientY - this.dragStart.y) * (this.viewBox.height / this.svg.clientHeight);
 			const newX = this.dragNodeStartPos.x + dx;
 			const newY = this.dragNodeStartPos.y + dy;
 
-			// Save snapshot before position change
 			const snapshot = this.createSnapshot();
 			this.undoRedo.pushSnapshot(snapshot);
 
-			// Update all selected nodes
 			for (const nodeId of this.selectedNodeIds) {
 				const layout = this.stateManager.getState().nodeLayouts.find(n => n.id === nodeId);
 				if (layout) {
@@ -285,6 +346,7 @@ export class BoardCanvas {
 			return;
 		}
 
+		// Finish pan
 		if (this.isPanning) {
 			this.isPanning = false;
 			this.svg.style.cursor = 'grab';
@@ -295,6 +357,92 @@ export class BoardCanvas {
 			});
 		}
 	};
+
+	/* ─── Drag-to-Connect ──────────────────────────────────── */
+
+	private startConnection(handle: SVGElement, e: MouseEvent): void {
+		const nodeId = handle.getAttribute('data-node-id');
+		const direction = handle.getAttribute('data-direction') as PortPosition;
+		if (!nodeId || !direction) return;
+
+		this.connectState.active = true;
+		this.connectState.sourceNodeId = nodeId;
+		this.connectState.sourcePort = direction;
+
+		const svgPos = this.clientToSvg(e.clientX, e.clientY);
+		this.connectState.currentX = svgPos.x;
+		this.connectState.currentY = svgPos.y;
+
+		this.svg.style.cursor = 'crosshair';
+		e.preventDefault();
+		e.stopPropagation();
+	}
+
+	private renderTempEdge(): void {
+		this.tempEdgeGroup.innerHTML = '';
+		if (!this.connectState.sourceNodeId) return;
+
+		const sourceLayout = this.stateManager.getState().nodeLayouts.find(
+			n => n.id === this.connectState.sourceNodeId,
+		);
+		if (!sourceLayout) return;
+
+		const path = renderTempEdge(this.connectState, sourceLayout);
+		if (path) {
+			this.tempEdgeGroup.appendChild(path);
+		}
+
+		// Highlight potential target
+		const layouts = this.stateManager.getState().nodeLayouts;
+		const target = findNodeAtPosition(
+			this.connectState.currentX, this.connectState.currentY,
+			layouts, this.connectState.sourceNodeId,
+		);
+
+		// Update node opacity to show target
+		for (const nodeEl of this.nodeGroup.querySelectorAll('[data-node-id]')) {
+			const el = nodeEl as SVGElement;
+			const nid = el.getAttribute('data-node-id');
+			if (target && nid === target.id) {
+				el.setAttribute('opacity', '1');
+				el.setAttribute('filter', 'drop-shadow(0 0 4px var(--vscode-textLink-foreground))');
+			} else if (nid !== this.connectState.sourceNodeId) {
+				el.setAttribute('opacity', '0.4');
+				el.removeAttribute('filter');
+			}
+		}
+	}
+
+	private finishConnection(e: MouseEvent): void {
+		const svgPos = this.clientToSvg(e.clientX, e.clientY);
+		const layouts = this.stateManager.getState().nodeLayouts;
+		const target = findNodeAtPosition(svgPos.x, svgPos.y, layouts, this.connectState.sourceNodeId ?? undefined);
+
+		if (target && this.connectState.sourceNodeId && this.callbacks.onAddEdge) {
+			const existingEdge = this.stateManager.getState().edges.find(
+				ed => ed.source === this.connectState.sourceNodeId && ed.target === target.id,
+			);
+			if (!existingEdge) {
+				const snapshot = this.createSnapshot();
+				this.undoRedo.pushSnapshot(snapshot);
+				this.callbacks.onAddEdge(this.connectState.sourceNodeId, target.id, 'informs');
+			}
+		}
+
+		// Reset
+		this.connectState = createConnectState();
+		this.tempEdgeGroup.innerHTML = '';
+		this.svg.style.cursor = 'grab';
+		this.render();
+	}
+
+	/* ─── Edge Selection ───────────────────────────────────── */
+
+	private selectEdge(edgeId: string): void {
+		this.selectedEdgeId = this.selectedEdgeId === edgeId ? null : edgeId;
+		this.selectedNodeIds.clear();
+		this.render();
+	}
 
 	/* ─── Mouse: Node Drag ─────────────────────────────────── */
 
@@ -316,6 +464,7 @@ export class BoardCanvas {
 			}
 		}
 
+		this.selectedEdgeId = null;
 		this.isDraggingNode = true;
 		this.dragNodeId = nodeId;
 		this.dragStart = { x: e.clientX, y: e.clientY };
@@ -358,13 +507,138 @@ export class BoardCanvas {
 
 	private readonly onContextMenu = (e: MouseEvent): void => {
 		e.preventDefault();
-		// Context menu will be handled by VS Code's IContextMenuService in Phase 3 Commit 6
+
+		const nodeEl = (e.target as Element).closest('[data-node-id]') as SVGElement;
+		const edgeEl = (e.target as Element).closest('[data-edge-id]') as SVGElement;
+
+		if (nodeEl) {
+			this.showNodeContextMenu(nodeEl, e);
+		} else if (edgeEl) {
+			this.showEdgeContextMenu(edgeEl, e);
+		} else {
+			this.showCanvasContextMenu(e);
+		}
 	};
+
+	/* ─── Context Menu: Node ───────────────────────────────── */
+
+	private showNodeContextMenu(nodeEl: SVGElement, e: MouseEvent): void {
+		const nodeId = nodeEl.getAttribute('data-node-id')!;
+		const nodeType = nodeEl.getAttribute('data-node-type')!;
+
+		// Select the node
+		if (!this.selectedNodeIds.has(nodeId)) {
+			this.selectedNodeIds.clear();
+			this.selectedNodeIds.add(nodeId);
+		}
+		this.selectedEdgeId = null;
+		this.render();
+
+		const delegate: IContextMenuDelegate = {
+			getAnchor: () => new StandardMouseEvent(window, e),
+			getActions: () => [
+				new Action('board.editNode', 'Edit', undefined, true, () => {
+					this.callbacks.onEditNode?.(nodeId, nodeType);
+				}),
+				new Action('board.duplicateNode', 'Duplicate', undefined, true, () => {
+					this.callbacks.onDuplicateNode?.(nodeId);
+				}),
+				new Action('board.separator1', ''),
+				new Action('board.deleteNode', 'Delete', undefined, true, () => {
+					const snapshot = this.createSnapshot();
+					this.undoRedo.pushSnapshot(snapshot);
+					this.callbacks.onRemoveNode?.(nodeId, nodeType);
+				}),
+			],
+		};
+
+		this.contextMenuService.showContextMenu(delegate);
+	}
+
+	/* ─── Context Menu: Edge ───────────────────────────────── */
+
+	private showEdgeContextMenu(edgeEl: SVGElement, e: MouseEvent): void {
+		const edgeId = edgeEl.getAttribute('data-edge-id')!;
+		this.selectedEdgeId = edgeId;
+		this.selectedNodeIds.clear();
+		this.render();
+
+		const edge = this.stateManager.getState().edges.find(ed => ed.id === edgeId);
+		const currentType = edge?.type || 'informs';
+
+		const delegate: IContextMenuDelegate = {
+			getAnchor: () => new StandardMouseEvent(window, e),
+			getActions: () => [
+				new Action('board.edgeTypeInforms', 'Type: informs', currentType === 'informs' ? 'checked' : '', true, () => {
+					if (edge) this.changeEdgeType(edgeId, 'informs');
+				}),
+				new Action('board.edgeTypeConstrains', 'Type: constrains', currentType === 'constrains' ? 'checked' : '', true, () => {
+					if (edge) this.changeEdgeType(edgeId, 'constrains');
+				}),
+				new Action('board.edgeTypeContradicts', 'Type: contradicts', currentType === 'contradicts' ? 'checked' : '', true, () => {
+					if (edge) this.changeEdgeType(edgeId, 'contradicts');
+				}),
+				new Action('board.edgeTypeValidates', 'Type: validates', currentType === 'validates' ? 'checked' : '', true, () => {
+					if (edge) this.changeEdgeType(edgeId, 'validates');
+				}),
+				new Action('board.edgeTypeExtends', 'Type: extends', currentType === 'extends' ? 'checked' : '', true, () => {
+					if (edge) this.changeEdgeType(edgeId, 'extends');
+				}),
+				new Action('board.separator1', ''),
+				new Action('board.deleteEdge', 'Delete Edge', undefined, true, () => {
+					const snapshot = this.createSnapshot();
+					this.undoRedo.pushSnapshot(snapshot);
+					this.callbacks.onRemoveEdge?.(edgeId);
+				}),
+			],
+		};
+
+		this.contextMenuService.showContextMenu(delegate);
+	}
+
+	private changeEdgeType(edgeId: string, newType: FlowEdgeData['type']): void {
+		const state = this.stateManager.getState();
+		const edge = state.edges.find(ed => ed.id === edgeId);
+		if (!edge) return;
+
+		// Remove old edge and add with new type
+		this.stateManager.removeEdge(edgeId);
+		this.stateManager.addEdge(edge.source, edge.target, newType);
+		this.render();
+	}
+
+	/* ─── Context Menu: Canvas ──────────────────────────────── */
+
+	private showCanvasContextMenu(e: MouseEvent): void {
+		this.selectedNodeIds.clear();
+		this.selectedEdgeId = null;
+		this.render();
+
+		const delegate: IContextMenuDelegate = {
+			getAnchor: () => new StandardMouseEvent(window, e),
+			getActions: () => [
+				new Action('board.addCard', 'Add Strategy Card', undefined, true, () => {
+					this.callbacks.onAddCard?.('vision');
+				}),
+				new Action('board.addDecision', 'Add Decision', undefined, true, () => {
+					this.callbacks.onAddDecision?.();
+				}),
+				new Action('board.separator1', ''),
+				new Action('board.resetLayout', 'Reset Layout', undefined, true, () => {
+					this.callbacks.onLayoutChange?.('column');
+				}),
+				new Action('board.fitView', 'Fit View', undefined, true, () => {
+					this.callbacks.onFitView?.();
+				}),
+			],
+		};
+
+		this.contextMenuService.showContextMenu(delegate);
+	}
 
 	/* ─── Keyboard ─────────────────────────────────────────── */
 
 	private readonly onKeyDown = (e: KeyboardEvent): void => {
-		// Don't fire when typing in inputs
 		const target = e.target as HTMLElement;
 		if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) {
 			return;
@@ -372,13 +646,20 @@ export class BoardCanvas {
 
 		const selectedIds = Array.from(this.selectedNodeIds);
 
-		// Delete/Backspace
-		if ((e.key === 'Delete' || e.key === 'Backspace') && selectedIds.length > 0) {
+		// Delete/Backspace — remove selected nodes or edge
+		if (e.key === 'Delete' || e.key === 'Backspace') {
 			e.preventDefault();
 			const snapshot = this.createSnapshot();
 			this.undoRedo.pushSnapshot(snapshot);
-			for (const id of selectedIds) {
-				this.stateManager.removeNodeLayout(id);
+
+			if (this.selectedEdgeId) {
+				this.callbacks.onRemoveEdge?.(this.selectedEdgeId);
+				this.selectedEdgeId = null;
+			} else if (selectedIds.length > 0) {
+				for (const id of selectedIds) {
+					const layout = this.stateManager.getState().nodeLayouts.find(n => n.id === id);
+					this.callbacks.onRemoveNode?.(id, layout?.type || 'card');
+				}
 			}
 			this.selectedNodeIds.clear();
 			this.render();
@@ -388,7 +669,6 @@ export class BoardCanvas {
 		// Ctrl+D duplicate
 		if ((e.ctrlKey || e.metaKey) && e.key === 'd' && selectedIds.length > 0) {
 			e.preventDefault();
-			// Duplicate logic — shift positions
 			const state = this.stateManager.getState();
 			for (const id of selectedIds) {
 				const layout = state.nodeLayouts.find(n => n.id === id);
@@ -409,6 +689,7 @@ export class BoardCanvas {
 			e.preventDefault();
 			const state = this.stateManager.getState();
 			this.selectedNodeIds = new Set(state.nodeLayouts.map(n => n.id));
+			this.selectedEdgeId = null;
 			this.render();
 			return;
 		}
@@ -416,6 +697,7 @@ export class BoardCanvas {
 		// Escape deselect
 		if (e.key === 'Escape') {
 			this.selectedNodeIds.clear();
+			this.selectedEdgeId = null;
 			this.render();
 			return;
 		}
@@ -464,41 +746,64 @@ export class BoardCanvas {
 		this.nodeGroup.innerHTML = '';
 		this.edgeGroup.innerHTML = '';
 
-		// Render edges
+		// Render edges (behind nodes)
 		for (const edge of state.edges) {
-			this.renderEdge(edge, state.nodeLayouts);
+			const isSelected = edge.id === this.selectedEdgeId;
+			const path = renderEdgePath(edge, state.nodeLayouts, isSelected);
+			if (path) {
+				this.edgeGroup.appendChild(path);
+
+				const sourceLayout = state.nodeLayouts.find(n => n.id === edge.source);
+				const targetLayout = state.nodeLayouts.find(n => n.id === edge.target);
+				if (sourceLayout && targetLayout) {
+					const label = renderEdgeLabel(edge, sourceLayout, targetLayout);
+					this.edgeGroup.appendChild(label);
+				}
+			}
 		}
 
 		// Render nodes
 		for (const layout of state.nodeLayouts) {
+			const isSelected = this.selectedNodeIds.has(layout.id);
+			let nodeEl: SVGGElement | null = null;
+
 			if (layout.type === 'constitution' && constitution) {
-				const el = renderConstitutionNode(
+				nodeEl = renderConstitutionNode(
 					layout, constitution,
 					() => this.callbacks.onNodeDoubleClick?.(layout.id, 'constitution'),
 				);
-				if (this.selectedNodeIds.has(layout.id)) this.addSelectionBorder(el, 240, 100);
-				this.nodeGroup.appendChild(el);
 			} else if (layout.type === 'card') {
 				const card = cards.find(c => c.id === layout.id);
 				if (card) {
-					const el = renderStrategyCardNode(
+					nodeEl = renderStrategyCardNode(
 						layout, card,
-						this.selectedNodeIds.has(layout.id), false, false,
+						isSelected, false, false,
 						() => this.callbacks.onNodeDoubleClick?.(layout.id, 'card'),
 					);
-					if (this.selectedNodeIds.has(layout.id)) this.addSelectionBorder(el, 220, 90);
-					this.nodeGroup.appendChild(el);
 				}
 			} else if (layout.type === 'decision') {
 				const decision = decisions.find(d => d.id === layout.id);
 				if (decision) {
-					const el = renderDecisionNode(
+					nodeEl = renderDecisionNode(
 						layout, decision,
-						this.selectedNodeIds.has(layout.id), false,
+						isSelected, false,
 						() => this.callbacks.onNodeDoubleClick?.(layout.id, 'decision'),
 					);
-					this.nodeGroup.appendChild(el);
 				}
+			}
+
+			if (nodeEl) {
+				if (isSelected) {
+					const dims = layout.type === 'constitution' ? { w: 240, h: 100 } :
+						layout.type === 'decision' ? { w: 180, h: 100 } : { w: 220, h: 90 };
+					this.addSelectionBorder(nodeEl, dims.w, dims.h);
+				}
+
+				// Add connection handles
+				const handles = renderConnectionHandles(layout);
+				nodeEl.appendChild(handles);
+
+				this.nodeGroup.appendChild(nodeEl);
 			}
 		}
 	}
@@ -516,55 +821,6 @@ export class BoardCanvas {
 		rect.setAttribute('stroke-width', '2');
 		rect.setAttribute('class', 'board-selection');
 		el.insertBefore(rect, el.firstChild);
-	}
-
-	/* ─── Edge Rendering ───────────────────────────────────── */
-
-	private renderEdge(edge: FlowEdgeData, layouts: FlowNodeLayout[]): void {
-		const sourceLayout = layouts.find(n => n.id === edge.source);
-		const targetLayout = layouts.find(n => n.id === edge.target);
-		if (!sourceLayout || !targetLayout) return;
-
-		const sx = sourceLayout.position.x + 110; // center of node
-		const sy = sourceLayout.position.y + 90;  // bottom of node
-		const tx = targetLayout.position.x + 110;
-		const ty = targetLayout.position.y;
-
-		// Cubic bezier
-		const cy = (sy + ty) / 2;
-		const d = `M ${sx} ${sy} C ${sx} ${cy}, ${tx} ${cy}, ${tx} ${ty}`;
-
-		const edgeColor =
-			edge.type === 'constrains' ? '#f59e0b' :
-			edge.type === 'contradicts' ? '#ef4444' :
-			edge.type === 'validates' ? '#10b981' :
-			edge.type === 'extends' ? '#3b82f6' :
-			'#a8a29e';
-
-		const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-		path.setAttribute('d', d);
-		path.setAttribute('fill', 'none');
-		path.setAttribute('stroke', edgeColor);
-		path.setAttribute('stroke-width', '1.5');
-		path.setAttribute('stroke-dasharray', edge.type === 'contradicts' ? '5,3' : 'none');
-		path.setAttribute('marker-end', `url(#arrow-${edge.type})`);
-		path.setAttribute('class', 'board-edge');
-		path.setAttribute('data-edge-id', edge.id);
-
-		this.edgeGroup.appendChild(path);
-
-		// Edge label
-		const labelX = (sx + tx) / 2;
-		const labelY = (sy + ty) / 2 - 10;
-		const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-		label.setAttribute('x', String(labelX));
-		label.setAttribute('y', String(labelY));
-		label.setAttribute('text-anchor', 'middle');
-		label.setAttribute('class', 'board-edge-label');
-		label.setAttribute('font-size', '9');
-		label.setAttribute('fill', 'var(--vscode-descriptionForeground)');
-		label.textContent = edge.type;
-		this.edgeGroup.appendChild(label);
 	}
 
 	/* ─── Public API ───────────────────────────────────────── */

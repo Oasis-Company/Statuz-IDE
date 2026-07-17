@@ -338,16 +338,4 @@ export function renderPlaceholderNode(
 
 /* ─── Connection Handle ──────────────────────────────────── */
 
-export function renderConnectionHandle(
-	cx: number, cy: number, direction: 'top' | 'right' | 'bottom' | 'left',
-): SVGCircleElement {
-	return createSVGElement<SVGCircleElement>('circle', {
-		class: `board-connection-handle ${direction}`,
-		cx: String(cx), cy: String(cy), r: '5',
-		fill: 'var(--vscode-input-border)',
-		stroke: 'var(--vscode-editor-background)',
-		'stroke-width': '2',
-		opacity: '0',
-		'data-direction': direction,
-	});
-}
+// Connection handles are now rendered via boardEdges.renderConnectionHandles()
