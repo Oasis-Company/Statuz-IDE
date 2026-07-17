@@ -52,6 +52,7 @@ import { HarnessCardGrid } from './harnessCardGrid.js';
 import { HarnessDetailPanel } from './harnessDetailPanel.js';
 import { IAgentManagementService } from '../agentManagementService.js';
 import { IAgentSkillItem, IAgentSkillFilter } from '../agentManagement.types.js';
+import { AgentCanvas } from './agentCanvas.js';
 
 /* ─── Data ───────────────────────────────────────────────── */
 
@@ -72,6 +73,8 @@ export class HarnessEditor extends EditorPane {
 	private sidebarContainer!: HTMLElement;
 	private cardGridContainer!: HTMLElement;
 	private detailPanelContainer!: HTMLElement;
+	private agentCanvasContainer!: HTMLElement;
+	private agentCanvas!: AgentCanvas;
 
 	private currentTab: 'catalog' | 'installed' | 'harness' | 'config' = 'catalog';
 	private currentFilter: IAgentSkillFilter = {
@@ -122,6 +125,12 @@ export class HarnessEditor extends EditorPane {
 		this.detailPanelContainer.className = 'harness-detail-panel';
 		mainArea.appendChild(this.detailPanelContainer);
 
+		// Agent Canvas container (hidden by default, shown for catalog/installed views)
+		this.agentCanvasContainer = document.createElement('div');
+		this.agentCanvasContainer.className = 'harness-agent-canvas-container';
+		this.agentCanvasContainer.style.display = 'none';
+		mainArea.appendChild(this.agentCanvasContainer);
+
 		// Status bar
 		this.statusBar = new HarnessStatusBar(this.rootElement);
 
@@ -129,6 +138,24 @@ export class HarnessEditor extends EditorPane {
 		this.sidebar = new HarnessSidebar(this.sidebarContainer, (filter) => this.onFilterChange(filter));
 		this.cardGrid = new HarnessCardGrid(this.cardGridContainer, (item) => this.onCardSelect(item));
 		this.detailPanel = new HarnessDetailPanel(this.detailPanelContainer);
+
+		// Initialize AgentCanvas
+		this.agentCanvas = new AgentCanvas(this.agentCanvasContainer, {
+			onNodeDoubleClick: (nodeId) => {
+				const item = this.agentMgmtService.getItem(nodeId);
+				if (item) {
+					this.onCardSelect(item);
+				}
+			},
+			onInstall: (id) => this.handleInstall(id),
+			onUninstall: (id) => this.handleUninstall(id),
+			onAddEdge: (source, target, type) => {
+				this.agentCanvas.addEdge(source, target, type);
+			},
+			onRemoveEdge: (edgeId) => {
+				this.agentCanvas.removeEdge(edgeId);
+			},
+		});
 
 		// Initial render
 		this.renderCurrentTab();
@@ -188,8 +215,14 @@ export class HarnessEditor extends EditorPane {
 	private renderCatalogView(): void {
 		this.sidebarContainer.style.display = '';
 		this.detailPanelContainer.style.display = '';
+		this.cardGridContainer.style.display = 'none';
+		this.agentCanvasContainer.style.display = '';
+
 		const items = this.agentMgmtService.getItems();
-		this.cardGrid.render(items, this.currentFilter);
+		this.agentCanvas.setItems(items, items);
+		this.agentCanvas.render();
+		this.agentCanvas.focus();
+
 		const enabled = items.filter(i => i.state === 'enabled').length;
 		this.statusBar.update(items.length, enabled, enabled);
 	}
@@ -199,15 +232,23 @@ export class HarnessEditor extends EditorPane {
 	private renderInstalledView(): void {
 		this.sidebarContainer.style.display = '';
 		this.detailPanelContainer.style.display = '';
+		this.cardGridContainer.style.display = 'none';
+		this.agentCanvasContainer.style.display = '';
+
 		const items = this.agentMgmtService.getItems();
 		const installed = items.filter(i => i.state === 'enabled' || i.state === 'error');
-		this.cardGrid.render(installed, this.currentFilter);
+		this.agentCanvas.setItems(items, installed);
+		this.agentCanvas.render();
+		this.agentCanvas.focus();
+
 		this.statusBar.update(items.length, installed.length, installed.filter(i => i.state === 'enabled').length);
 	}
 
 	// ─── Harness Dashboard ──────────────────────────────────
 
 	private renderHarnessDashboard(): void {
+		this.agentCanvasContainer.style.display = 'none';
+		this.cardGridContainer.style.display = '';
 		this.sidebarContainer.style.display = 'none';
 		this.detailPanelContainer.style.display = 'none';
 		const items = this.agentMgmtService.getItems();
@@ -230,6 +271,8 @@ export class HarnessEditor extends EditorPane {
 	// ─── Config View ────────────────────────────────────────
 
 	private renderConfigView(): void {
+		this.agentCanvasContainer.style.display = 'none';
+		this.cardGridContainer.style.display = '';
 		this.sidebarContainer.style.display = 'none';
 		this.detailPanelContainer.style.display = 'none';
 		this.cardGrid.renderConfigView();
@@ -242,7 +285,16 @@ export class HarnessEditor extends EditorPane {
 
 	private onFilterChange(filter: IAgentSkillFilter): void {
 		this.currentFilter = filter;
-		this.cardGrid.render(this.agentMgmtService.getItems(), this.currentFilter);
+		if (this.currentTab === 'catalog' || this.currentTab === 'installed') {
+			const items = this.agentMgmtService.getItems();
+			const filtered = this.currentTab === 'installed'
+				? items.filter(i => i.state === 'enabled' || i.state === 'error')
+				: items;
+			this.agentCanvas.setItems(items, filtered);
+			this.agentCanvas.render();
+		} else {
+			this.cardGrid.render(this.agentMgmtService.getItems(), this.currentFilter);
+		}
 	}
 
 	private onCardSelect(item: IAgentSkillItem): void {
@@ -292,6 +344,7 @@ export class HarnessEditor extends EditorPane {
 		this.cardGrid?.dispose();
 		this.detailPanel?.dispose();
 		this.statusBar?.dispose();
+		this.agentCanvas?.destroy();
 		super.dispose();
 	}
 }
