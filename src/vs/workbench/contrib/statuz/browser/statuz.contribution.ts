@@ -112,3 +112,7 @@ import '../common/engine/statuzEngineService.js'
 import './supabase/supabaseClientService.js'
 import './supabase/supabaseAuthService.js'
 import './board/boardDataService.js'
+
+// ---------- Supabase auth contribution (AccountsContext menu) ----------
+
+import './supabase/supabaseAuthContribution.js'
