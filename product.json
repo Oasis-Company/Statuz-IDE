@@ -6,7 +6,7 @@
 	"applicationName": "statuz",
 	"dataFolderName": ".statuz-ide",
 	"win32MutexName": "statuzeditor",
-	"licenseName": "MIT",
+	"licenseName": "Apache-2.0",
 	"licenseUrl": "https://github.com/Oasis-Company/Statuz-IDE/blob/main/LICENSE.txt",
 	"serverLicenseUrl": "https://github.com/Oasis-Company/Statuz-IDE/blob/main/LICENSE.txt",
 	"serverGreeting": [],
