@@ -1,3 +1,7 @@
+/*--------------------------------------------------------------------------------------
+ *  Copyright 2026 Statuz. All rights reserved.
+ *  Licensed under the Apache License, Version 2.0. See LICENSE.txt for more information.
+ *--------------------------------------------------------------------------------------*/
 import { localize2 } from '../../../../nls.js';
 import { URI } from '../../../../base/common/uri.js';
 import { Action2, registerAction2, MenuId } from '../../../../platform/actions/common/actions.js';
