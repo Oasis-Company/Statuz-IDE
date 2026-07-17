@@ -106,3 +106,9 @@ import '../common/statuzModelService.js'
 
 // graph engine service (stub — native module not yet integrated)
 import '../common/engine/statuzEngineService.js'
+
+// ---------- Supabase services ----------
+
+import './supabase/supabaseClientService.js'
+import './supabase/supabaseAuthService.js'
+import './board/boardDataService.js'

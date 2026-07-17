@@ -40,86 +40,13 @@ import { BoardToolbar } from './board/boardToolbar.js';
 import { BoardCompletenessPanel } from './board/boardCompletenessPanel.js';
 import { BoardStateManager } from './board/boardStateManager.js';
 import { BoardUndoRedo } from './board/boardUndoRedo.js';
-import { buildNodes, buildEdges } from './board/boardLayout.js';
-import type { FlowNodeLayout, FlowEdgeData, SandboxCard, Constitution } from './board/boardTypes.js';
+import { computeColumnLayout, computeDagreLayout } from './board/boardLayout.js';
+import type { FlowNodeLayout, FlowEdgeData, SandboxCard } from './board/boardTypes.js';
 import type { BoardSnapshot } from './board/boardUndoRedo.js';
-
-/* ─── Sample Data ────────────────────────────────────────── */
-
-function createSampleData(): BoardCanvasData {
-	const cards: SandboxCard[] = [
-		{
-			id: 'card-vision',
-			type: 'vision',
-			conceptId: 'A',
-			content: 'A unified IDE for strategic thinking and execution — combining AI agents, canvas-based planning, and code editing in one tool.',
-			status: 'approved',
-			createdAt: '2026-07-01',
-			updatedAt: '2026-07-15',
-		},
-		{
-			id: 'card-user',
-			type: 'user',
-			conceptId: 'A',
-			content: 'Technical founders and senior engineers who need to manage both strategic decisions and implementation details.',
-			status: 'approved',
-			createdAt: '2026-07-02',
-			updatedAt: '2026-07-10',
-		},
-		{
-			id: 'card-problem',
-			type: 'problem',
-			conceptId: 'B',
-			content: 'Strategic decisions get lost in Slack threads and Notion docs. No tool connects strategy directly to code.',
-			status: 'pending',
-			createdAt: '2026-07-03',
-			updatedAt: '2026-07-12',
-		},
-		{
-			id: 'card-mvp',
-			type: 'mvp',
-			conceptId: 'B',
-			content: 'Agent management, board canvas, and native engine integration — shipping usable pieces that compose into a whole.',
-			status: 'draft',
-			createdAt: '2026-07-05',
-			updatedAt: '2026-07-14',
-		},
-	];
-
-	const constitution: Constitution = {
-		vision: 'Build tools that connect strategy to execution — every decision visible, every assumption tracked.',
-		principles: ['AI-native first', 'Strategy-code linkage', 'Local-first with sync', 'Extensible by plugins'],
-		constraints: ['Must work offline', 'No vendor lock-in for AI models', 'Privacy-preserving data model'],
-		metrics: ['Weekly active users', 'Average session duration', 'Decision-to-implementation time'],
-		forbidden_features: [],
-	};
-
-	const decisions = [
-		{
-			id: 'decision-1',
-			type: 'creation',
-			description: 'Use native SVG instead of React Flow for the Board canvas',
-			commitment: 'Committed',
-			time: '2026-07-15',
-		},
-		{
-			id: 'decision-2',
-			type: 'milestone',
-			description: 'Ship Agent Management MVP before Board integration',
-			commitment: 'Committed',
-			time: '2026-07-16',
-		},
-		{
-			id: 'decision-3',
-			type: 'correction',
-			description: 'Replace Zod with manual validators for zero-dependency storage',
-			commitment: 'Accepted',
-			time: '2026-07-17',
-		},
-	];
-
-	return { cards, constitution, decisions };
-}
+import { ISupabaseAuthService } from './supabase/supabaseAuthService.js';
+import { IBoardDataService } from './board/boardDataService.js';
+import { SupabaseLoginDialog } from './supabase/supabaseLoginDialog.js';
+import type { BoardSyncData } from './supabase/supabaseTypes.js';
 
 /* ─── BoardViewPane ──────────────────────────────────────── */
 
@@ -131,6 +58,11 @@ class BoardViewPane extends ViewPane {
 	private completenessPanel!: BoardCompletenessPanel;
 	private stateManager!: BoardStateManager;
 	private undoRedo!: BoardUndoRedo;
+
+	private boardData: BoardCanvasData = { cards: [], constitution: null, decisions: [] };
+	private loginDialog: SupabaseLoginDialog | null = null;
+	private lastSavedData: string = '';
+	private saveTimer: ReturnType<typeof setTimeout> | null = null;
 
 	constructor(
 		options: IViewPaneOptions,
@@ -144,6 +76,8 @@ class BoardViewPane extends ViewPane {
 		@IOpenerService openerService: IOpenerService,
 		@ITelemetryService telemetryService: ITelemetryService,
 		@IHoverService hoverService: IHoverService,
+		@ISupabaseAuthService private readonly authService: ISupabaseAuthService,
+		@IBoardDataService private readonly boardDataService: IBoardDataService,
 	) {
 		super(options, keybindingService, contextMenuService, configurationService, contextKeyService, viewDescriptorService, instantiationService, openerService, themeService, hoverService);
 	}
@@ -161,7 +95,10 @@ class BoardViewPane extends ViewPane {
 		this.stateManager = new BoardStateManager(projectId);
 		this.undoRedo = new BoardUndoRedo();
 
-		// Initialize layouts from state manager
+		// Initialize empty board data
+		this.boardData = { cards: [], constitution: null, decisions: [] };
+
+		// Load persisted layouts from state manager (already loaded from localStorage)
 		this.ensureLayouts();
 
 		// Track undo/redo state changes for toolbar
@@ -186,13 +123,12 @@ class BoardViewPane extends ViewPane {
 		canvasContainer.style.cssText = 'flex:1;position:relative;overflow:hidden;';
 		this.container.appendChild(canvasContainer);
 
-		// Canvas
-		const data = createSampleData();
+		// Canvas — use empty data, no longer calls createSampleData()
 		this.canvas = new BoardCanvas(
 			canvasContainer,
 			this.stateManager,
 			this.undoRedo,
-			data,
+			this.boardData,
 			this.contextMenuService,
 			{
 				onNodeDoubleClick: (id, type) => this.handleNodeDoubleClick(id, type),
@@ -216,60 +152,56 @@ class BoardViewPane extends ViewPane {
 				console.log('[Board] Edit constitution');
 			},
 		});
-		this.completenessPanel.update(data.cards, data.constitution);
+		this.completenessPanel.update(this.boardData.cards, this.boardData.constitution);
+
+		// Async load data
+		this.loadBoardData().catch(err => console.warn('[Board] Data load failed:', err));
+	}
+
+	/* ─── Data Loading ─────────────────────────────────────── */
+
+	private async loadBoardData(): Promise<void> {
+		try {
+			// 1. Try Supabase first
+			if (this.authService.isLoggedIn) {
+				const result = await this.boardDataService.loadBoard('statuz-main');
+				if (result.data && result.data.nodes.length > 0) {
+					// Sync layouts/edges/viewport from Supabase to stateManager
+					this.stateManager.setLayouts(result.data.nodes.map(n => ({
+						id: n.id,
+						type: n.type as FlowNodeLayout['type'],
+						position: n.position,
+						size: 'medium' as const,
+					})));
+					this.stateManager.setEdges(result.data.edges.map(e => ({
+						id: e.id,
+						source: e.source,
+						target: e.target,
+						type: e.type as FlowEdgeData['type'],
+					})));
+					this.stateManager.setViewport(result.data.viewport);
+					this.canvas.render();
+					this.lastSavedData = JSON.stringify(result.data);
+					return;
+				}
+			}
+		} catch (err) {
+			console.warn('[Board] Supabase load failed, falling back to localStorage:', err);
+		}
+
+		// 2. Fallback to localStorage — BoardStateManager already loaded it
+		const state = this.stateManager.getState();
+		if (state.nodeLayouts.length > 0) {
+			this.canvas.render();
+		}
+		// 3. Empty state — stay empty, user can create cards via toolbar
 	}
 
 	/* ─── Layout Management ────────────────────────────────── */
 
 	private ensureLayouts(): void {
-		const state = this.stateManager.getState();
-		const data = createSampleData();
-
-		// Collect all expected node IDs
-		const expectedIds = new Set<string>();
-		expectedIds.add('node-constitution');
-		for (const card of data.cards) expectedIds.add(card.id);
-		for (const decision of data.decisions) expectedIds.add(decision.id);
-
-		// Add missing layouts
-		for (const id of expectedIds) {
-			if (!state.nodeLayouts.some(n => n.id === id)) {
-				let type: FlowNodeLayout['type'] = 'card';
-				if (id === 'node-constitution') type = 'constitution';
-				else if (id.startsWith('decision-')) type = 'decision';
-				this.stateManager.addNodeLayout(id, type);
-			}
-		}
-
-		// Auto-layout if no positions set
-		const layouts = this.stateManager.getState().nodeLayouts;
-		const hasPositions = layouts.some(n => n.position.x !== 0 || n.position.y !== 0);
-		if (!hasPositions) {
-			this.applyAutoLayout(data);
-		}
-
-		// Auto-create card chain edges if none exist
-		const edges = this.stateManager.getState().edges;
-		if (edges.length === 0) {
-			const cardIds = data.cards.map(c => c.id);
-			for (let i = 0; i < cardIds.length - 1; i++) {
-				this.stateManager.addEdge(cardIds[i], cardIds[i + 1], 'informs');
-			}
-		}
-	}
-
-	private applyAutoLayout(data: BoardCanvasData): void {
-		const nodes = buildNodes(data.cards, data.constitution, data.decisions, this.stateManager.getState().nodeLayouts);
-		const edges = buildEdges(data.cards, this.stateManager.getState().edges);
-
-		for (const node of nodes) {
-			this.stateManager.updateNodePosition(node.id, node.position);
-		}
-		for (const edge of edges) {
-			if (!this.stateManager.getState().edges.some(e => e.id === edge.id)) {
-				this.stateManager.addEdge(edge.source, edge.target, edge.type);
-			}
-		}
+		// Simplified: BoardStateManager constructor already loaded from localStorage.
+		// No sample data auto-creation. User creates cards via toolbar/context menu.
 	}
 
 	/* ─── Zoom ─────────────────────────────────────────────── */
@@ -352,14 +284,16 @@ class BoardViewPane extends ViewPane {
 	/* ─── Layout Change ────────────────────────────────────── */
 
 	private handleLayoutChange(layout: 'column' | 'dagre' | 'manual'): void {
+		const state = this.stateManager.getState();
+		if (state.nodeLayouts.length === 0) return; // No data — nothing to layout
+
 		if (layout === 'column') {
-			const data = createSampleData();
-			this.applyAutoLayout(data);
+			const layouts = computeColumnLayout(this.boardData.cards, this.boardData.decisions);
+			this.stateManager.setLayouts(layouts);
 			this.canvas.render();
 		} else if (layout === 'dagre') {
-			// Dagre layout is computed in boardLayout.ts
-			const data = createSampleData();
-			this.applyAutoLayout(data);
+			const layouts = computeDagreLayout(state.nodeLayouts, state.edges);
+			this.stateManager.setLayouts(layouts);
 			this.canvas.render();
 		}
 		// 'manual' — no automatic changes
@@ -381,7 +315,22 @@ class BoardViewPane extends ViewPane {
 			: { x: 100, y: 100 };
 
 		this.stateManager.addNodeLayout(newId, 'card', pos);
+
+		// Add card content to boardData
+		const newCard: SandboxCard = {
+			id: newId,
+			type: type as SandboxCard['type'],
+			conceptId: 'A',
+			content: `New ${type} card`,
+			status: 'draft',
+			createdAt: new Date().toISOString(),
+			updatedAt: new Date().toISOString(),
+		};
+		this.boardData.cards = [...this.boardData.cards, newCard];
+		this.canvas.updateData(this.boardData);
+		this.completenessPanel.update(this.boardData.cards, this.boardData.constitution);
 		this.canvas.render();
+		this.scheduleSave();
 	}
 
 	private handleAddDecision(): void {
@@ -390,12 +339,35 @@ class BoardViewPane extends ViewPane {
 		const pos = { x: 500, y: 100 + state.nodeLayouts.length * 130 };
 
 		this.stateManager.addNodeLayout(newId, 'decision', pos);
+
+		// Add decision content to boardData
+		const newDecision = {
+			id: newId,
+			type: 'creation',
+			description: 'New decision',
+			commitment: 'Draft',
+			time: new Date().toISOString(),
+		};
+		this.boardData.decisions = [...this.boardData.decisions, newDecision];
+		this.canvas.updateData(this.boardData);
 		this.canvas.render();
+		this.scheduleSave();
 	}
 
-	private handleRemoveNode(nodeId: string, _nodeType: string): void {
+	private handleRemoveNode(nodeId: string, nodeType: string): void {
 		this.stateManager.removeNodeLayout(nodeId);
+
+		// Also remove from boardData
+		if (nodeType === 'card') {
+			this.boardData.cards = this.boardData.cards.filter(c => c.id !== nodeId);
+		} else if (nodeType === 'decision') {
+			this.boardData.decisions = this.boardData.decisions.filter(d => d.id !== nodeId);
+		}
+
+		this.canvas.updateData(this.boardData);
+		this.completenessPanel.update(this.boardData.cards, this.boardData.constitution);
 		this.canvas.render();
+		this.scheduleSave();
 	}
 
 	private handleDuplicateNode(nodeId: string): void {
@@ -425,6 +397,35 @@ class BoardViewPane extends ViewPane {
 		this.canvas.render();
 	}
 
+	/* ─── Auto-save ────────────────────────────────────────── */
+
+	private scheduleSave(): void {
+		if (this.saveTimer) clearTimeout(this.saveTimer);
+		this.saveTimer = setTimeout(() => this.doSave(), 2000);
+	}
+
+	private async doSave(): Promise<void> {
+		const state = this.stateManager.getState();
+		const syncData: BoardSyncData = {
+			nodes: state.nodeLayouts.map(n => ({ id: n.id, type: n.type, position: n.position })),
+			edges: state.edges.map(e => ({ id: e.id, source: e.source, target: e.target, type: e.type })),
+			viewport: state.viewport,
+			lastModified: new Date().toISOString(),
+			version: 1,
+		};
+
+		const dataStr = JSON.stringify(syncData);
+		if (dataStr === this.lastSavedData) return; // No change
+		this.lastSavedData = dataStr;
+
+		if (this.authService.isLoggedIn) {
+			const result = await this.boardDataService.saveBoard('statuz-main', syncData);
+			if (result.error) {
+				console.warn('[Board] Save to Supabase failed:', result.error.message);
+			}
+		}
+	}
+
 	/* ─── Layout ───────────────────────────────────────────── */
 
 	protected override layoutBody(height: number, width: number): void {
@@ -434,9 +435,11 @@ class BoardViewPane extends ViewPane {
 	}
 
 	override dispose(): void {
+		if (this.saveTimer) clearTimeout(this.saveTimer);
 		this.canvas?.destroy();
 		this.boardToolbar?.destroy();
 		this.completenessPanel?.destroy();
+		this.loginDialog?.dispose();
 		super.dispose();
 	}
 }

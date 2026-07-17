@@ -31,11 +31,16 @@ import { Action2, registerAction2 } from '../../../../platform/actions/common/ac
 import { ServicesAccessor } from '../../../../editor/browser/editorExtensions.js';
 import { IViewsService } from '../../../services/views/common/viewsService.js';
 import { FileAccess } from '../../../../base/common/network.js';
+import { ISupabaseAuthService } from './supabase/supabaseAuthService.js';
+import { SupabaseLoginDialog } from './supabase/supabaseLoginDialog.js';
 
 
 // ---------- Define viewpane ----------
 
 class DashboardViewPane extends ViewPane {
+
+	private loginDialog: SupabaseLoginDialog | null = null;
+	private authStatusEl: HTMLElement | null = null;
 
 	constructor(
 		options: IViewPaneOptions,
@@ -49,6 +54,7 @@ class DashboardViewPane extends ViewPane {
 		@IOpenerService openerService: IOpenerService,
 		@ITelemetryService telemetryService: ITelemetryService,
 		@IHoverService hoverService: IHoverService,
+		@ISupabaseAuthService private readonly authService: ISupabaseAuthService,
 	) {
 		super(options, keybindingService, contextMenuService, configurationService, contextKeyService, viewDescriptorService, instantiationService, openerService, themeService, hoverService)
 	}
@@ -75,12 +81,90 @@ class DashboardViewPane extends ViewPane {
 		container.appendChild(title);
 		container.appendChild(desc);
 		parent.appendChild(container);
+
+		// Auth section
+		const authSection = document.createElement('div');
+		authSection.style.cssText = 'margin-top:24px;border-top:1px solid var(--vscode-sideBarSectionHeader-border,#333);padding-top:16px;width:100%;max-width:280px;';
+		this.authStatusEl = document.createElement('div');
+		authSection.appendChild(this.authStatusEl);
+		parent.appendChild(authSection);
+
+		this.updateAuthUI();
+
+		// Listen for auth changes
+		this._register(this.authService.onDidChangeSession(() => {
+			this.updateAuthUI();
+		}));
+	}
+
+	private updateAuthUI(): void {
+		if (!this.authStatusEl) return;
+		this.authStatusEl.innerHTML = '';
+
+		const user = this.authService.getCurrentUser();
+		if (user) {
+			// Logged in state
+			const emailSpan = document.createElement('span');
+			emailSpan.textContent = user.email || 'Logged in';
+			emailSpan.style.cssText = 'display:block;font-size:12px;margin-bottom:8px;color:var(--vscode-foreground);';
+
+			const signOutBtn = document.createElement('button');
+			signOutBtn.textContent = 'Sign Out';
+			signOutBtn.style.cssText = `
+				width:100%;padding:6px 12px;
+				background:var(--vscode-button-secondaryBackground,#3c3c3c);
+				color:var(--vscode-button-secondaryForeground,#ccc);
+				border:1px solid var(--vscode-button-border,transparent);
+				border-radius:4px;cursor:pointer;font-size:12px;font-family:inherit;
+			`;
+			signOutBtn.addEventListener('click', () => {
+				this.authService.signOut();
+			});
+
+			this.authStatusEl.appendChild(emailSpan);
+			this.authStatusEl.appendChild(signOutBtn);
+		} else {
+			// Logged out state
+			const signInBtn = document.createElement('button');
+			signInBtn.textContent = 'Sign In to Statuz';
+			signInBtn.style.cssText = `
+				width:100%;padding:6px 12px;
+				background:var(--vscode-button-background,#0078d4);
+				color:var(--vscode-button-foreground,#fff);
+				border:1px solid var(--vscode-button-border,transparent);
+				border-radius:4px;cursor:pointer;font-size:12px;font-family:inherit;
+			`;
+			signInBtn.addEventListener('click', () => {
+				this.loginDialog = new SupabaseLoginDialog(this.element, {
+					onSignIn: async (email, password) => {
+						const result = await this.authService.signIn(email, password);
+						if (result.error) throw new Error(result.error.message);
+					},
+					onSignUp: async (email, password) => {
+						const result = await this.authService.signUp(email, password);
+						if (result.error) throw new Error(result.error.message);
+					},
+					onClose: () => {
+						this.loginDialog?.dispose();
+						this.loginDialog = null;
+					},
+				});
+			});
+
+			this.authStatusEl.appendChild(signInBtn);
+		}
 	}
 
 	protected override layoutBody(height: number, width: number): void {
 		super.layoutBody(height, width);
 		this.element.style.height = `${height}px`;
 		this.element.style.width = `${width}px`;
+	}
+
+	override dispose(): void {
+		this.loginDialog?.dispose();
+		this.loginDialog = null;
+		super.dispose();
 	}
 }
 
