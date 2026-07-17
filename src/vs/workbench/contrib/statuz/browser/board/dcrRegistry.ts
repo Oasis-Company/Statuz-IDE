@@ -3,6 +3,7 @@
  *  Licensed under the Apache License, Version 2.0.
  *  Ported from Sandboxer src/lib/dcr/registry.ts
  *  Adapted: Supabase → in-memory Map; compensating transaction via try/catch rollback
+ *  Original work Copyright (c) Sandboxer authors. Licensed under the MIT License.
  *--------------------------------------------------------------------------------------------*/
 
 import type {
