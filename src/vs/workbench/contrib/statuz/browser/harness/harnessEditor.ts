@@ -75,7 +75,7 @@ export class HarnessEditor extends EditorPane {
 
 	private currentTab: 'catalog' | 'installed' | 'harness' | 'config' = 'catalog';
 	private currentFilter: IAgentSkillFilter = {
-		query: '', type: 'all', state: 'all',
+		query: '', types: [], state: 'all',
 		sortBy: 'name', sortAsc: true,
 	};
 

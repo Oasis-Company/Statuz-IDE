@@ -28,7 +28,7 @@ export interface IAgentSkillItem {
 
 export interface IAgentSkillFilter {
 	query: string;
-	type: AgentSkillType | 'all';
+	types: AgentSkillType[];   // empty array means 'all'
 	state: ItemState | 'all';
 	sortBy: 'name' | 'lastUsed' | 'usageCount' | 'state';
 	sortAsc: boolean;

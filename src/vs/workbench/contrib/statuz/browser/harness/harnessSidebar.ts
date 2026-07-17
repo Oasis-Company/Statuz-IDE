@@ -23,7 +23,7 @@ export class HarnessSidebar extends Disposable {
 	private sortSelect!: HTMLSelectElement;
 
 	private currentFilter: IAgentSkillFilter = {
-		query: '', type: 'all', state: 'all',
+		query: '', types: [], state: 'all',
 		sortBy: 'name', sortAsc: true,
 	};
 
@@ -119,11 +119,6 @@ export class HarnessSidebar extends Disposable {
 	}
 
 	private updateTypeFilter(): void {
-		if (this.allCheckbox.checked) {
-			this.currentFilter.type = 'all';
-			return;
-		}
-
 		const selected: AgentSkillType[] = [];
 		if (this.agentCheckbox.checked) selected.push('agent');
 		if (this.skillCheckbox.checked) selected.push('skill');
@@ -132,20 +127,12 @@ export class HarnessSidebar extends Disposable {
 
 		// If none selected, treat as all
 		if (selected.length === 0) {
-			this.currentFilter.type = 'all';
+			this.currentFilter.types = [];
 			this.allCheckbox.checked = true;
 			return;
 		}
 
-		// If only one type, use it directly
-		if (selected.length === 1) {
-			this.currentFilter.type = selected[0];
-			return;
-		}
-
-		// Multiple types selected - handle via filtering in the card grid
-		// For now, default to 'all' and let the card grid filter
-		this.currentFilter.type = 'all';
+		this.currentFilter.types = selected;
 	}
 
 	private createStateFilter(): void {

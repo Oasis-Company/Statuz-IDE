@@ -20,6 +20,11 @@ import './boardPane.js'
 // register Agent Management pane (Activity Bar) — replaced by full-page HarnessEditor
 import './harness/harnessEditor.js'
 
+// register AgentManagementService singleton
+import { registerSingleton } from '../../../../platform/instantiation/common/extensions.js';
+import { IAgentManagementService, AgentManagementService } from './agentManagementService.js';
+registerSingleton(IAgentManagementService, AgentManagementService, 0);
+
 // register quick edit (Ctrl+K)
 import './quickEditActions.js'
 

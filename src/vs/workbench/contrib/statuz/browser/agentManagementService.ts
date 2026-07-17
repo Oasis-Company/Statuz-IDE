@@ -175,8 +175,8 @@ export class AgentManagementService implements IAgentManagementService {
 		let result = [...this.items];
 
 		// Filter by type
-		if (filter.type !== 'all') {
-			result = result.filter(item => item.type === filter.type);
+		if (filter.types.length > 0) {
+			result = result.filter(item => filter.types.includes(item.type));
 		}
 
 		// Filter by state

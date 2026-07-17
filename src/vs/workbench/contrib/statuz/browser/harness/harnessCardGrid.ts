@@ -77,8 +77,8 @@ export class HarnessCardGrid extends Disposable {
 		let result = [...items];
 
 		// Type filter
-		if (filter.type !== 'all') {
-			result = result.filter(item => item.type === filter.type);
+		if (filter.types.length > 0) {
+			result = result.filter(item => filter.types.includes(item.type));
 		}
 
 		// State filter
