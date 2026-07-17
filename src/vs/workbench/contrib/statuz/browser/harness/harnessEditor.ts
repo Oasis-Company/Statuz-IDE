@@ -245,12 +245,14 @@ export class HarnessEditor extends EditorPane {
 
 	// ─── Actions ────────────────────────────────────────────
 
-	private handleInstall(id: string): void {
-		this.agentMgmtService.installItem(id);
+	private async handleInstall(id: string): Promise<void> {
+		await this.agentMgmtService.installItem(id);
+		this.renderCurrentTab();
 	}
 
-	private handleUninstall(id: string): void {
-		this.agentMgmtService.uninstallItem(id);
+	private async handleUninstall(id: string): Promise<void> {
+		await this.agentMgmtService.uninstallItem(id);
+		this.renderCurrentTab();
 	}
 
 	private handleToggle(id: string, state: 'enabled' | 'disabled'): void {

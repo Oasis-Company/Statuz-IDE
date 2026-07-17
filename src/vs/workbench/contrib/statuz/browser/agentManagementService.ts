@@ -6,6 +6,7 @@
 import { createDecorator } from '../../../../platform/instantiation/common/instantiation.js';
 import { IAgentSkillItem, IAgentSkillFilter, ItemState } from './agentManagement.types.js';
 import { Emitter, Event } from '../../../../base/common/event.js';
+import { IEccInstallService } from './ecc/eccInstallService.js';
 
 export const IAgentManagementService = createDecorator<IAgentManagementService>('agentManagementService');
 
@@ -30,7 +31,7 @@ export class AgentManagementService implements IAgentManagementService {
 
 	private items: IAgentSkillItem[] = [];
 
-	constructor() {
+	constructor(@IEccInstallService private readonly eccInstallService: IEccInstallService) {
 		this.initializeSampleData();
 	}
 
@@ -230,21 +231,21 @@ export class AgentManagementService implements IAgentManagementService {
 	}
 
 	async installItem(id: string): Promise<void> {
-		// TODO: Phase 3 — real install via EccInstallService
+		await this.eccInstallService.install(id);
 		const item = this.items.find(i => i.id === id);
 		if (item) {
 			item.state = 'enabled';
-			this._onDidChangeItems.fire();
 		}
+		this._onDidChangeItems.fire();
 	}
 
 	async uninstallItem(id: string): Promise<void> {
-		// TODO: Phase 3 — real uninstall via EccInstallService
+		await this.eccInstallService.uninstall(id);
 		const item = this.items.find(i => i.id === id);
 		if (item) {
 			item.state = 'disabled';
-			this._onDidChangeItems.fire();
 		}
+		this._onDidChangeItems.fire();
 	}
 
 	refresh(): void {

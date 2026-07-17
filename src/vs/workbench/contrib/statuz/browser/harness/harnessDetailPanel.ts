@@ -8,8 +8,8 @@ import { Disposable } from '../../../../../base/common/lifecycle.js';
 import { IAgentSkillItem } from '../agentManagement.types.js';
 
 export interface HarnessDetailActions {
-	onInstall: (id: string) => void;
-	onUninstall: (id: string) => void;
+	onInstall: (id: string) => Promise<void>;
+	onUninstall: (id: string) => Promise<void>;
 	onToggle: (id: string, state: 'enabled' | 'disabled') => void;
 	onConfigSave: (id: string, config: Record<string, any>) => void;
 }
@@ -17,6 +17,8 @@ export interface HarnessDetailActions {
 export class HarnessDetailPanel extends Disposable {
 
 	private readonly container: HTMLElement;
+	private actionButtons: HTMLElement | null = null;
+	private statusMessage: HTMLElement | null = null;
 
 	constructor(parent: HTMLElement) {
 		super();
@@ -72,29 +74,50 @@ export class HarnessDetailPanel extends Disposable {
 			});
 		}
 
+		// Status message area (for progress/error feedback)
+		this.statusMessage = append(content, $('.harness-detail-status'));
+		this.statusMessage.style.display = 'none';
+
 		// Actions
-		const actionSection = append(content, $('.harness-detail-actions'));
+		this.actionButtons = append(content, $('.harness-detail-actions'));
 
 		if (item.state === 'enabled' || item.state === 'error') {
-			const uninstallBtn = append(actionSection, $('button.harness-detail-btn.danger'));
+			const uninstallBtn = append(this.actionButtons, $('button.harness-detail-btn.danger')) as HTMLButtonElement;
 			uninstallBtn.textContent = 'Uninstall';
-			this._register(addDisposableListener(uninstallBtn, 'click', () => {
-				actions.onUninstall(item.id);
+			this._register(addDisposableListener(uninstallBtn, 'click', async () => {
+				if (!this.confirmUninstall(item.name)) {
+					return;
+				}
+				this.setStatus('progress', 'Uninstalling...');
+				uninstallBtn.disabled = true;
+				try {
+					await actions.onUninstall(item.id);
+					this.setStatus('success', 'Uninstalled successfully');
+				} catch (e) {
+					this.setStatus('error', 'Uninstall failed');
+				}
 			}));
 
-			const toggleBtn = append(actionSection, $('button.harness-detail-btn.secondary'));
+			const toggleBtn = append(this.actionButtons, $('button.harness-detail-btn.secondary')) as HTMLButtonElement;
 			toggleBtn.textContent = item.state === 'enabled' ? 'Disable' : 'Enable';
 			this._register(addDisposableListener(toggleBtn, 'click', () => {
 				actions.onToggle(item.id, item.state === 'enabled' ? 'disabled' : 'enabled');
 			}));
 		} else {
-			const installBtn = append(actionSection, $('button.harness-detail-btn.primary'));
+			const installBtn = append(this.actionButtons, $('button.harness-detail-btn.primary')) as HTMLButtonElement;
 			installBtn.textContent = 'Install';
-			this._register(addDisposableListener(installBtn, 'click', () => {
-				actions.onInstall(item.id);
+			this._register(addDisposableListener(installBtn, 'click', async () => {
+				this.setStatus('progress', 'Installing...');
+				installBtn.disabled = true;
+				try {
+					await actions.onInstall(item.id);
+					this.setStatus('success', 'Installed successfully');
+				} catch (e) {
+					this.setStatus('error', 'Install failed');
+				}
 			}));
 
-			const toggleBtn = append(actionSection, $('button.harness-detail-btn.secondary'));
+			const toggleBtn = append(this.actionButtons, $('button.harness-detail-btn.secondary'));
 			toggleBtn.textContent = item.state === 'disabled' ? 'Enable' : 'Disable';
 			this._register(addDisposableListener(toggleBtn, 'click', () => {
 				actions.onToggle(item.id, item.state === 'disabled' ? 'enabled' : 'disabled');
@@ -120,8 +143,31 @@ export class HarnessDetailPanel extends Disposable {
 		}));
 	}
 
+	private setStatus(type: 'progress' | 'success' | 'error', message: string): void {
+		if (!this.statusMessage) {
+			return;
+		}
+		this.statusMessage.style.display = '';
+		this.statusMessage.textContent = message;
+		this.statusMessage.className = 'harness-detail-status';
+		if (type === 'progress') {
+			this.statusMessage.classList.add('harness-detail-status-progress');
+		} else if (type === 'success') {
+			this.statusMessage.classList.add('harness-detail-status-success');
+		} else if (type === 'error') {
+			this.statusMessage.classList.add('harness-detail-status-error');
+		}
+	}
+
+	private confirmUninstall(name: string): boolean {
+		// Use simple confirm dialog
+		return window.confirm(`Are you sure you want to uninstall "${name}"?`);
+	}
+
 	private renderEmpty(): void {
 		clearNode(this.container);
+		this.statusMessage = null;
+		this.actionButtons = null;
 		const empty = append(this.container, $('.harness-detail-empty'));
 		append(empty, $('span.codicon.codicon.symbol-method'));
 		append(empty, $('span')).textContent = 'Select an item to view details';

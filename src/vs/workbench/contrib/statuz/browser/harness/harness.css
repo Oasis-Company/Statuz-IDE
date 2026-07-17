@@ -501,6 +501,33 @@
 	color: var(--vscode-badge-foreground);
 }
 
+.harness-detail-status {
+	margin: 8px 0;
+	padding: 6px 10px;
+	border-radius: 4px;
+	font-size: 12px;
+	font-weight: 500;
+	transition: opacity 0.2s ease;
+}
+
+.harness-detail-status-progress {
+	background-color: var(--vscode-editorInfo-background);
+	color: var(--vscode-editorInfo-foreground);
+	border: 1px solid var(--vscode-editorInfo-border, transparent);
+}
+
+.harness-detail-status-success {
+	background-color: var(--vscode-editorSuccess-background, var(--vscode-gitDecoration-addedResourceForeground));
+	color: var(--vscode-editor-foreground);
+	border: 1px solid var(--vscode-gitDecoration-addedResourceForeground, transparent);
+}
+
+.harness-detail-status-error {
+	background-color: var(--vscode-editorError-background, var(--vscode-inputValidation-errorBackground));
+	color: var(--vscode-editor-foreground);
+	border: 1px solid var(--vscode-inputValidation-errorBorder, transparent);
+}
+
 .harness-detail-actions {
 	display: flex;
 	flex-direction: column;
