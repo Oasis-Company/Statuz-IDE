@@ -1,3 +1,7 @@
+/*--------------------------------------------------------------------------------------
+ *  Copyright 2026 Statuz. All rights reserved.
+ *  Licensed under the Apache License, Version 2.0. See LICENSE.txt for more information.
+ *--------------------------------------------------------------------------------------*/
 import { CancellationToken } from '../../../../base/common/cancellation.js';
 import { Position } from '../../../../editor/common/core/position.js';
 import { DocumentSymbol, SymbolKind } from '../../../../editor/common/languages.js';
