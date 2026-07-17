@@ -3,6 +3,7 @@
  *  Licensed under the Apache License, Version 2.0.
  *  Ported from Sandboxer src/lib/dcr/transform.ts
  *  Adapted: Supabase row types removed; kept helper functions only
+ *  Original work Copyright (c) Sandboxer authors. Licensed under the MIT License.
  *--------------------------------------------------------------------------------------------*/
 
 import type { DecisionEdge, DriftFlagItem } from './dcrTypes.js';
