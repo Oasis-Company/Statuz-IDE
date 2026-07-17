@@ -116,3 +116,8 @@ import './board/boardDataService.js'
 // ---------- Supabase auth contribution (AccountsContext menu) ----------
 
 import './supabase/supabaseAuthContribution.js'
+
+// ---------- Statuz Core services ----------
+
+import { IStatuzService, StatuzService } from './statuz/statuzService.js';
+registerSingleton(IStatuzService, StatuzService, 0 /* InstantiationType.Eager */);

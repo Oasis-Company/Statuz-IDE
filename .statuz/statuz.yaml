@@ -1,0 +1,63 @@
+statuz_version: "0.1"
+identity:
+  agent_name: statuz-ide-dev
+  project_name: Statuz-IDE
+  organization: statuz-protocol
+  environment: development
+role:
+  name: full-stack-ide
+  responsibilities:
+    - Build the Statuz IDE
+    - Integrate statuz core engine
+    - Maintain agent management UI
+  boundaries:
+    - Do not modify statuz core engine
+    - Do not change the license
+current_state:
+  stage: implementation
+  task: Dashboard integration
+  status: in_progress
+  last_checkpoint: completed_agent_canvas
+  next_action: Integrate statuz service into dashboard
+progress:
+  completed:
+    - Agent Management Canvas
+    - ECC integration
+    - Supabase auth
+    - Board real data
+  blocked_by: []
+  open_questions:
+    - When to integrate Rust engine?
+relations:
+  related_agents: []
+  related_projects:
+    - statuz
+    - ISDB
+  related_files:
+    - src/vs/workbench/contrib/statuz/
+  related_tools:
+    - git
+    - node
+    - typescript
+    - rust
+rules:
+  should:
+    - Read statuz.yaml at session start
+    - Write clear commit messages in English
+    - Verify with npm run compile before committing
+  should_not:
+    - Add unnecessary complexity
+    - Store secrets in statuz.yaml
+checkpoints:
+  - id: cp-001
+    at: "2026-07-15T10:00:00Z"
+    summary: Initialized Statuz IDE project structure.
+    next_action: Implement agent management interface
+  - id: cp-002
+    at: "2026-07-16T14:00:00Z"
+    summary: Completed ECC integration with 63 agents catalogued.
+    next_action: Begin Supabase integration
+  - id: cp-003
+    at: "2026-07-18T08:00:00Z"
+    summary: Completed agent canvas with real-time editing.
+    next_action: Integrate statuz core into dashboard
