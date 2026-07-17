@@ -3,6 +3,7 @@
  *  Licensed under the Apache License, Version 2.0.
  *  Ported from Sandboxer src/lib/dcr/types.ts
  *  Adapted: Supabase row types removed; kept core decision types
+ *  Original work Copyright (c) Sandboxer authors. Licensed under the MIT License.
  *--------------------------------------------------------------------------------------------*/
 
 /* ─── Scalar Types ──────────────────────────────────────── */
