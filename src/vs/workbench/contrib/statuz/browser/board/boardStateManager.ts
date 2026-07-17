@@ -3,6 +3,7 @@
  *  Licensed under the Apache License, Version 2.0.
  *  Ported from Sandboxer src/components/flow/hooks/useFlowBoard.ts
  *  Adapted: React hooks → class-based BoardStateManager
+ *  Original work Copyright (c) Sandboxer authors. Licensed under the MIT License.
  *--------------------------------------------------------------------------------------------*/
 
 import type { FlowNodeLayout, FlowEdgeData, StoredViewport } from './boardTypes.js';
