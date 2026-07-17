@@ -25,6 +25,12 @@ import { registerSingleton } from '../../../../platform/instantiation/common/ext
 import { IAgentManagementService, AgentManagementService } from './agentManagementService.js';
 registerSingleton(IAgentManagementService, AgentManagementService, 0);
 
+// register ECC services
+import { IEccCatalogService, EccCatalogService } from './ecc/eccCatalogService.js';
+import { IEccInstallService, EccInstallService } from './ecc/eccInstallService.js';
+registerSingleton(IEccCatalogService, EccCatalogService, 0);
+registerSingleton(IEccInstallService, EccInstallService, 0);
+
 // register quick edit (Ctrl+K)
 import './quickEditActions.js'
 
