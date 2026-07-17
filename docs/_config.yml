@@ -1,0 +1,30 @@
+# Statuz IDE — GitHub Pages Configuration
+# Swiss Style · Black & White · Minimalist
+
+title: Statuz IDE
+description: Topology-Aware Development Environment. VS Code lets you edit code. Statuz lets you understand it.
+url: "https://oasis-company.github.io"
+baseurl: "/Statuz-IDE"
+
+# Build settings
+permalink: pretty
+markdown: kramdown
+
+# Exclude from processing
+exclude:
+  - README.md
+  - GH_PAGES_PLAN.md
+
+# Defaults
+defaults:
+  - scope:
+      path: ""
+    values:
+      layout: null
+
+# GitHub Pages theme: none (we use custom CSS)
+theme: null
+
+# Social
+social:
+  github: Oasis-Company/Statuz-IDE

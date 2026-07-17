@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Statuz IDE — A topology-aware development environment. VS Code lets you edit code. Statuz lets you understand it.">
+  <meta name="keywords" content="Statuz, IDE, topology-aware, development, VS Code fork, Rust graph engine, AI coding">
+  <meta name="author" content="Oasis Company">
+  <meta property="og:title" content="Statuz IDE — Topology-Aware Development Environment">
+  <meta property="og:description" content="VS Code lets you edit code. Statuz lets you understand it. Built on VS Code. Powered by a Rust Graph Engine.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://oasis-company.github.io/Statuz-IDE">
+  <meta property="og:image" content="https://oasis-company.github.io/Statuz-IDE/assets/logo.svg">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Statuz IDE — Topology-Aware Development Environment">
+  <meta name="twitter:description" content="VS Code lets you edit code. Statuz lets you understand it.">
+  <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
+  <link rel="stylesheet" href="css/style.css">
+  <title>Statuz IDE — Topology-Aware Development Environment</title>
+</head>
+<body>
+
+  <!-- ============================================================
+       HERO
+       ============================================================ -->
+  <header class="hero" id="hero">
+    <div class="container">
+      <div class="hero-inner">
+        <svg class="hero-logo" viewBox="0 0 256 256" fill="none" aria-hidden="true">
+          <line x1="40" y1="184" x2="144" y2="168" stroke="currentColor" stroke-width="16" stroke-linecap="round"/>
+          <line x1="144" y1="168" x2="112" y2="72" stroke="currentColor" stroke-width="16" stroke-linecap="round"/>
+          <line x1="112" y1="72" x2="216" y2="56" stroke="currentColor" stroke-width="16" stroke-linecap="round"/>
+          <circle cx="128" cy="120" r="20" fill="currentColor"/>
+        </svg>
+
+        <h1 class="hero-title">STATUZ IDE</h1>
+        <p class="hero-subtitle">Topology-Aware Development Environment</p>
+        <p class="hero-tagline">Built on VS Code. Powered by a Rust Graph Engine.</p>
+
+        <div class="hero-actions">
+          <a href="https://github.com/Oasis-Company/Statuz-IDE" class="btn" target="_blank" rel="noopener noreferrer">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
+            </svg>
+            GitHub Repository
+          </a>
+          <a href="#download" class="btn btn-primary">Download</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <hr class="section-rule" aria-hidden="true">
+
+  <!-- ============================================================
+       CORE IDEA
+       ============================================================ -->
+  <section class="section" id="core-idea">
+    <div class="container">
+      <p class="section-label">Core Idea</p>
+
+      <div class="core-thesis">
+        VS Code lets you <em>edit</em> code.<br>
+        Statuz lets you <em>understand</em> it.
+      </div>
+
+      <p class="body-large" style="max-width:640px; margin-bottom:var(--space-lg);">
+        Three primitive queries that form the foundation of topological reasoning about software systems.
+      </p>
+
+      <div class="query-grid">
+        <!-- Traverse -->
+        <div class="query-card">
+          <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="24" cy="24" r="6"/>
+            <line x1="24" y1="6" x2="24" y2="18"/>
+            <line x1="24" y1="30" x2="24" y2="42"/>
+            <line x1="6" y1="24" x2="18" y2="24"/>
+            <line x1="30" y1="24" x2="42" y2="24"/>
+            <line x1="10.5" y1="10.5" x2="18" y2="18"/>
+            <line x1="37.5" y1="10.5" x2="30" y2="18"/>
+            <line x1="10.5" y1="37.5" x2="18" y2="30"/>
+            <line x1="37.5" y1="37.5" x2="30" y2="30"/>
+          </svg>
+          <div class="query-name">Traverse</div>
+          <p class="query-desc">What does this connect to? Explore the adjacency list of any node to discover its relationships.</p>
+          <code class="query-syntax">traverse(node, relation?)</code>
+        </div>
+
+        <!-- Impact -->
+        <div class="query-card">
+          <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="24" cy="24" r="4" fill="currentColor"/>
+            <circle cx="24" cy="24" r="10" stroke-dasharray="2 2"/>
+            <circle cx="24" cy="24" r="16" stroke-dasharray="2 2"/>
+            <circle cx="24" cy="24" r="22" stroke-dasharray="2 2"/>
+          </svg>
+          <div class="query-name">Impact</div>
+          <p class="query-desc">If this changes, who is affected? Reverse BFS blast radius analysis for change impact.</p>
+          <code class="query-syntax">impact(node)</code>
+        </div>
+
+        <!-- Path -->
+        <div class="query-card">
+          <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="8" cy="40" r="5" fill="currentColor"/>
+            <circle cx="40" cy="8" r="5" fill="currentColor"/>
+            <path d="M12 36 Q24 28 20 20 Q16 12 35 12" stroke-dasharray="3 2"/>
+          </svg>
+          <div class="query-name">Path</div>
+          <p class="query-desc">How do I get from A to B? BFS shortest path discovery across the graph.</p>
+          <code class="query-syntax">path(from, to)</code>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-rule" aria-hidden="true">
+
+  <!-- ============================================================
+       CAPABILITIES
+       ============================================================ -->
+  <section class="section" id="capabilities">
+    <div class="container">
+      <p class="section-label">Capabilities</p>
+      <h2 class="section-title">Everything you need to<br>understand your code.</h2>
+
+      <div class="capabilities-grid" style="margin-top:var(--space-xl);">
+
+        <!-- AI Chat & Inline Edit -->
+        <div class="capability-card">
+          <svg class="capability-icon" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M4 8a4 4 0 0 1 4-4h24a4 4 0 0 1 4 4v16a4 4 0 0 1-4 4H16l-8 8v-8H8a4 4 0 0 1-4-4V8z"/>
+            <line x1="12" y1="16" x2="28" y2="16"/>
+            <line x1="12" y1="22" x2="24" y2="22"/>
+          </svg>
+          <div class="capability-name">AI Chat &amp; Inline Edit</div>
+          <p class="capability-desc">Context-aware AI assistant with Ctrl+K/L inline editing. Streaming diffs, fast/slow apply modes, and autocomplete with LRU caching.</p>
+          <div class="capability-tags">
+            <span class="capability-tag">Chat</span>
+            <span class="capability-tag">Ctrl+K</span>
+            <span class="capability-tag">Autocomplete</span>
+          </div>
+        </div>
+
+        <!-- Sandboxer Board -->
+        <div class="capability-card">
+          <svg class="capability-icon" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="3" y="3" width="14" height="14" rx="1"/>
+            <rect x="23" y="3" width="14" height="14" rx="1"/>
+            <rect x="3" y="23" width="14" height="14" rx="1"/>
+            <rect x="23" y="23" width="14" height="14" rx="1"/>
+            <line x1="10" y1="10" x2="10" y2="10"/>
+          </svg>
+          <div class="capability-name">Sandboxer Board</div>
+          <p class="capability-desc">Strategic planning canvas with native SVG rendering. DCR drift detection, 50-step undo/redo, and automatic layout with column/dagre modes.</p>
+          <div class="capability-tags">
+            <span class="capability-tag">SVG Canvas</span>
+            <span class="capability-tag">DCR</span>
+            <span class="capability-tag">Strategy</span>
+          </div>
+        </div>
+
+        <!-- Agent Management -->
+        <div class="capability-card">
+          <svg class="capability-icon" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="20" cy="14" r="6"/>
+            <path d="M8 34c0-6.627 5.373-12 12-12s12 5.373 12 12"/>
+            <circle cx="20" cy="14" r="10" stroke-dasharray="2 2"/>
+          </svg>
+          <div class="capability-name">Agent Management</div>
+          <p class="capability-desc">ECC catalog browser with one-click install/uninstall. Harness visualization canvas for skills, commands, agents, and rules.</p>
+          <div class="capability-tags">
+            <span class="capability-tag">ECC</span>
+            <span class="capability-tag">Catalog</span>
+            <span class="capability-tag">Harness</span>
+          </div>
+        </div>
+
+        <!-- 17 AI Providers -->
+        <div class="capability-card">
+          <svg class="capability-icon" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="4" y="4" width="32" height="32" rx="4"/>
+            <line x1="8" y1="16" x2="14" y2="16"/>
+            <line x1="8" y1="22" x2="18" y2="22"/>
+            <line x1="8" y1="28" x2="12" y2="28"/>
+            <circle cx="26" cy="20" r="5"/>
+            <line x1="29" y1="23" x2="32" y2="26"/>
+          </svg>
+          <div class="capability-name">17 AI Providers</div>
+          <p class="capability-desc">Anthropic, OpenAI, Gemini, Groq, Mistral, Ollama, DeepSeek, OpenRouter, xAI, LM Studio, and more. Per-model capability configuration.</p>
+          <div class="capability-tags">
+            <span class="capability-tag">Multi-Model</span>
+            <span class="capability-tag">Local</span>
+            <span class="capability-tag">Cloud</span>
+          </div>
+        </div>
+
+        <!-- MCP Protocol -->
+        <div class="capability-card">
+          <svg class="capability-icon" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="4" y="10" width="12" height="20" rx="2"/>
+            <rect x="24" y="10" width="12" height="20" rx="2"/>
+            <line x1="16" y1="20" x2="24" y2="20"/>
+            <circle cx="10" cy="20" r="2" fill="currentColor"/>
+            <circle cx="30" cy="20" r="2" fill="currentColor"/>
+          </svg>
+          <div class="capability-name">MCP Protocol</div>
+          <p class="capability-desc">Model Context Protocol integration. Full tool discovery, server management, and dynamic tool calling across MCP-compatible servers.</p>
+          <div class="capability-tags">
+            <span class="capability-tag">MCP</span>
+            <span class="capability-tag">Tool Discovery</span>
+            <span class="capability-tag">SDK</span>
+          </div>
+        </div>
+
+        <!-- VS Code Ecosystem -->
+        <div class="capability-card">
+          <svg class="capability-icon" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="4" y="4" width="32" height="20" rx="2"/>
+            <line x1="4" y1="14" x2="36" y2="14"/>
+            <line x1="20" y1="4" x2="20" y2="24"/>
+            <line x1="8" y1="30" x2="18" y2="30"/>
+            <line x1="22" y1="30" x2="32" y2="30"/>
+            <line x1="13" y1="28" x2="13" y2="36"/>
+            <line x1="27" y1="28" x2="27" y2="36"/>
+          </svg>
+          <div class="capability-name">VS Code Ecosystem</div>
+          <p class="capability-desc">100% compatibility with the VS Code extension marketplace. 80+ built-in extensions, themes, language servers, and debuggers.</p>
+          <div class="capability-tags">
+            <span class="capability-tag">Extensions</span>
+            <span class="capability-tag">Marketplace</span>
+            <span class="capability-tag">Themes</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-rule" aria-hidden="true">
+
+  <!-- ============================================================
+       ARCHITECTURE
+       ============================================================ -->
+  <section class="section" id="architecture">
+    <div class="container">
+      <p class="section-label">Architecture</p>
+      <h2 class="section-title">Three layers. One unified<br>development experience.</h2>
+
+      <div class="arch-diagram">
+        <!-- Layer 1: VS Code Core -->
+        <div class="arch-layer">
+          <div class="arch-layer-name">VS Code Core</div>
+          <div class="arch-layer-items">Editor &middot; Terminal &middot; Debug &middot; Git &middot; Language Servers &middot; Extension Host</div>
+        </div>
+
+        <div class="arch-connector" aria-hidden="true"></div>
+
+        <!-- Layer 2: Statuz Layer -->
+        <div class="arch-layer">
+          <div class="arch-layer-name">Statuz Layer</div>
+          <div class="arch-layer-items">AI Chat &middot; Inline Edit &middot; Board Canvas &middot; Agent Management &middot; ECC &middot; MCP Bridge &middot; 17 Providers</div>
+        </div>
+
+        <div class="arch-connector" aria-hidden="true"></div>
+
+        <!-- Layer 3: Rust Graph Engine -->
+        <div class="arch-layer" style="border-style:dashed;">
+          <div class="arch-layer-name">Rust Graph Engine</div>
+          <div class="arch-layer-items">GraphEngine &middot; Cluster &middot; Field &middot; .stz Format &middot; traverse &middot; impact &middot; path</div>
+          <div class="arch-layer-coming">Coming Soon</div>
+        </div>
+      </div>
+
+      <p class="arch-note">
+        The Statuz Layer sits on top of the full VS Code Core, preserving all native capabilities.
+        The Rust Graph Engine (in development) provides the topological reasoning foundation.
+      </p>
+    </div>
+  </section>
+
+  <hr class="section-rule" aria-hidden="true">
+
+  <!-- ============================================================
+       DOWNLOAD
+       ============================================================ -->
+  <section class="section" id="download">
+    <div class="container">
+      <p class="section-label">Download</p>
+      <h2 class="section-title">Get Statuz IDE.</h2>
+
+      <div class="download-info">
+        <div class="download-version">
+          Current version: <strong>1.99.3-dev</strong>
+        </div>
+        <div class="download-version">
+          License: <strong>Apache 2.0</strong>
+        </div>
+        <div class="download-version">
+          Build: <strong>21c8d8e</strong>
+        </div>
+      </div>
+
+      <div class="download-platforms">
+        <!-- Windows -->
+        <div class="download-card">
+          <svg class="download-card-icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="4" y="4" width="40" height="40" rx="4"/>
+            <line x1="4" y1="16" x2="44" y2="16"/>
+            <line x1="24" y1="4" x2="24" y2="44"/>
+            <rect x="8" y="20" width="12" height="10" rx="1"/>
+            <rect x="28" y="20" width="12" height="10" rx="1"/>
+            <rect x="8" y="34" width="12" height="10" rx="1"/>
+            <rect x="28" y="34" width="12" height="10" rx="1"/>
+          </svg>
+          <div class="download-card-name">Windows</div>
+          <p class="download-card-desc">Windows 10 / 11, 64-bit<br>EXE Installer &amp; Portable</p>
+          <span class="download-card-status">Build from Source</span>
+        </div>
+
+        <!-- macOS -->
+        <div class="download-card">
+          <svg class="download-card-icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M36 4c-4 0-8 2-10 6-2 4-1 8 1 10s4 4 6 2c2-2 4-6 3-10-1-4-4-8-8-8"/>
+            <path d="M24 12c0 4-2 8-6 10-4 2-10 1-14-2"/>
+            <path d="M14 16c-2 4-1 10 2 14 3 4 8 6 12 5"/>
+          </svg>
+          <div class="download-card-name">macOS</div>
+          <p class="download-card-desc">macOS 12+, Intel &amp; Apple Silicon<br>DMG &amp; ZIP</p>
+          <span class="download-card-status">Build from Source</span>
+        </div>
+
+        <!-- Linux -->
+        <div class="download-card">
+          <svg class="download-card-icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M24 4c-4 0-6 2-6 6v4l-6 10c-2 4-2 8 0 12l4 6c2 2 4 4 8 4s6-2 8-4l4-6c2-4 2-8 0-12l-6-10v-4c0-4-2-6-6-6z"/>
+            <circle cx="24" cy="38" r="2" fill="currentColor"/>
+            <line x1="24" y1="26" x2="24" y2="34"/>
+            <line x1="18" y1="20" x2="18" y2="22"/>
+            <line x1="30" y1="20" x2="30" y2="22"/>
+          </svg>
+          <div class="download-card-name">Linux</div>
+          <p class="download-card-desc">Debian / Ubuntu / Fedora<br>DEB, RPM, Snap, AppImage</p>
+          <span class="download-card-status">Build from Source</span>
+        </div>
+      </div>
+
+      <div class="download-source">
+        <p>
+          Pre-built binaries are coming soon.
+          In the meantime, <a href="https://github.com/Oasis-Company/Statuz-IDE/blob/main/HOW_TO_CONTRIBUTE.md" target="_blank" rel="noopener noreferrer">build from source</a>.
+        </p>
+      </div>
+
+      <div class="download-requirements">
+        <h4>System Requirements</h4>
+        <ul>
+          <li>Node.js 20+</li>
+          <li>8 GB RAM minimum</li>
+          <li>2 GB free disk space</li>
+          <li>GPU with WebGL support</li>
+          <li>Internet connection for AI features</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-rule" aria-hidden="true">
+
+  <!-- ============================================================
+       STATUS
+       ============================================================ -->
+  <section class="section" id="status">
+    <div class="container">
+      <p class="section-label">Development Status</p>
+      <h2 class="section-title">Phased rollout.</h2>
+
+      <div class="phase-list" style="margin-top:var(--space-xl);">
+
+        <div class="phase-item">
+          <div class="phase-header">
+            <span class="phase-name">Phase 0 &mdash; Brand Shell</span>
+            <span class="phase-percent">70%</span>
+          </div>
+          <div class="phase-bar">
+            <div class="phase-bar-fill" style="width:70%"></div>
+          </div>
+          <div class="phase-desc">Product branding, icon replacement, codebase cleanup, license compliance. Brand migration from Void is in progress.</div>
+          <span class="phase-status">Active</span>
+        </div>
+
+        <div class="phase-item">
+          <div class="phase-header">
+            <span class="phase-name">Phase 1 &mdash; Rust Engine Integration</span>
+            <span class="phase-percent">0%</span>
+          </div>
+          <div class="phase-bar">
+            <div class="phase-bar-fill" style="width:0%"></div>
+          </div>
+          <div class="phase-desc">napi-rs native module, IStatuzEngineService IPC channel, .stz file format support, core graph operations.</div>
+          <span class="phase-status">Planned</span>
+        </div>
+
+        <div class="phase-item">
+          <div class="phase-header">
+            <span class="phase-name">Phase 2 &mdash; Core Graph UI</span>
+            <span class="phase-percent">0%</span>
+          </div>
+          <div class="phase-bar">
+            <div class="phase-bar-fill" style="width:0%"></div>
+          </div>
+          <div class="phase-desc">Cluster Explorer, Graph Visualizer, Query Console, Impact Analyzer, .stz file editor.</div>
+          <span class="phase-status">Planned</span>
+        </div>
+
+        <div class="phase-item">
+          <div class="phase-header">
+            <span class="phase-name">Phase 3 &mdash; AI Integration</span>
+            <span class="phase-percent">0%</span>
+          </div>
+          <div class="phase-bar">
+            <div class="phase-bar-fill" style="width:0%"></div>
+          </div>
+          <div class="phase-desc">Graph-aware AI commands, auto-graph-builder, context bridge, semantic query enhancement.</div>
+          <span class="phase-status">Planned</span>
+        </div>
+
+        <div class="phase-item">
+          <div class="phase-header">
+            <span class="phase-name">Phase 4+ &mdash; Advanced &amp; Ecosystem</span>
+            <span class="phase-percent">0%</span>
+          </div>
+          <div class="phase-bar">
+            <div class="phase-bar-fill" style="width:0%"></div>
+          </div>
+          <div class="phase-desc">Health dashboard, cross-field bridges, clone/merge, MCP server integration, signal bus, .stz standardization.</div>
+          <span class="phase-status">Planned</span>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-rule" aria-hidden="true">
+
+  <!-- ============================================================
+       FOOTER / LEGAL
+       ============================================================ -->
+  <footer class="footer" id="legal">
+    <div class="container">
+      <div class="footer-grid">
+        <!-- Brand -->
+        <div class="footer-brand">
+          <svg class="footer-logo" viewBox="0 0 256 256" fill="none" aria-hidden="true">
+            <line x1="40" y1="184" x2="144" y2="168" stroke="currentColor" stroke-width="16" stroke-linecap="round"/>
+            <line x1="144" y1="168" x2="112" y2="72" stroke="currentColor" stroke-width="16" stroke-linecap="round"/>
+            <line x1="112" y1="72" x2="216" y2="56" stroke="currentColor" stroke-width="16" stroke-linecap="round"/>
+            <circle cx="128" cy="120" r="20" fill="currentColor"/>
+          </svg>
+          <p>Statuz IDE is a topology-aware development environment built on VS Code. Developed by Oasis Company.</p>
+        </div>
+
+        <!-- Product -->
+        <div class="footer-col">
+          <h4>Product</h4>
+          <ul>
+            <li><a href="#core-idea">Core Idea</a></li>
+            <li><a href="#capabilities">Capabilities</a></li>
+            <li><a href="#architecture">Architecture</a></li>
+            <li><a href="#download">Download</a></li>
+            <li><a href="#status">Roadmap</a></li>
+          </ul>
+        </div>
+
+        <!-- Resources -->
+        <div class="footer-col">
+          <h4>Resources</h4>
+          <ul>
+            <li><a href="https://github.com/Oasis-Company/Statuz-IDE" target="_blank" rel="noopener noreferrer">GitHub</a></li>
+            <li><a href="https://github.com/Oasis-Company/Statuz-IDE/issues" target="_blank" rel="noopener noreferrer">Issues</a></li>
+            <li><a href="https://github.com/Oasis-Company/Statuz-IDE/blob/main/HOW_TO_CONTRIBUTE.md" target="_blank" rel="noopener noreferrer">Contribute</a></li>
+            <li><a href="https://github.com/Oasis-Company/Statuz-IDE/blob/main/STATUZ_IDE_ROADMAP.md" target="_blank" rel="noopener noreferrer">Roadmap</a></li>
+          </ul>
+        </div>
+
+        <!-- Organization -->
+        <div class="footer-col">
+          <h4>Oasis Company</h4>
+          <ul>
+            <li><a href="https://github.com/Oasis-Company" target="_blank" rel="noopener noreferrer">GitHub Organization</a></li>
+            <li><a href="https://github.com/Oasis-Company/Statuz-IDE/blob/main/LICENSE.txt" target="_blank" rel="noopener noreferrer">License</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- License Details -->
+      <div class="license-section">
+        <h3>License Information</h3>
+        <p>
+          <strong>Statuz IDE</strong> is licensed under the <a href="https://github.com/Oasis-Company/Statuz-IDE/blob/main/LICENSE.txt" target="_blank" rel="noopener noreferrer">Apache License, Version 2.0</a>.
+          Copyright &copy; 2025&ndash;2026 Oasis Company. All rights reserved.
+        </p>
+        <p>
+          Statuz IDE is a fork of <strong>Void Editor</strong>, which is itself a fork of <strong>Visual Studio Code</strong>.
+          The original VS Code portions are licensed under the <a href="https://github.com/Oasis-Company/Statuz-IDE/blob/main/LICENSE-VS-Code.txt" target="_blank" rel="noopener noreferrer">MIT License</a>
+          and are copyright &copy; Microsoft Corporation.
+        </p>
+        <p>
+          Statuz additions and modifications are licensed under the Apache 2.0 License.
+          The project is not affiliated with Microsoft Corporation or the Void Editor project.
+        </p>
+        <p>
+          <a href="https://github.com/Oasis-Company/Statuz-IDE/blob/main/LICENSE.txt" target="_blank" rel="noopener noreferrer">View full Apache 2.0 license</a>
+          &middot;
+          <a href="https://github.com/Oasis-Company/Statuz-IDE/blob/main/LICENSE-VS-Code.txt" target="_blank" rel="noopener noreferrer">View VS Code MIT license</a>
+        </p>
+      </div>
+
+      <!-- Bottom Bar -->
+      <div class="footer-bottom">
+        <p>&copy; 2025&ndash;2026 Oasis Company. All rights reserved.</p>
+        <div class="footer-legal-links">
+          <a href="https://github.com/Oasis-Company/Statuz-IDE/blob/main/LICENSE.txt" target="_blank" rel="noopener noreferrer">Apache 2.0</a>
+          <span style="color:var(--color-border);">|</span>
+          <a href="https://github.com/Oasis-Company/Statuz-IDE" target="_blank" rel="noopener noreferrer">GitHub</a>
+          <span style="color:var(--color-border);">|</span>
+          <a href="https://github.com/Oasis-Company/Statuz-IDE/blob/main/LICENSE-VS-Code.txt" target="_blank" rel="noopener noreferrer">VS Code License</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- JavaScript -->
+  <script src="js/main.js"></script>
+</body>
+</html>
