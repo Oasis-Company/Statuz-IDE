@@ -3,6 +3,7 @@
  *  Licensed under the Apache License, Version 2.0.
  *  Ported from Sandboxer src/lib/dcr/ai-bridge.ts
  *  Adapted: AI provider dependency removed; generic config interface
+ *  Original work Copyright (c) Sandboxer authors. Licensed under the MIT License.
  *--------------------------------------------------------------------------------------------*/
 
 import type {
