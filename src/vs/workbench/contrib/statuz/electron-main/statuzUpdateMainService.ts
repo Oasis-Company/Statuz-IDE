@@ -95,7 +95,7 @@ export class StatuzMainUpdateService extends Disposable implements IStatuzUpdate
 
 	private async _manualCheckGHTagIfDisabled(explicit: boolean): Promise<VoidCheckUpdateRespose> {
 		try {
-			const response = await fetch('https://api.github.com/repos/voideditor/binaries/releases/latest');
+			const response = await fetch('https://api.github.com/repos/Oasis-Company/Statuz-IDE/releases/latest');
 
 			const data = await response.json();
 			const version = data.tag_name;
