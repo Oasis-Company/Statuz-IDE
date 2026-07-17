@@ -3,6 +3,7 @@
  *  Licensed under the Apache License, Version 2.0.
  *  Ported from Sandboxer src/lib/board/completeness.ts
  *  Adapted: field names aligned with canonical Constitution type
+ *  Original work Copyright (c) Sandboxer authors. Licensed under the MIT License.
  *--------------------------------------------------------------------------------------------*/
 
 import type { SandboxCard, Constitution } from './boardTypes.js';
