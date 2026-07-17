@@ -3,6 +3,7 @@
  *  Licensed under the Apache License, Version 2.0.
  *  Ported from Sandboxer src/lib/storage/engine.ts
  *  Adapted: Zod schema → StorageSchema validator; no external dependencies
+ *  Original work Copyright (c) Sandboxer authors. Licensed under the MIT License.
  *--------------------------------------------------------------------------------------------*/
 
 import type { StorageValue, StorageKeyDef, StorageConfig } from './storageTypes.js';
