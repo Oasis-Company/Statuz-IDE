@@ -3,6 +3,7 @@
  *  Licensed under the Apache License, Version 2.0.
  *  Ported from Sandboxer src/lib/api/cache.ts
  *  No changes needed — pure generic cache with no external dependencies
+ *  Original work Copyright (c) Sandboxer authors. Licensed under the MIT License.
  *--------------------------------------------------------------------------------------------*/
 
 /* ─── Cache Entry ────────────────────────────────────────── */
