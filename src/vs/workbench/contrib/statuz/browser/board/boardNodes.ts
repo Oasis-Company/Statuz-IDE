@@ -3,6 +3,7 @@
  *  Licensed under the Apache License, Version 2.0.
  *  Ported from Sandboxer src/components/flow/FlowBoardNodes.tsx
  *  Adapted: React JSX → native SVG <g> DOM elements
+ *  Original work Copyright (c) Sandboxer authors. Licensed under the MIT License.
  *--------------------------------------------------------------------------------------------*/
 
 import type { FlowNodeLayout, SandboxCard, Constitution } from './boardTypes.js';
