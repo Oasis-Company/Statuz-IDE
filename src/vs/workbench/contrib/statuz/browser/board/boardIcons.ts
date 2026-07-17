@@ -3,6 +3,7 @@
  *  Licensed under the Apache License, Version 2.0.
  *  Ported from Sandboxer src/components/flow/board-icons.tsx
  *  Adapted: React JSX → plain SVG string templates
+ *  Original work Copyright (c) Sandboxer authors. Licensed under the MIT License.
  *--------------------------------------------------------------------------------------------*/
 
 /* ─── Card Icons ─────────────────────────────────────────── */
