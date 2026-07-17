@@ -6,7 +6,7 @@
  *--------------------------------------------------------------------------------------------*/
 
 import type { StorageKeyDef, StorageSchema } from './storageTypes.js';
-import type { FlowNodeLayout, FlowEdgeData, BoardSnapshot, StoredViewport } from './boardTypes.js';
+import type { FlowNodeLayout, FlowEdgeData, BoardSnapshotData, StoredViewport } from './boardTypes.js';
 
 /* ─── Validator Helpers ──────────────────────────────────── */
 
@@ -103,26 +103,26 @@ function validateRuleViolation(v: unknown): { field: string; detail: string } {
 	};
 }
 
-function validateBoardSnapshot(value: unknown): BoardSnapshot {
+function validateBoardSnapshot(value: unknown): BoardSnapshotData {
 	const obj = safeObject(value);
-	if (!obj) throw new Error('Expected object for BoardSnapshot');
+	if (!obj) throw new Error('Expected object for BoardSnapshotData');
 	return {
 		cardId: obj.cardId !== undefined ? safeString(obj.cardId, '') : undefined,
 		summary: safeString(obj.summary, ''),
 		status: SNAPSHOT_STATUSES.includes(obj.status as typeof SNAPSHOT_STATUSES[number])
-			? obj.status as BoardSnapshot['status'] : 'draft',
+			? obj.status as BoardSnapshotData['status'] : 'draft',
 		ruleViolations: Array.isArray(obj.ruleViolations)
 			? obj.ruleViolations.map((v: unknown) => validateRuleViolation(v))
 			: [],
 	};
 }
 
-function validateBoardSnapshotArray(value: unknown): BoardSnapshot[] {
+function validateBoardSnapshotArray(value: unknown): BoardSnapshotData[] {
 	if (!Array.isArray(value)) return [];
 	return value.map(v => validateBoardSnapshot(v));
 }
 
-const boardSnapshotSchema: StorageSchema<BoardSnapshot[]> = {
+const boardSnapshotSchema: StorageSchema<BoardSnapshotData[]> = {
 	validate: validateBoardSnapshotArray,
 };
 
@@ -170,8 +170,8 @@ export const FLOW_BOARD_KEYS = {
 		key: 'snapshots',
 		prefix: 'sb-flow',
 		schema: boardSnapshotSchema,
-		default: [] as BoardSnapshot[],
-	} satisfies StorageKeyDef<BoardSnapshot[]>,
+		default: [] as BoardSnapshotData[],
+	} satisfies StorageKeyDef<BoardSnapshotData[]>,
 
 	completedQuestions: {
 		key: 'completed',
