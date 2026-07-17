@@ -3,6 +3,7 @@
  *  Licensed under the Apache License, Version 2.0.
  *  Ported from Sandboxer src/lib/board/mutations.ts
  *  Adapted: removed React types; kept pure mutation resolution logic
+ *  Original work Copyright (c) Sandboxer authors. Licensed under the MIT License.
  *--------------------------------------------------------------------------------------------*/
 
 import type { SandboxCard, FlowEdgeData } from './boardTypes.js';
