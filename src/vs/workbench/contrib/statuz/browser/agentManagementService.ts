@@ -6,7 +6,9 @@
 import { createDecorator } from '../../../../platform/instantiation/common/instantiation.js';
 import { IAgentSkillItem, IAgentSkillFilter, ItemState } from './agentManagement.types.js';
 import { Emitter, Event } from '../../../../base/common/event.js';
+import { IEccCatalogService } from './ecc/eccCatalogService.js';
 import { IEccInstallService } from './ecc/eccInstallService.js';
+import { IStorageService, StorageScope, StorageTarget } from '../../../../platform/storage/common/storage.js';
 
 export const IAgentManagementService = createDecorator<IAgentManagementService>('agentManagementService');
 
@@ -29,173 +31,129 @@ export class AgentManagementService implements IAgentManagementService {
 	private readonly _onDidChangeItems = new Emitter<void>();
 	readonly onDidChangeItems: Event<void> = this._onDidChangeItems.event;
 
-	private items: IAgentSkillItem[] = [];
+	/** Tracks per-item state overrides (config, lastUsed, etc.) */
+	private stateOverrides: Map<string, Partial<IAgentSkillItem>> = new Map();
+	private readonly STATE_KEY = 'statuz.agent.overrides.v2';
 
-	constructor(@IEccInstallService private readonly eccInstallService: IEccInstallService) {
-		this.initializeSampleData();
+	constructor(
+		@IEccCatalogService private readonly eccCatalogService: IEccCatalogService,
+		@IEccInstallService private readonly eccInstallService: IEccInstallService,
+		@IStorageService private readonly storageService: IStorageService,
+	) {
+		this.loadStateOverrides();
+
+		// Forward catalog changes to UI
+		this.eccCatalogService.onDidChangeCatalog(() => {
+			this._onDidChangeItems.fire();
+		});
+
+		// Forward install changes to UI
+		this.eccInstallService.onDidChangeInstalled(() => {
+			this._onDidChangeItems.fire();
+		});
+
+		// Trigger initial catalog load from disk (not from cache)
+		this.ensureCatalogLoaded();
 	}
 
-	private initializeSampleData(): void {
-		this.items = [
-			{
-				id: 'agent-sort',
-				name: 'Agent Sort',
-				type: 'skill',
-				description: 'Build evidence-backed ECC install plans by sorting skills, commands, rules, and hooks into DAILY vs LIBRARY buckets.',
-				version: '1.2.0',
-				author: 'ECC Team',
-				state: 'enabled',
-				iconCodicon: 'codicon-list-filter',
-				installPath: '~/.claude/skills/agent-sort/',
-				config: { defaultMode: 'quick-scan', autoCommit: true },
-				lastUsed: Date.now() - 86400000,
-				usageCount: 47,
-				tags: ['install', 'planning', 'audit'],
-				category: 'Development'
-			},
-			{
-				id: 'skill-scout',
-				name: 'Skill Scout',
-				type: 'skill',
-				description: 'Search existing local, marketplace, GitHub, and web skill sources before creating a new skill.',
-				version: '2.0.1',
-				author: 'ECC Team',
-				state: 'enabled',
-				iconCodicon: 'codicon-search',
-				installPath: '~/.claude/skills/skill-scout/',
-				config: { maxResults: 10, includeMarketplace: true },
-				lastUsed: Date.now() - 3600000,
-				usageCount: 128,
-				tags: ['discovery', 'search'],
-				category: 'Development'
-			},
-			{
-				id: 'harness-construction',
-				name: 'Harness Construction',
-				type: 'agent',
-				description: 'Design and optimize AI agent action spaces, tool definitions, and observation formatting for higher completion rates.',
-				version: '1.0.0',
-				author: 'Statuz Core',
-				state: 'enabled',
-				iconCodicon: 'codicon-symbol-struct',
-				installPath: '~/.claude/agents/harness-construction/',
-				config: { architecture: 'react', toolGranularity: 'medium' },
-				lastUsed: Date.now() - 7200000,
-				usageCount: 23,
-				tags: ['agent', 'optimization', 'design'],
-				category: 'Agent'
-			},
-			{
-				id: 'agentic-os',
-				name: 'Agentic OS',
-				type: 'agent',
-				description: 'Build persistent multi-agent operating systems. Kernel architecture, specialist agents, slash commands, file-based memory.',
-				version: '2.3.0',
-				author: 'Statuz Core',
-				state: 'enabled',
-				iconCodicon: 'codicon-symbol-array',
-				installPath: '~/.claude/agents/agentic-os/',
-				config: { maxAgents: 5, memoryType: 'file' },
-				lastUsed: Date.now() - 43200000,
-				usageCount: 15,
-				tags: ['orchestration', 'multi-agent'],
-				category: 'Agent'
-			},
-			{
-				id: 'code-reviewer',
-				name: 'Code Reviewer',
-				type: 'command',
-				description: 'Review pull requests and code changes with configurable strictness levels and automated feedback.',
-				version: '0.5.0',
-				author: 'Community',
-				state: 'disabled',
-				iconCodicon: 'codicon-review',
-				installPath: '~/.claude/commands/code-reviewer/',
-				config: { strictness: 'moderate', autoComment: false },
-				lastUsed: 0,
-				usageCount: 0,
-				tags: ['review', 'code-quality'],
-				category: 'Development'
-			},
-			{
-				id: 'docs-generator',
-				name: 'Docs Generator',
-				type: 'skill',
-				description: 'Auto-generate documentation from code comments, JSDoc, and TypeScript type definitions.',
-				version: '1.1.0',
-				author: 'Community',
-				state: 'disabled',
-				iconCodicon: 'codicon-file-code',
-				installPath: '~/.claude/skills/docs-generator/',
-				config: { format: 'markdown', includeExamples: true },
-				lastUsed: Date.now() - 604800000,
-				usageCount: 8,
-				tags: ['documentation', 'generation'],
-				category: 'Documentation'
-			},
-			{
-				id: 'security-scanner',
-				name: 'Security Scanner',
-				type: 'skill',
-				description: 'Scan Claude Code configuration for security vulnerabilities, misconfigurations, and injection risks.',
-				version: '0.8.0',
-				author: 'Security Team',
-				state: 'error',
-				iconCodicon: 'codicon-shield',
-				installPath: '~/.claude/skills/security-scanner/',
-				config: { scanDepth: 'deep', autoFix: false },
-				lastUsed: Date.now() - 120000,
-				usageCount: 34,
-				tags: ['security', 'audit'],
-				category: 'Security'
-			},
-			{
-				id: 'perf-analyzer',
-				name: 'Performance Analyzer',
-				type: 'rule',
-				description: 'Performance optimization rules for React, TypeScript, and Node.js — catch common anti-patterns before they ship.',
-				version: '1.0.0',
-				author: 'Statuz Core',
-				state: 'enabled',
-				iconCodicon: 'codicon-dashboard',
-				installPath: '~/.claude/rules/perf-analyzer/',
-				config: { severity: 'warning', autoFix: true },
-				lastUsed: Date.now() - 1800000,
-				usageCount: 56,
-				tags: ['performance', 'linting', 'react'],
-				category: 'Development'
-			},
-		];
+	private async ensureCatalogLoaded(): Promise<void> {
+		if (!this.eccCatalogService.getCachedCatalog()) {
+			await this.eccCatalogService.fetchCatalog();
+			this._onDidChangeItems.fire();
+		} else {
+			// Try to refresh from disk in background
+			this.eccCatalogService.fetchCatalog().then(() => {
+				this._onDidChangeItems.fire();
+			}).catch(() => {
+				// Use cached version if disk load fails
+			});
+		}
 	}
+
+	// ─── State Override Persistence ───────────────────────────
+
+	private loadStateOverrides(): void {
+		const raw = this.storageService.get(this.STATE_KEY, StorageScope.PROFILE);
+		if (raw) {
+			try {
+				const entries = JSON.parse(raw) as [string, Partial<IAgentSkillItem>][];
+				this.stateOverrides = new Map(entries);
+			} catch { /* ignore */ }
+		}
+	}
+
+	private saveStateOverrides(): void {
+		this.storageService.store(
+			this.STATE_KEY,
+			JSON.stringify([...this.stateOverrides.entries()]),
+			StorageScope.PROFILE,
+			StorageTarget.MACHINE,
+		);
+	}
+
+	// ─── Build Items from ECC Catalog ─────────────────────────
+
+	private buildItems(): IAgentSkillItem[] {
+		const catalog = this.eccCatalogService.getCachedCatalog();
+		if (!catalog) {
+			return [];
+		}
+
+		return catalog.components.map(comp => {
+			// Start with the catalog item
+			const item: IAgentSkillItem = this.eccCatalogService.toAgentSkillItem(comp);
+
+			// Apply state from install service
+			if (this.eccInstallService.isInstalled(comp.id)) {
+				item.state = 'enabled';
+			}
+
+			// Apply state overrides
+			const override = this.stateOverrides.get(comp.id);
+			if (override) {
+				if (override.state !== undefined) item.state = override.state;
+				if (override.config !== undefined) item.config = { ...item.config, ...override.config };
+				if (override.lastUsed !== undefined) item.lastUsed = override.lastUsed;
+				if (override.usageCount !== undefined) item.usageCount = override.usageCount;
+			}
+
+			return item;
+		});
+	}
+
+	// ─── Public API ───────────────────────────────────────────
 
 	getItems(): IAgentSkillItem[] {
-		return [...this.items];
+		return this.buildItems();
 	}
 
 	getFilteredItems(filter: IAgentSkillFilter): IAgentSkillItem[] {
-		let result = [...this.items];
+		// Start with catalog-level filtering (type + search)
+		let result = this.eccCatalogService.getFilteredCatalog(filter);
 
-		// Filter by type
-		if (filter.types.length > 0) {
-			result = result.filter(item => filter.types.includes(item.type));
-		}
+		// Apply state overrides to filtered items
+		result = result.map(item => {
+			// Apply install state
+			if (this.eccInstallService.isInstalled(item.id)) {
+				item.state = 'enabled';
+			}
+			// Apply overrides
+			const override = this.stateOverrides.get(item.id);
+			if (override) {
+				if (override.state !== undefined) item.state = override.state;
+				if (override.config !== undefined) item.config = { ...item.config, ...override.config };
+				if (override.lastUsed !== undefined) item.lastUsed = override.lastUsed;
+				if (override.usageCount !== undefined) item.usageCount = override.usageCount;
+			}
+			return item;
+		});
 
-		// Filter by state
+		// Apply state filter (only for catalog items, since we already filtered)
 		if (filter.state !== 'all') {
 			result = result.filter(item => item.state === filter.state);
 		}
 
-		// Search by query
-		if (filter.query.trim()) {
-			const q = filter.query.toLowerCase();
-			result = result.filter(item =>
-				item.name.toLowerCase().includes(q) ||
-				item.description.toLowerCase().includes(q) ||
-				item.tags.some(t => t.toLowerCase().includes(q))
-			);
-		}
-
-		// Sort
+		// Apply sort
 		result.sort((a, b) => {
 			let cmp = 0;
 			switch (filter.sortBy) {
@@ -211,40 +169,38 @@ export class AgentManagementService implements IAgentManagementService {
 	}
 
 	getItem(id: string): IAgentSkillItem | undefined {
-		return this.items.find(item => item.id === id);
+		const items = this.buildItems();
+		return items.find(item => item.id === id);
 	}
 
 	setItemState(id: string, state: ItemState): void {
-		const item = this.items.find(i => i.id === id);
-		if (item) {
-			item.state = state;
-			this._onDidChangeItems.fire();
-		}
+		let override = this.stateOverrides.get(id) || {};
+		override.state = state;
+		this.stateOverrides.set(id, override);
+		this.saveStateOverrides();
+		this._onDidChangeItems.fire();
 	}
 
 	updateConfig(id: string, config: Record<string, any>): void {
-		const item = this.items.find(i => i.id === id);
-		if (item) {
-			item.config = { ...item.config, ...config };
-			this._onDidChangeItems.fire();
-		}
+		let override = this.stateOverrides.get(id) || {};
+		override.config = { ...(override.config || {}), ...config };
+		this.stateOverrides.set(id, override);
+		this.saveStateOverrides();
+		this._onDidChangeItems.fire();
 	}
 
 	async installItem(id: string): Promise<void> {
-		await this.eccInstallService.install(id);
-		const item = this.items.find(i => i.id === id);
-		if (item) {
-			item.state = 'enabled';
+		// Ensure catalog is loaded before install
+		const catalog = this.eccCatalogService.getCachedCatalog();
+		if (!catalog) {
+			await this.eccCatalogService.fetchCatalog();
 		}
+		await this.eccInstallService.install(id);
 		this._onDidChangeItems.fire();
 	}
 
 	async uninstallItem(id: string): Promise<void> {
 		await this.eccInstallService.uninstall(id);
-		const item = this.items.find(i => i.id === id);
-		if (item) {
-			item.state = 'disabled';
-		}
 		this._onDidChangeItems.fire();
 	}
 
