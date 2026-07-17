@@ -1,0 +1,765 @@
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+/* ─── Full-Page Layout ───────────────────────────────────── */
+
+.harness-editor {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	width: 100%;
+	overflow: hidden;
+	background-color: var(--vscode-editor-background);
+	color: var(--vscode-editor-foreground);
+	font-size: 13px;
+	line-height: 1.4;
+}
+
+/* ─── Nav Bar ────────────────────────────────────────────── */
+
+.harness-nav-bar {
+	display: flex;
+	align-items: center;
+	height: 40px;
+	min-height: 40px;
+	padding: 0 16px;
+	border-bottom: 1px solid var(--vscode-sideBarSectionHeader-border);
+	background-color: var(--vscode-editor-background);
+	gap: 4px;
+	flex-shrink: 0;
+}
+
+.harness-nav-tab-group {
+	display: flex;
+	align-items: center;
+	gap: 2px;
+}
+
+.harness-nav-tab {
+	background: none;
+	border: none;
+	color: var(--vscode-sideBar-foreground);
+	padding: 6px 14px;
+	cursor: pointer;
+	font-size: 12px;
+	line-height: 20px;
+	border-radius: 4px;
+	transition: background-color 0.15s ease;
+}
+
+.harness-nav-tab:hover {
+	background-color: var(--vscode-list-hoverBackground);
+}
+
+.harness-nav-tab.active {
+	color: var(--vscode-editor-foreground);
+	background-color: var(--vscode-list-activeSelectionBackground);
+}
+
+.harness-nav-actions {
+	display: flex;
+	align-items: center;
+	margin-left: auto;
+	gap: 4px;
+}
+
+.harness-nav-action-btn {
+	background: none;
+	border: 1px solid transparent;
+	color: var(--vscode-sideBar-foreground);
+	padding: 4px 8px;
+	cursor: pointer;
+	font-size: 12px;
+	border-radius: 4px;
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	transition: background-color 0.15s ease;
+}
+
+.harness-nav-action-btn:hover {
+	background-color: var(--vscode-list-hoverBackground);
+}
+
+.harness-nav-action-btn .codicon {
+	font-size: 14px;
+}
+
+/* ─── Main Area (3-zone) ─────────────────────────────────── */
+
+.harness-main-area {
+	display: flex;
+	flex: 1;
+	overflow: hidden;
+}
+
+/* ─── Sidebar ────────────────────────────────────────────── */
+
+.harness-sidebar {
+	width: 260px;
+	min-width: 200px;
+	max-width: 320px;
+	overflow-y: auto;
+	border-right: 1px solid var(--vscode-sideBarSectionHeader-border);
+	background-color: var(--vscode-sideBar-background);
+	display: flex;
+	flex-direction: column;
+	padding: 12px;
+	gap: 12px;
+}
+
+.harness-sidebar-search {
+	position: relative;
+	display: flex;
+	align-items: center;
+}
+
+.harness-sidebar-search-input {
+	width: 100%;
+	padding: 4px 28px 4px 24px;
+	border: 1px solid var(--vscode-input-border);
+	background-color: var(--vscode-input-background);
+	color: var(--vscode-input-foreground);
+	font-size: 12px;
+	line-height: 22px;
+	border-radius: 4px;
+	outline: none;
+}
+
+.harness-sidebar-search-input:focus {
+	border-color: var(--vscode-focusBorder);
+}
+
+.harness-sidebar-search-icon {
+	position: absolute;
+	left: 6px;
+	font-size: 12px;
+	color: var(--vscode-input-placeholderForeground);
+	pointer-events: none;
+}
+
+.harness-sidebar-clear {
+	position: absolute;
+	right: 4px;
+	font-size: 12px;
+	color: var(--vscode-input-placeholderForeground);
+	cursor: pointer;
+	display: none;
+}
+
+.harness-sidebar-clear.visible {
+	display: block;
+}
+
+.harness-sidebar-section {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+.harness-sidebar-section-title {
+	font-size: 11px;
+	font-weight: 600;
+	text-transform: uppercase;
+	color: var(--vscode-descriptionForeground);
+	padding: 4px 0;
+}
+
+.harness-sidebar-filter-item {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	padding: 3px 6px;
+	cursor: pointer;
+	border-radius: 3px;
+	font-size: 12px;
+	color: var(--vscode-sideBar-foreground);
+}
+
+.harness-sidebar-filter-item:hover {
+	background-color: var(--vscode-list-hoverBackground);
+}
+
+.harness-sidebar-filter-item input[type="checkbox"] {
+	margin: 0;
+	accent-color: var(--vscode-checkbox-selectBackground);
+	cursor: pointer;
+}
+
+.harness-sidebar-filter-item label {
+	cursor: pointer;
+	flex: 1;
+}
+
+.harness-sidebar-filter-item .count {
+	color: var(--vscode-descriptionForeground);
+	font-size: 11px;
+}
+
+.harness-sidebar-select {
+	width: 100%;
+	padding: 3px 6px;
+	border: 1px solid var(--vscode-input-border);
+	background-color: var(--vscode-input-background);
+	color: var(--vscode-input-foreground);
+	font-size: 12px;
+	border-radius: 3px;
+	outline: none;
+	cursor: pointer;
+}
+
+.harness-sidebar-select:focus {
+	border-color: var(--vscode-focusBorder);
+}
+
+/* ─── Card Grid Container ────────────────────────────────── */
+
+.harness-card-grid-container {
+	flex: 1;
+	overflow-y: auto;
+	overflow-x: hidden;
+	background-color: var(--vscode-editor-background);
+}
+
+/* ─── Card Grid ──────────────────────────────────────────── */
+
+.harness-card-grid {
+	padding: 16px;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.harness-category-header {
+	font-size: 13px;
+	font-weight: 600;
+	padding: 12px 0 8px;
+	color: var(--vscode-editor-foreground);
+	border-bottom: 1px solid var(--vscode-sideBarSectionHeader-border);
+	margin-bottom: 8px;
+}
+
+.harness-category-header:first-child {
+	padding-top: 0;
+}
+
+.harness-category-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+	gap: 8px;
+	margin-bottom: 8px;
+}
+
+/* ─── Card ───────────────────────────────────────────────── */
+
+.harness-card {
+	display: flex;
+	flex-direction: column;
+	padding: 12px;
+	border: 1px solid var(--vscode-sideBarSectionHeader-border);
+	border-radius: 6px;
+	cursor: pointer;
+	transition: border-color 0.15s ease, background-color 0.15s ease;
+	background-color: var(--vscode-editor-background);
+	gap: 6px;
+	position: relative;
+}
+
+.harness-card:hover {
+	border-color: var(--vscode-list-activeSelectionBackground);
+	background-color: var(--vscode-list-hoverBackground);
+}
+
+.harness-card.selected {
+	border-color: var(--vscode-list-activeSelectionBackground);
+	background-color: var(--vscode-list-activeSelectionBackground);
+	color: var(--vscode-list-activeSelectionForeground);
+}
+
+.harness-card-header {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.harness-card-icon {
+	font-size: 16px;
+	width: 20px;
+	text-align: center;
+	flex-shrink: 0;
+}
+
+.harness-card-name {
+	font-size: 13px;
+	font-weight: 500;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	flex: 1;
+}
+
+.harness-card-type-badge {
+	font-size: 10px;
+	padding: 1px 6px;
+	border-radius: 3px;
+	font-weight: 500;
+	text-transform: uppercase;
+	flex-shrink: 0;
+}
+
+.harness-card-type-badge.agent {
+	background-color: var(--vscode-testing-iconPassed);
+	color: var(--vscode-editor-background);
+}
+
+.harness-card-type-badge.skill {
+	background-color: var(--vscode-testing-iconQueued);
+	color: var(--vscode-editor-background);
+}
+
+.harness-card-type-badge.command {
+	background-color: var(--vscode-testing-iconUnset);
+	color: var(--vscode-editor-background);
+}
+
+.harness-card-type-badge.rule {
+	background-color: var(--vscode-testing-iconSkipped);
+	color: var(--vscode-editor-background);
+}
+
+.harness-card-description {
+	font-size: 11px;
+	color: var(--vscode-descriptionForeground);
+	line-height: 1.4;
+	display: -webkit-box;
+	-webkit-line-clamp: 2;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+}
+
+.harness-card.selected .harness-card-description {
+	color: inherit;
+	opacity: 0.8;
+}
+
+.harness-card-footer {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	margin-top: 2px;
+}
+
+.harness-card-state-dot {
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	flex-shrink: 0;
+}
+
+.harness-card-state-dot.enabled {
+	background-color: var(--vscode-testing-iconPassed);
+}
+
+.harness-card-state-dot.disabled {
+	background-color: var(--vscode-testing-iconUnset);
+}
+
+.harness-card-state-dot.error {
+	background-color: var(--vscode-testing-iconFailed);
+}
+
+.harness-card-state-dot.installing {
+	background-color: var(--vscode-testing-iconQueued);
+	animation: pulse 1s ease-in-out infinite;
+}
+
+@keyframes pulse {
+	0%, 100% { opacity: 1; }
+	50% { opacity: 0.4; }
+}
+
+.harness-card-version {
+	font-size: 10px;
+	color: var(--vscode-descriptionForeground);
+}
+
+.harness-card-tags {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 4px;
+}
+
+.harness-card-tag {
+	font-size: 10px;
+	padding: 1px 4px;
+	border-radius: 2px;
+	background-color: var(--vscode-badge-background);
+	color: var(--vscode-badge-foreground);
+}
+
+/* ─── Detail Panel ───────────────────────────────────────── */
+
+.harness-detail-panel {
+	width: 320px;
+	min-width: 260px;
+	max-width: 400px;
+	overflow-y: auto;
+	border-left: 1px solid var(--vscode-sideBarSectionHeader-border);
+	background-color: var(--vscode-sideBar-background);
+	display: flex;
+	flex-direction: column;
+}
+
+.harness-detail-empty {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	height: 100%;
+	color: var(--vscode-descriptionForeground);
+	font-size: 12px;
+	padding: 24px;
+	text-align: center;
+	gap: 8px;
+}
+
+.harness-detail-empty .codicon {
+	font-size: 32px;
+	opacity: 0.4;
+}
+
+.harness-detail-content {
+	padding: 16px;
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+}
+
+.harness-detail-header {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.harness-detail-icon {
+	font-size: 20px;
+}
+
+.harness-detail-name {
+	font-size: 15px;
+	font-weight: 600;
+	flex: 1;
+}
+
+.harness-detail-section {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+
+.harness-detail-section-title {
+	font-size: 11px;
+	font-weight: 600;
+	text-transform: uppercase;
+	color: var(--vscode-descriptionForeground);
+}
+
+.harness-detail-description {
+	font-size: 12px;
+	line-height: 1.5;
+	color: var(--vscode-editor-foreground);
+}
+
+.harness-detail-info-grid {
+	display: grid;
+	grid-template-columns: 80px 1fr;
+	gap: 4px 8px;
+	font-size: 12px;
+}
+
+.harness-detail-info-label {
+	color: var(--vscode-descriptionForeground);
+}
+
+.harness-detail-info-value {
+	color: var(--vscode-editor-foreground);
+}
+
+.harness-detail-tags {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 4px;
+}
+
+.harness-detail-tag {
+	font-size: 11px;
+	padding: 2px 6px;
+	border-radius: 3px;
+	background-color: var(--vscode-badge-background);
+	color: var(--vscode-badge-foreground);
+}
+
+.harness-detail-actions {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+
+.harness-detail-btn {
+	padding: 6px 12px;
+	border: 1px solid var(--vscode-button-border, transparent);
+	border-radius: 4px;
+	cursor: pointer;
+	font-size: 12px;
+	font-weight: 500;
+	text-align: center;
+	transition: opacity 0.15s ease;
+}
+
+.harness-detail-btn:hover {
+	opacity: 0.8;
+}
+
+.harness-detail-btn.primary {
+	background-color: var(--vscode-button-background);
+	color: var(--vscode-button-foreground);
+}
+
+.harness-detail-btn.primary:hover {
+	background-color: var(--vscode-button-hoverBackground);
+}
+
+.harness-detail-btn.secondary {
+	background-color: transparent;
+	color: var(--vscode-editor-foreground);
+	border-color: var(--vscode-sideBarSectionHeader-border);
+}
+
+.harness-detail-btn.secondary:hover {
+	background-color: var(--vscode-list-hoverBackground);
+}
+
+.harness-detail-btn.danger {
+	background-color: transparent;
+	color: var(--vscode-errorForeground);
+	border-color: var(--vscode-errorForeground);
+}
+
+.harness-detail-btn.danger:hover {
+	background-color: var(--vscode-inputValidation-errorBackground);
+}
+
+.harness-detail-config {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+
+.harness-detail-config-textarea {
+	width: 100%;
+	min-height: 80px;
+	padding: 6px;
+	border: 1px solid var(--vscode-input-border);
+	background-color: var(--vscode-input-background);
+	color: var(--vscode-input-foreground);
+	font-family: var(--vscode-editor-font-family);
+	font-size: 11px;
+	border-radius: 4px;
+	resize: vertical;
+	outline: none;
+}
+
+.harness-detail-config-textarea:focus {
+	border-color: var(--vscode-focusBorder);
+}
+
+.harness-detail-config-actions {
+	display: flex;
+	gap: 6px;
+}
+
+/* ─── Status Bar ─────────────────────────────────────────── */
+
+.harness-status-bar {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	height: 24px;
+	min-height: 24px;
+	padding: 0 12px;
+	border-top: 1px solid var(--vscode-sideBarSectionHeader-border);
+	background-color: var(--vscode-statusBar-background);
+	color: var(--vscode-statusBar-foreground);
+	font-size: 11px;
+	flex-shrink: 0;
+}
+
+.harness-status-left {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+}
+
+.harness-status-right {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.harness-status-item {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+}
+
+.harness-status-item .codicon {
+	font-size: 12px;
+}
+
+/* ─── Harness Dashboard ──────────────────────────────────── */
+
+.harness-dashboard {
+	padding: 24px;
+	display: flex;
+	flex-direction: column;
+	gap: 24px;
+	overflow-y: auto;
+	height: 100%;
+}
+
+.harness-dashboard-header {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+.harness-dashboard-title {
+	font-size: 20px;
+	font-weight: 600;
+}
+
+.harness-dashboard-subtitle {
+	font-size: 12px;
+	color: var(--vscode-descriptionForeground);
+}
+
+.harness-dashboard-metrics {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+	gap: 12px;
+}
+
+.harness-dashboard-metric {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	padding: 16px;
+	border: 1px solid var(--vscode-sideBarSectionHeader-border);
+	border-radius: 6px;
+	background-color: var(--vscode-editor-background);
+}
+
+.harness-dashboard-metric-value {
+	font-size: 28px;
+	font-weight: 600;
+	color: var(--vscode-editor-foreground);
+}
+
+.harness-dashboard-metric-label {
+	font-size: 11px;
+	color: var(--vscode-descriptionForeground);
+	text-transform: uppercase;
+}
+
+.harness-dashboard-quick-actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+}
+
+.harness-dashboard-quick-btn {
+	padding: 8px 16px;
+	border: 1px solid var(--vscode-sideBarSectionHeader-border);
+	border-radius: 6px;
+	background-color: var(--vscode-editor-background);
+	color: var(--vscode-editor-foreground);
+	cursor: pointer;
+	font-size: 12px;
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.harness-dashboard-quick-btn:hover {
+	border-color: var(--vscode-list-activeSelectionBackground);
+	background-color: var(--vscode-list-hoverBackground);
+}
+
+/* ─── Config View ────────────────────────────────────────── */
+
+.harness-config-view {
+	padding: 24px;
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+	overflow-y: auto;
+	height: 100%;
+}
+
+.harness-config-title {
+	font-size: 18px;
+	font-weight: 600;
+}
+
+.harness-config-section {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.harness-config-section-title {
+	font-size: 13px;
+	font-weight: 600;
+}
+
+.harness-config-row {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 8px 12px;
+	border: 1px solid var(--vscode-sideBarSectionHeader-border);
+	border-radius: 4px;
+	background-color: var(--vscode-editor-background);
+}
+
+.harness-config-row-label {
+	font-size: 12px;
+}
+
+.harness-config-row-value {
+	font-size: 12px;
+	color: var(--vscode-descriptionForeground);
+}
+
+/* ─── Empty State ────────────────────────────────────────── */
+
+.harness-empty-state {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	height: 100%;
+	color: var(--vscode-descriptionForeground);
+	font-size: 13px;
+	padding: 40px;
+	text-align: center;
+	gap: 12px;
+}
+
+.harness-empty-state .codicon {
+	font-size: 48px;
+	opacity: 0.3;
+}
