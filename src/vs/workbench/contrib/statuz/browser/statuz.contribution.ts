@@ -17,6 +17,9 @@ import './dashboardPane.js'
 // register Sandboxer Board pane (Activity Bar)
 import './boardPane.js'
 
+// register Agent Management pane (Activity Bar)
+import './agentManagementPane.js'
+
 // register quick edit (Ctrl+K)
 import './quickEditActions.js'
 
