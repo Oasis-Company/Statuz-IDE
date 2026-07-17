@@ -10,6 +10,7 @@
   "type": "module",
   "private": true,
   "scripts": {
+    "start": "start-ide.bat",
     "buildreact": "cd ./src/vs/workbench/contrib/statuz/browser/react/ && node build.js && cd ../../../../../../../",
     "watchreact": "cd ./src/vs/workbench/contrib/statuz/browser/react/ && node build.js --watch && cd ../../../../../../../",
     "watchreactd": "deemon npm run watchreact",
