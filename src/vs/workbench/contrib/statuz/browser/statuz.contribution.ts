@@ -17,8 +17,8 @@ import './dashboardPane.js'
 // register Sandboxer Board pane (Activity Bar)
 import './boardPane.js'
 
-// register Agent Management pane (Activity Bar)
-import './agentManagementPane.js'
+// register Agent Management pane (Activity Bar) — replaced by full-page HarnessEditor
+import './harness/harnessEditor.js'
 
 // register quick edit (Ctrl+K)
 import './quickEditActions.js'
