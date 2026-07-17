@@ -3,6 +3,7 @@
  *  Licensed under the Apache License, Version 2.0.
  *  Ported from Sandboxer src/components/flow/boardUtils.ts
  *  Adapted: React Flow types → native FlowNodeLayout/FlowEdgeData
+ *  Original work Copyright (c) Sandboxer authors. Licensed under the MIT License.
  *--------------------------------------------------------------------------------------------*/
 
 import type { SandboxCard, Constitution, FlowNodeLayout, FlowEdgeData } from './boardTypes.js';
