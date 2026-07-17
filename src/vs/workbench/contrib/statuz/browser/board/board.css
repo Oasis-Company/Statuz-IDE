@@ -1,0 +1,324 @@
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Statuz. All rights reserved.
+ *  Licensed under the Apache License, Version 2.0.
+ *  Native VS Code styling for the Board module
+ *  All colors use --vscode-* CSS variables for theme compatibility
+ *--------------------------------------------------------------------------------------------*/
+
+/* ─── Board Canvas ───────────────────────────────────────── */
+
+.board-canvas {
+	display: block;
+	width: 100%;
+	height: 100%;
+	background: var(--vscode-editor-background);
+}
+
+.board-canvas:focus {
+	outline: none;
+}
+
+/* ─── Board Background Grid ──────────────────────────────── */
+
+/* Subtle dot grid background drawn via SVG pattern */
+.board-canvas::before {
+	content: '';
+	/* Grid is handled by the BoardViewPane container */
+}
+
+/* ─── Board Nodes ────────────────────────────────────────── */
+
+.board-node {
+	transition: filter 0.15s ease;
+}
+
+.board-node:hover {
+	filter: brightness(0.97);
+}
+
+.board-node.constitution {
+	fill: color-mix(in srgb, var(--vscode-textLink-foreground, #3794ff) 5%, var(--vscode-editor-background));
+	stroke: var(--vscode-textLink-foreground, #3794ff);
+	stroke-width: 2;
+}
+
+.board-node.card {
+	fill: var(--vscode-editor-background);
+}
+
+.board-node.card.importing {
+	animation: board-pulse 1.5s ease-in-out infinite;
+}
+
+.board-node.decision {
+	fill: var(--vscode-editor-background);
+	stroke: var(--vscode-foreground);
+}
+
+.board-node.placeholder {
+	stroke: var(--vscode-descriptionForeground);
+}
+
+/* ─── Node Title ─────────────────────────────────────────── */
+
+.board-node-title {
+	font-family: var(--vscode-font-family);
+	font-size: 13px;
+	font-weight: 600;
+	fill: var(--vscode-foreground);
+}
+
+.board-node-type-label {
+	font-family: var(--vscode-font-family);
+	font-size: 9px;
+	font-weight: 700;
+	letter-spacing: 0.5px;
+	text-transform: uppercase;
+}
+
+.board-node-status {
+	font-family: var(--vscode-font-family);
+	font-size: 9px;
+	font-weight: 600;
+}
+
+/* ─── Edges ──────────────────────────────────────────────── */
+
+.board-edge {
+	transition: stroke 0.2s ease;
+}
+
+.board-edge:hover {
+	stroke-width: 2.5;
+}
+
+.board-edge-label {
+	font-family: var(--vscode-font-family);
+	font-size: 9px;
+	fill: var(--vscode-descriptionForeground);
+	pointer-events: none;
+	user-select: none;
+}
+
+/* ─── Connection Handles ─────────────────────────────────── */
+
+.board-connection-handle {
+	transition: opacity 0.15s ease, r 0.15s ease;
+}
+
+.board-node:hover .board-connection-handle,
+g:hover .board-connection-handle {
+	opacity: 1;
+}
+
+.board-connection-handle:hover {
+	r: 7;
+	fill: var(--vscode-focusBorder, #007acc);
+}
+
+/* ─── Selection ──────────────────────────────────────────── */
+
+.board-selection {
+	pointer-events: none;
+}
+
+/* ─── Toolbar ────────────────────────────────────────────── */
+
+.board-toolbar {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	padding: 8px 12px;
+	background: var(--vscode-sideBar-background);
+	border-bottom: 1px solid var(--vscode-sideBar-border, var(--vscode-panel-border));
+	flex-shrink: 0;
+}
+
+.board-toolbar button {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 28px;
+	height: 28px;
+	border: none;
+	background: transparent;
+	color: var(--vscode-foreground);
+	border-radius: 4px;
+	cursor: pointer;
+	font-size: 14px;
+}
+
+.board-toolbar button:hover {
+	background: var(--vscode-toolbar-hoverBackground);
+}
+
+.board-toolbar button:disabled {
+	opacity: 0.4;
+	cursor: default;
+}
+
+.board-toolbar .toolbar-separator {
+	width: 1px;
+	height: 20px;
+	background: var(--vscode-sideBar-border, var(--vscode-panel-border));
+	margin: 0 4px;
+}
+
+.board-toolbar input[type="search"] {
+	flex: 1;
+	max-width: 200px;
+	height: 26px;
+	padding: 0 8px;
+	border: 1px solid var(--vscode-input-border);
+	background: var(--vscode-input-background);
+	color: var(--vscode-input-foreground);
+	border-radius: 4px;
+	font-family: var(--vscode-font-family);
+	font-size: 12px;
+	outline: none;
+}
+
+.board-toolbar input[type="search"]:focus {
+	border-color: var(--vscode-focusBorder);
+}
+
+.board-toolbar input[type="search"]::placeholder {
+	color: var(--vscode-input-placeholderForeground);
+}
+
+/* ─── Tools Panel ────────────────────────────────────────── */
+
+.board-tools-panel {
+	position: absolute;
+	top: 44px;
+	right: 12px;
+	width: 240px;
+	background: var(--vscode-sideBar-background);
+	border: 1px solid var(--vscode-panel-border);
+	border-radius: 6px;
+	box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+	z-index: 100;
+	overflow: hidden;
+}
+
+.board-tools-panel .tabs {
+	display: flex;
+	border-bottom: 1px solid var(--vscode-panel-border);
+}
+
+.board-tools-panel .tab {
+	flex: 1;
+	padding: 8px 0;
+	background: transparent;
+	border: none;
+	color: var(--vscode-descriptionForeground);
+	font-family: var(--vscode-font-family);
+	font-size: 12px;
+	cursor: pointer;
+}
+
+.board-tools-panel .tab.active {
+	color: var(--vscode-foreground);
+	border-bottom: 2px solid var(--vscode-focusBorder);
+}
+
+.board-tools-panel .tab-content {
+	padding: 12px;
+}
+
+/* ─── Completion Panel ───────────────────────────────────── */
+
+.board-completion-panel {
+	padding: 12px 16px;
+	background: var(--vscode-sideBar-background);
+	border-top: 1px solid var(--vscode-sideBar-border, var(--vscode-panel-border));
+	flex-shrink: 0;
+}
+
+.board-completion-panel .progress-bar {
+	height: 6px;
+	background: var(--vscode-input-background);
+	border-radius: 3px;
+	overflow: hidden;
+	margin-bottom: 8px;
+}
+
+.board-completion-panel .progress-fill {
+	height: 100%;
+	background: var(--vscode-textLink-foreground, #3794ff);
+	border-radius: 3px;
+	transition: width 0.4s ease;
+}
+
+.board-completion-panel .score-text {
+	font-family: var(--vscode-font-family);
+	font-size: 12px;
+	font-weight: 600;
+	color: var(--vscode-foreground);
+	margin-bottom: 4px;
+}
+
+.board-completion-panel .breakdown {
+	font-family: var(--vscode-font-family);
+	font-size: 11px;
+	color: var(--vscode-descriptionForeground);
+	line-height: 1.6;
+}
+
+/* ─── Animations ─────────────────────────────────────────── */
+
+@keyframes board-pulse {
+	0%, 100% { opacity: 1; }
+	50% { opacity: 0.5; }
+}
+
+/* ─── Context Menu ───────────────────────────────────────── */
+
+.board-context-menu {
+	position: fixed;
+	min-width: 160px;
+	background: var(--vscode-menu-background, var(--vscode-sideBar-background));
+	border: 1px solid var(--vscode-menu-border, var(--vscode-panel-border));
+	border-radius: 6px;
+	box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+	z-index: 1000;
+	padding: 4px 0;
+}
+
+.board-context-menu .menu-item {
+	padding: 6px 16px;
+	font-family: var(--vscode-font-family);
+	font-size: 12px;
+	color: var(--vscode-menu-foreground, var(--vscode-foreground));
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.board-context-menu .menu-item:hover {
+	background: var(--vscode-menu-selectionBackground, var(--vscode-list-hoverBackground));
+}
+
+.board-context-menu .menu-separator {
+	height: 1px;
+	background: var(--vscode-menu-separatorBackground, var(--vscode-panel-border));
+	margin: 4px 0;
+}
+
+.board-context-menu .menu-item.danger {
+	color: var(--vscode-errorForeground, #f48771);
+}
+
+/* ─── Responsive ─────────────────────────────────────────── */
+
+@media (max-width: 400px) {
+	.board-toolbar {
+		padding: 6px 8px;
+		gap: 2px;
+	}
+
+	.board-toolbar input[type="search"] {
+		max-width: 120px;
+	}
+}
