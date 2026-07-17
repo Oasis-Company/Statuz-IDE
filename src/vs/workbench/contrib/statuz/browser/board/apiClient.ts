@@ -3,6 +3,7 @@
  *  Licensed under the Apache License, Version 2.0.
  *  Ported from Sandboxer src/lib/api/client.ts
  *  Adapted: Supabase removed; kept classifyError, guardAsync, guardSync
+ *  Original work Copyright (c) Sandboxer authors. Licensed under the MIT License.
  *--------------------------------------------------------------------------------------------*/
 
 import type { ApiError, ApiResult } from './apiTypes.js';
