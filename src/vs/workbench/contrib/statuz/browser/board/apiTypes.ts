@@ -2,6 +2,7 @@
  *  Copyright (c) Statuz. All rights reserved.
  *  Licensed under the Apache License, Version 2.0.
  *  Ported from Sandboxer src/lib/api/types.ts
+ *  Original work Copyright (c) Sandboxer authors. Licensed under the MIT License.
  *--------------------------------------------------------------------------------------------*/
 
 /* ─── Error Types ────────────────────────────────────────── */
