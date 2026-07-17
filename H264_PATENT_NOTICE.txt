@@ -1,0 +1,26 @@
+H.264/AVC PATENT NOTICE
+
+THIS PRODUCT IS LICENSED UNDER THE AVC PATENT PORTFOLIO LICENSE FOR THE
+PERSONAL AND NON-COMMERCIAL USE OF A CONSUMER TO (i) ENCODE VIDEO IN
+COMPLIANCE WITH THE AVC STANDARD ("AVC VIDEO") AND/OR (ii) DECODE AVC
+VIDEO THAT WAS ENCODED BY A CONSUMER ENGAGED IN A PERSONAL AND
+NON-COMMERCIAL ACTIVITY AND/OR WAS OBTAINED FROM A VIDEO PROVIDER
+LICENSED TO PROVIDE AVC VIDEO. NO LICENSE IS GRANTED OR SHALL BE IMPLIED
+FOR ANY OTHER USE.
+
+ADDITIONAL INFORMATION MAY BE OBTAINED FROM MPEG LA, L.L.C.
+SEE HTTP://WWW.MPEGLA.COM
+
+--------------------------------------------------------------------
+
+Statuz IDE includes H.264/AVC codec support via ffmpeg for the sole
+purpose of media preview functionality (e.g., video playback in the
+editor). This codec is provided under the AVC patent portfolio license
+as described above.
+
+If you intend to use Statuz IDE in a commercial context, you may need
+to obtain a separate commercial license from MPEG LA for H.264/AVC
+patent rights. See https://www.mpegla.com/programs/avc-h-264/
+
+Statuz IDE is a non-profit project. If you are a commercial user,
+please evaluate your own H.264/AVC licensing obligations.
