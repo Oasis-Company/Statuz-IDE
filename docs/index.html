@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Statuz IDE — A topology-aware development environment. VS Code lets you edit code. Statuz lets you understand it.">
-  <meta name="keywords" content="Statuz, IDE, topology-aware, development, VS Code fork, Rust graph engine, AI coding">
+  <meta name="description" content="Statuz IDE — A topology-aware development environment. VS Code lets you edit code. Statuz lets you understand it. Built on VS Code. Powered by a Rust Graph Engine.">
+  <meta name="keywords" content="Statuz, IDE, topology-aware, development, VS Code fork, Rust graph engine, AI coding, topological computing">
   <meta name="author" content="Oasis Company">
   <meta property="og:title" content="Statuz IDE — Topology-Aware Development Environment">
-  <meta property="og:description" content="VS Code lets you edit code. Statuz lets you understand it. Built on VS Code. Powered by a Rust Graph Engine.">
+  <meta property="og:description" content="VS Code lets you edit code. Statuz lets you understand it. Three primitive queries. 15 AI providers. Native SVG canvas. Real-time drift detection.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://oasis-company.github.io/Statuz-IDE">
   <meta property="og:image" content="https://oasis-company.github.io/Statuz-IDE/assets/logo.svg">
@@ -35,6 +35,7 @@
 
         <h1 class="hero-title">STATUZ IDE</h1>
         <p class="hero-subtitle">Topology-Aware Development Environment</p>
+        <p class="hero-dramatic">The end of text-only development.</p>
         <p class="hero-tagline">Built on VS Code. Powered by a Rust Graph Engine.</p>
 
         <div class="hero-actions">
@@ -45,6 +46,7 @@
             GitHub Repository
           </a>
           <a href="#download" class="btn btn-primary">Download</a>
+          <a href="#philosophy" class="btn">The Philosophy</a>
         </div>
       </div>
     </div>
@@ -53,7 +55,168 @@
   <hr class="section-rule" aria-hidden="true">
 
   <!-- ============================================================
-       CORE IDEA
+       STATS BAR
+       ============================================================ -->
+  <section class="section-compact" id="stats">
+    <div class="container">
+      <div class="stats-bar">
+        <div class="stat-item">
+          <div class="stat-number">16</div>
+          <div class="stat-label">AI Providers</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">5</div>
+          <div class="stat-label">Core Algorithms</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">3</div>
+          <div class="stat-label">Primitive Queries</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">1</div>
+          <div class="stat-label">Graph Engine</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="pull-quote">
+    <div class="container">
+      <p class="pull-quote-text">"Every IDE treats code as a file.<br>Statuz treats code as a <em>system</em>."</p>
+    </div>
+  </div>
+
+  <hr class="section-rule" aria-hidden="true">
+
+  <!-- ============================================================
+       DESIGN PHILOSOPHY
+       ============================================================ -->
+  <section class="section" id="philosophy">
+    <div class="container">
+      <p class="section-label">Design Philosophy</p>
+      <h2 class="section-title">The topological paradigm.</h2>
+
+      <div class="philosophy-grid">
+
+        <div class="philosophy-card has-detail">
+          <svg class="philosophy-card-icon" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="20" cy="20" r="8"/>
+            <circle cx="20" cy="20" r="15" stroke-dasharray="2 2"/>
+            <circle cx="20" cy="20" r="18" stroke-dasharray="1 3"/>
+          </svg>
+          <div class="philosophy-card-title">Topology over Syntax</div>
+          <p class="philosophy-card-desc">
+            Every IDE treats code as text. Statuz treats code as a <strong>topological graph</strong>.
+            Functions are nodes. Imports are edges. Modules are clusters. Dependencies are relations.
+            This is not a metaphor — it is a computational model, backed by a Rust graph engine
+            with dual-indexed adjacency lists for O(1) traversal in any direction.
+          </p>
+          <dl class="philosophy-detail-list">
+            <div class="philosophy-detail-item">
+              <dt>Every node is a computation unit</dt>
+              <dd>Functions, classes, modules, files — all nodes in a single unified graph</dd>
+            </div>
+            <div class="philosophy-detail-item">
+              <dt>Every edge is a relationship</dt>
+              <dd>depends_on, produces, consumes, validates, informs, contains, delegates_to — 7 built-in relation types, infinitely extensible</dd>
+            </div>
+            <div class="philosophy-detail-item">
+              <dt>Every cluster is a bounded context</dt>
+              <dd>Fields represent distinct views of the same ecosystem. Cross-field bridges enable bidirectional traversal</dd>
+            </div>
+            <div class="philosophy-detail-item">
+              <dt>Every change has a blast radius</dt>
+              <dd>Reverse BFS impact analysis across all fields simultaneously. Know exactly what breaks.</dd>
+            </div>
+          </dl>
+        </div>
+
+        <div class="philosophy-card">
+          <svg class="philosophy-card-icon" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="4" y="4" width="14" height="14" rx="1"/>
+            <rect x="22" y="4" width="14" height="14" rx="1"/>
+            <rect x="4" y="22" width="14" height="14" rx="1"/>
+            <rect x="22" y="22" width="14" height="14" rx="1"/>
+            <line x1="18" y1="11" x2="22" y2="11"/>
+            <line x1="11" y1="18" x2="11" y2="22"/>
+            <line x1="29" y1="18" x2="29" y2="22"/>
+            <line x1="18" y1="29" x2="22" y2="29"/>
+          </svg>
+          <div class="philosophy-card-title">Additive Engineering</div>
+          <p class="philosophy-card-desc">
+            Statuz does not replace VS Code — it <strong>adds</strong> to it. The full VS Code
+            extension ecosystem, debugger, terminal, and language servers remain untouched.
+            The Statuz Layer sits on top, enriching the editor with topological reasoning,
+            AI-powered code understanding, and strategic decision tracking.
+          </p>
+        </div>
+
+        <div class="philosophy-card">
+          <svg class="philosophy-card-icon" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M4 20 L12 8 L20 28 L28 12 L36 24" stroke-width="2.5"/>
+            <circle cx="12" cy="8" r="3" fill="currentColor"/>
+            <circle cx="20" cy="28" r="3" fill="currentColor"/>
+            <circle cx="28" cy="12" r="3" fill="currentColor"/>
+          </svg>
+          <div class="philosophy-card-title">Three Primitive Queries</div>
+          <p class="philosophy-card-desc">
+            A complete topological understanding of any software system can be reduced to
+            three questions. Traverse, Impact, Path. Everything else — health reports,
+            centrality analysis, diff detection, subgraph extraction — is a composition
+            of these three primitives.
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       MANIFESTO
+       ============================================================ -->
+  <section class="manifesto" id="manifesto">
+    <div class="container">
+      <p class="manifesto-label">The Statuz Manifesto</p>
+      <div class="manifesto-statements">
+        <div class="manifesto-statement" data-index="0">
+          <span class="manifesto-marker">01</span>
+          <div class="manifesto-text">
+            <strong>Code is not text.</strong> Code is a graph. Functions are nodes. Imports are edges. Modules are clusters. Every IDE before Statuz treated code as a flat file — a relic of the punch-card era.
+          </div>
+        </div>
+        <div class="manifesto-statement" data-index="1">
+          <span class="manifesto-marker">02</span>
+          <div class="manifesto-text">
+            <strong>Understanding is more important than editing.</strong> VS Code gives you the best text editor in the world. Statuz gives you the first topological runtime. Two tools. One environment. No compromises.
+          </div>
+        </div>
+        <div class="manifesto-statement" data-index="2">
+          <span class="manifesto-marker">03</span>
+          <div class="manifesto-text">
+            <strong>Three queries are enough.</strong> Traverse. Impact. Path. Every question you can ask about a software system — blast radius, dependency chain, critical path, central hub, architectural drift — is a composition of these three primitives.
+          </div>
+        </div>
+        <div class="manifesto-statement" data-index="3">
+          <span class="manifesto-marker">04</span>
+          <div class="manifesto-text">
+            <strong>AI is not a feature. It is a substrate.</strong> 16 providers, a unified streaming architecture, MCP protocol, reasoning extraction, and inline editing — not as an add-on, but as a first-class citizen in the topological model.
+          </div>
+        </div>
+        <div class="manifesto-statement" data-index="4">
+          <span class="manifesto-marker">05</span>
+          <div class="manifesto-text">
+            <strong>Every decision is a commitment. Every drift is detectable.</strong> DCR tracks architectural decisions with formal commitment levels. Drift detection scans for decay, contradiction, and violation. The board visualizes the strategy. The engine enforces the topology.
+          </div>
+        </div>
+      </div>
+      <p class="manifesto-footer">The text era is over. The topology era has begun.</p>
+    </div>
+  </section>
+
+  <hr class="section-rule" aria-hidden="true">
+
+  <!-- ============================================================
+       CORE IDEA (Three Queries)
        ============================================================ -->
   <section class="section" id="core-idea">
     <div class="container">
@@ -65,11 +228,10 @@
       </div>
 
       <p class="body-large" style="max-width:640px; margin-bottom:var(--space-lg);">
-        Three primitive queries that form the foundation of topological reasoning about software systems.
+        Three primitive queries. One graph. Infinite compositions.
       </p>
 
       <div class="query-grid">
-        <!-- Traverse -->
         <div class="query-card">
           <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <circle cx="24" cy="24" r="6"/>
@@ -83,11 +245,13 @@
             <line x1="37.5" y1="37.5" x2="30" y2="30"/>
           </svg>
           <div class="query-name">Traverse</div>
-          <p class="query-desc">What does this connect to? Explore the adjacency list of any node to discover its relationships.</p>
+          <p class="query-desc">
+            "What does this connect to?"<br>
+            O(1) adjacency list lookup. Filter by relation type. Supports cross-field bridge traversal.
+          </p>
           <code class="query-syntax">traverse(node, relation?)</code>
         </div>
 
-        <!-- Impact -->
         <div class="query-card">
           <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <circle cx="24" cy="24" r="4" fill="currentColor"/>
@@ -96,11 +260,13 @@
             <circle cx="24" cy="24" r="22" stroke-dasharray="2 2"/>
           </svg>
           <div class="query-name">Impact</div>
-          <p class="query-desc">If this changes, who is affected? Reverse BFS blast radius analysis for change impact.</p>
+          <p class="query-desc">
+            "If this changes, who is affected?"<br>
+            Reverse BFS blast radius analysis. Degree centrality. Critical path detection. Cross-field propagation.
+          </p>
           <code class="query-syntax">impact(node)</code>
         </div>
 
-        <!-- Path -->
         <div class="query-card">
           <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <circle cx="8" cy="40" r="5" fill="currentColor"/>
@@ -108,12 +274,559 @@
             <path d="M12 36 Q24 28 20 20 Q16 12 35 12" stroke-dasharray="3 2"/>
           </svg>
           <div class="query-name">Path</div>
-          <p class="query-desc">How do I get from A to B? BFS shortest path discovery across the graph.</p>
+          <p class="query-desc">
+            "How do I get from A to B?"<br>
+            BFS shortest path with parent tracking. Field-level path annotation. Cross-field via bidirectional bridges.
+          </p>
           <code class="query-syntax">path(from, to)</code>
         </div>
+
       </div>
     </div>
   </section>
+
+  <hr class="section-rule" aria-hidden="true">
+
+  <!-- ============================================================
+       TECHNICAL DEEP DIVE
+       ============================================================ -->
+  <section class="section" id="technical">
+    <div class="container">
+      <p class="section-label">Technical Deep Dive</p>
+      <h2 class="section-title">The graph engine,<br>in full detail.</h2>
+
+      <div class="tech-grid">
+
+        <!-- Graph Engine Architecture -->
+        <div class="tech-card tech-card-full">
+          <svg class="tech-card-icon" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="2" y="2" width="36" height="36" rx="3"/>
+            <circle cx="12" cy="14" r="5" fill="currentColor"/>
+            <circle cx="28" cy="14" r="5" fill="currentColor"/>
+            <circle cx="20" cy="30" r="5" fill="currentColor"/>
+            <line x1="17" y1="14" x2="23" y2="14"/>
+            <line x1="12" y1="19" x2="16" y2="26"/>
+            <line x1="28" y1="19" x2="24" y2="26"/>
+          </svg>
+          <div class="tech-card-title">GraphEngine &mdash; In-Memory Topological Runtime</div>
+          <p class="tech-card-desc">
+            Written in Rust, compiled via napi-rs, the GraphEngine is the computational heart of Statuz.
+            It maintains an adjacency-list-based directed graph with triple-redundant edge storage for
+            O(1) traversal in both directions. Three copies of every edge exist simultaneously: the global
+            edge registry, the source node's outgoing adjacency (indexed by relation type), and the target
+            node's incoming adjacency (also indexed by relation type). Cascade removal ensures consistency
+            without garbage collection.
+          </p>
+          <div class="tech-specs">
+            <div class="tech-spec">
+              <span class="tech-spec-label">Storage</span>
+              <span class="tech-spec-value">HashMap&lt;NodeId, Node&gt;</span>
+            </div>
+            <div class="tech-spec">
+              <span class="tech-spec-label">Traversal</span>
+              <span class="tech-spec-value">O(1) adjacency lookup</span>
+            </div>
+            <div class="tech-spec">
+              <span class="tech-spec-label">Edge Indexing</span>
+              <span class="tech-spec-value">Triple-redundant</span>
+            </div>
+            <div class="tech-spec">
+              <span class="tech-spec-label">Runtime</span>
+              <span class="tech-spec-value">Rust + napi-rs</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Binary Format -->
+        <div class="tech-card">
+          <svg class="tech-card-icon" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="4" y="4" width="32" height="32" rx="3"/>
+            <line x1="4" y1="14" x2="36" y2="14"/>
+            <line x1="4" y1="24" x2="36" y2="24"/>
+            <rect x="8" y="17" width="6" height="4" fill="currentColor"/>
+            <rect x="18" y="17" width="6" height="4" fill="currentColor"/>
+            <rect x="28" y="27" width="6" height="4" fill="currentColor"/>
+          </svg>
+          <div class="tech-card-title">.stz Binary Format</div>
+          <p class="tech-card-desc">
+            Self-contained, encrypted, content-addressable. Magic bytes "STZ\0" identify the format.
+            Content is msgpack-encoded, optionally zstd-compressed (level 3), and ChaCha20-encrypted
+            with an Argon2id-derived key. The Cluster ID is the first 16 bytes of a blake3 hash.
+            The hash covers content only, so metadata can be modified without invalidating it.
+          </p>
+          <div class="tech-code-block">Magic:  "STZ\0" (4 bytes)
+Version: 0x0002 (2 bytes, LE)
+Flags:   0x0000 (2 bytes, LE)
+Salt:    16 bytes (Argon2id)
+Content: msgpack . zstd . ChaCha20
+Hash:    32 bytes (blake3)</div>
+        </div>
+
+        <!-- Cluster Architecture -->
+        <div class="tech-card">
+          <svg class="tech-card-icon" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="20" cy="20" r="16" stroke-dasharray="3 2"/>
+            <circle cx="14" cy="14" r="6"/>
+            <circle cx="26" cy="14" r="6"/>
+            <circle cx="20" cy="28" r="6"/>
+            <line x1="20" y1="14" x2="20" y2="22"/>
+            <line x1="14" y1="20" x2="26" y2="20"/>
+          </svg>
+          <div class="tech-card-title">Cluster &amp; Field Architecture</div>
+          <p class="tech-card-desc">
+            A Cluster owns all nodes centrally. Each Field owns its own edges — representing different
+            views of the same ecosystem. Cross-field bridges are bidirectional: each bridge creates
+            forward and reverse edges simultaneously. Cross-field traversal uses recursive DFS with
+            visited-set deduplication. Impact analysis propagates across all fields via reverse BFS,
+            following bridge edges to discover affected nodes in remote fields.
+          </p>
+          <div class="tech-algo">
+            <span class="tech-algo-label">Cross-Field Traversal</span>
+            <span class="tech-algo-desc">Recursive DFS with visited sets for both fields and nodes. Depth-limited. Returns HashMap&lt;FieldId, (Vec&lt;NodeId&gt;, Vec&lt;Edge&gt;)&gt;.</span>
+          </div>
+          <div class="tech-algo">
+            <span class="tech-algo-label">Cross-Field Impact</span>
+            <span class="tech-algo-desc">Reverse BFS across ALL fields. When crossing a bridge, follows the reverse bridge to the other field.</span>
+          </div>
+        </div>
+
+        <!-- Algorithm Suite -->
+        <div class="tech-card tech-card-full">
+          <svg class="tech-card-icon" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polyline points="4 28 12 18 20 24 28 10 36 16" stroke-width="2.5"/>
+            <circle cx="12" cy="18" r="2" fill="currentColor"/>
+            <circle cx="20" cy="24" r="2" fill="currentColor"/>
+            <circle cx="28" cy="10" r="2" fill="currentColor"/>
+          </svg>
+          <div class="tech-card-title">Algorithm Suite</div>
+          <p class="tech-card-desc">
+            Beyond the three primitives, the engine provides a complete analytical toolkit.
+          </p>
+          <div class="tech-specs">
+            <div class="tech-spec">
+              <span class="tech-spec-label">Degree Centrality</span>
+              <span class="tech-spec-value">Top-N sort by total degree</span>
+            </div>
+            <div class="tech-spec">
+              <span class="tech-spec-label">Transitive Closure</span>
+              <span class="tech-spec-value">Full BFS reachability</span>
+            </div>
+            <div class="tech-spec">
+              <span class="tech-spec-label">Health Report</span>
+              <span class="tech-spec-value">Orphans, sinks, sources, disconnected components</span>
+            </div>
+            <div class="tech-spec">
+              <span class="tech-spec-label">Subgraph Extraction</span>
+              <span class="tech-spec-value">Depth-limited BFS from seed nodes</span>
+            </div>
+            <div class="tech-spec">
+              <span class="tech-spec-label">Diff Engine</span>
+              <span class="tech-spec-value">Full cluster comparison, WEIGHT_EPSILON 1e-10</span>
+            </div>
+            <div class="tech-spec">
+              <span class="tech-spec-label">Validation</span>
+              <span class="tech-spec-value">8 issue categories, severity-graded</span>
+            </div>
+            <div class="tech-spec">
+              <span class="tech-spec-label">Merge System</span>
+              <span class="tech-spec-value">4 strategies: Skip, Overwrite, Rename, MergeMeta</span>
+            </div>
+            <div class="tech-spec">
+              <span class="tech-spec-label">Clone</span>
+              <span class="tech-spec-value">Content-addressable ID regeneration</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <div class="pull-quote">
+    <div class="container">
+      <p class="pull-quote-text">"Three queries. One graph.<br>Everything else is a <em>composition</em>."</p>
+    </div>
+  </div>
+
+  <hr class="section-rule" aria-hidden="true">
+
+  <!-- ============================================================
+       AI PIPELINE
+       ============================================================ -->
+  <section class="section" id="ai-pipeline">
+    <div class="container">
+      <p class="section-label">AI Pipeline</p>
+      <h2 class="section-title">16 providers. One unified<br>streaming architecture.</h2>
+
+      <p class="body-large" style="max-width:640px; margin-bottom:var(--space-lg);">
+        A unified provider dispatcher maps 16 providers to their respective chat, FIM,
+        and model-list implementations. Each provider is a first-class entry in a typed
+        record, ensuring compile-time exhaustiveness checking.
+      </p>
+
+      <div class="provider-grid">
+        <div class="provider-item"><span class="provider-name">Anthropic</span><span class="provider-tag">Native SDK</span></div>
+        <div class="provider-item"><span class="provider-name">OpenAI</span><span class="provider-tag">Native SDK</span></div>
+        <div class="provider-item"><span class="provider-name">Gemini</span><span class="provider-tag">Native SDK</span></div>
+        <div class="provider-item"><span class="provider-name">Groq</span><span class="provider-tag">OAI Compat</span></div>
+        <div class="provider-item"><span class="provider-name">Mistral</span><span class="provider-tag">Native FIM</span></div>
+        <div class="provider-item"><span class="provider-name">Ollama</span><span class="provider-tag">Local</span></div>
+        <div class="provider-item"><span class="provider-name">DeepSeek</span><span class="provider-tag">OAI Compat</span></div>
+        <div class="provider-item"><span class="provider-name">OpenRouter</span><span class="provider-tag">OAI Compat</span></div>
+        <div class="provider-item"><span class="provider-name">xAI (Grok)</span><span class="provider-tag">OAI Compat</span></div>
+        <div class="provider-item"><span class="provider-name">vLLM</span><span class="provider-tag">Local</span></div>
+        <div class="provider-item"><span class="provider-name">LM Studio</span><span class="provider-tag">Local</span></div>
+        <div class="provider-item"><span class="provider-name">Azure</span><span class="provider-tag">Enterprise</span></div>
+        <div class="provider-item"><span class="provider-name">Vertex AI</span><span class="provider-tag">Enterprise</span></div>
+        <div class="provider-item"><span class="provider-name">Bedrock</span><span class="provider-tag">Enterprise</span></div>
+        <div class="provider-item"><span class="provider-name">liteLLM</span><span class="provider-tag">Proxy</span></div>
+        <div class="provider-item"><span class="provider-name">OAI Compat</span><span class="provider-tag">Any</span></div>
+      </div>
+
+      <!-- Pipeline Diagram -->
+      <div class="ai-pipeline-diagram">
+        <div class="ai-stage">
+          <div class="ai-stage-box highlight">
+            <span class="ai-stage-label">Stage 1</span>
+            <span class="ai-stage-name">Unified Dispatcher</span>
+            <span class="ai-stage-desc">Typed CallFnOfProvider record maps provider name to implementation</span>
+          </div>
+          <div class="ai-stage-arrow">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 2 12 8 4 14"/></svg>
+          </div>
+          <div class="ai-stage-box">
+            <span class="ai-stage-label">Stage 2</span>
+            <span class="ai-stage-name">Streaming Abstraction</span>
+            <span class="ai-stage-desc">3 streaming patterns normalized to one callback interface</span>
+          </div>
+          <div class="ai-stage-arrow">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 2 12 8 4 14"/></svg>
+          </div>
+          <div class="ai-stage-box">
+            <span class="ai-stage-label">Stage 3</span>
+            <span class="ai-stage-name">Reasoning Extraction</span>
+            <span class="ai-stage-desc">Multi-vendor reasoning: budget sliders, effort sliders, think tags, thinking fields</span>
+          </div>
+          <div class="ai-stage-arrow">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 2 12 8 4 14"/></svg>
+          </div>
+          <div class="ai-stage-box">
+            <span class="ai-stage-label">Stage 4</span>
+            <span class="ai-stage-name">Tool Calling</span>
+            <span class="ai-stage-desc">3 native formats (OpenAI, Anthropic, Gemini) + XML fallback parser</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Streaming Patterns -->
+      <div class="ai-flow-row">
+        <div class="ai-flow-card">
+          <svg class="ai-flow-card-icon" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="16" cy="16" r="12"/>
+            <polyline points="12 16 16 20 22 12"/>
+          </svg>
+          <div class="ai-flow-card-title">OpenAI Streaming</div>
+          <div class="ai-flow-card-desc">For-await over chunked response. Accumulates fullText, fullReasoning, tool call fragments from delta chunks.</div>
+          <code class="ai-flow-card-code">for await (const chunk of response)</code>
+        </div>
+        <div class="ai-flow-card">
+          <svg class="ai-flow-card-icon" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="4" y="4" width="24" height="24" rx="4"/>
+            <polyline points="12 16 16 20 22 12"/>
+          </svg>
+          <div class="ai-flow-card-title">Anthropic Events</div>
+          <div class="ai-flow-card-desc">Event-based streaming with content_block_start, content_block_delta, thinking_delta, input_json_delta, redacted_thinking.</div>
+          <code class="ai-flow-card-code">stream.on('streamEvent', ...)</code>
+        </div>
+        <div class="ai-flow-card">
+          <svg class="ai-flow-card-icon" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M4 16 L12 8 L20 24 L28 12"/>
+          </svg>
+          <div class="ai-flow-card-title">Gemini Native</div>
+          <div class="ai-flow-card-desc">For-await over generateContentStream. Extracts functionCalls from chunks for native tool calling.</div>
+          <code class="ai-flow-card-code">for await (const chunk of stream)</code>
+        </div>
+      </div>
+
+      <!-- Reasoning System -->
+      <div class="tech-grid" style="margin-top:var(--space-xl);">
+        <div class="tech-card">
+          <svg class="tech-card-icon" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="20" cy="14" r="6"/>
+            <path d="M8 32c0-6.627 5.373-12 12-12s12 5.373 12 12"/>
+            <line x1="20" y1="8" x2="20" y2="4"/>
+            <line x1="20" y1="20" x2="20" y2="24"/>
+          </svg>
+          <div class="tech-card-title">Reasoning System</div>
+          <p class="tech-card-desc">
+            Two slider types: <strong>budget_slider</strong> (Anthropic, Gemini) and <strong>effort_slider</strong> (OpenAI, xAI, OpenRouter).
+            Provider-specific reasoning IO settings. Manual think-tag parsing for open-source models.
+            Per-feature reasoning toggle. Reserved output token space adjustment.
+          </p>
+          <div class="tech-specs">
+            <div class="tech-spec">
+              <span class="tech-spec-label">Claude Opus 4</span>
+              <span class="tech-spec-value">200K ctx, budget 1024-8192</span>
+            </div>
+            <div class="tech-spec">
+              <span class="tech-spec-label">o3 / o4-mini</span>
+              <span class="tech-spec-value">1M ctx, effort slider</span>
+            </div>
+            <div class="tech-spec">
+              <span class="tech-spec-label">Gemini 2.5 Pro</span>
+              <span class="tech-spec-value">1M ctx, budget 1024-24576</span>
+            </div>
+            <div class="tech-spec">
+              <span class="tech-spec-label">Llama 4</span>
+              <span class="tech-spec-value">10M ctx (open-source record)</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="tech-card">
+          <svg class="tech-card-icon" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="4" y="8" width="12" height="24" rx="2"/>
+            <rect x="24" y="8" width="12" height="24" rx="2"/>
+            <line x1="16" y1="20" x2="24" y2="20"/>
+          </svg>
+          <div class="tech-card-title">Inline Edit Engine</div>
+          <p class="tech-card-desc">
+            Dual-mode editing: <strong>Fast Apply</strong> (search/replace blocks) and <strong>Slow Apply</strong> (full file rewrite).
+            Search/replace has up to 4 retries with block-by-block streaming. Overlap detection prevents
+            conflicting edits. Right-to-left application preserves line numbers. Snapshot-based undo/redo
+            with full state capture. Streaming diff zones with sweep animation.
+          </p>
+          <div class="tech-specs">
+            <div class="tech-spec">
+              <span class="tech-spec-label">Fast Apply</span>
+              <span class="tech-spec-value">Search/Replace blocks</span>
+            </div>
+            <div class="tech-spec">
+              <span class="tech-spec-label">Retries</span>
+              <span class="tech-spec-value">Up to 4 (N_RETRIES)</span>
+            </div>
+            <div class="tech-spec">
+              <span class="tech-spec-label">Threshold</span>
+              <span class="tech-spec-value">1000+ chars → Fast Apply</span>
+            </div>
+            <div class="tech-spec">
+              <span class="tech-spec-label">Undo</span>
+              <span class="tech-spec-value">Snapshot-based, deepClone</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="tech-card">
+          <svg class="tech-card-icon" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="4" y="4" width="32" height="8" rx="2"/>
+            <rect x="4" y="16" width="32" height="8" rx="2"/>
+            <rect x="4" y="28" width="32" height="8" rx="2"/>
+            <line x1="20" y1="12" x2="20" y2="16"/>
+            <line x1="20" y1="24" x2="20" y2="28"/>
+          </svg>
+          <div class="tech-card-title">Autocomplete Engine</div>
+          <p class="tech-card-desc">
+            Custom LRU cache with O(1) lookups, abort-on-eviction for LLM requests. 500ms debounce,
+            60s timeout. Four completion types: fill-middle, redo-suffix, next-line, no-predict.
+            Stack-based parenthesis balancing prevents syntax errors. Subsequence matching handles
+            LLM-generated suffix variations.
+          </p>
+          <div class="tech-specs">
+            <div class="tech-spec">
+              <span class="tech-spec-label">Cache</span>
+              <span class="tech-spec-value">LRU, max 20 per doc</span>
+            </div>
+            <div class="tech-spec">
+              <span class="tech-spec-label">Debounce</span>
+              <span class="tech-spec-value">500ms</span>
+            </div>
+            <div class="tech-spec">
+              <span class="tech-spec-label">Timeout</span>
+              <span class="tech-spec-value">60s</span>
+            </div>
+            <div class="tech-spec">
+              <span class="tech-spec-label">Pending Limit</span>
+              <span class="tech-spec-value">Max 2 concurrent</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="tech-card">
+          <svg class="tech-card-icon" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M4 20 L12 8 L20 28 L28 12 L36 20"/>
+            <circle cx="12" cy="8" r="2" fill="currentColor"/>
+            <circle cx="20" cy="28" r="2" fill="currentColor"/>
+            <circle cx="28" cy="12" r="2" fill="currentColor"/>
+          </svg>
+          <div class="tech-card-title">MCP Protocol</div>
+          <p class="tech-card-desc">
+            Full Model Context Protocol integration. Dynamic tool discovery, server management,
+            toggle on/off, MCP config file support. Tools are converted to provider-native formats
+            (OpenAI, Anthropic, Gemini) or fall back to XML parsing for providers without native tool support.
+          </p>
+          <div class="tech-specs">
+            <div class="tech-spec">
+              <span class="tech-spec-label">Tool Formats</span>
+              <span class="tech-spec-value">3 native + XML fallback</span>
+            </div>
+            <div class="tech-spec">
+              <span class="tech-spec-label">Chat Modes</span>
+              <span class="tech-spec-value">normal, gather, agent</span>
+            </div>
+            <div class="tech-spec">
+              <span class="tech-spec-label">Tool Matrix</span>
+              <span class="tech-spec-value">Agent: all tools; Gather: read-only</span>
+            </div>
+            <div class="tech-spec">
+              <span class="tech-spec-label">SDK</span>
+              <span class="tech-spec-value">@modelcontextprotocol/sdk 1.11</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-rule" aria-hidden="true">
+
+  <!-- ============================================================
+       DCR SYSTEM
+       ============================================================ -->
+  <section class="section" id="dcr">
+    <div class="container">
+      <p class="section-label">Decision Commitment Registry</p>
+      <h2 class="section-title">Track every decision.<br>Detect every drift.</h2>
+
+      <p class="body-large" style="max-width:640px; margin-bottom:var(--space-lg);">
+        A formal decision tracking system that registers every architectural commitment,
+        detects drift before it becomes debt, and uses AI to surface implicit decisions
+        the rule engine would miss.
+      </p>
+
+      <div class="dcr-metrics">
+        <div class="dcr-metric">
+          <div class="dcr-metric-number">6</div>
+          <div class="dcr-metric-label">Commitment Levels</div>
+        </div>
+        <div class="dcr-metric">
+          <div class="dcr-metric-number">5</div>
+          <div class="dcr-metric-label">Decision Categories</div>
+        </div>
+        <div class="dcr-metric">
+          <div class="dcr-metric-number">4</div>
+          <div class="dcr-metric-label">Detection Sources</div>
+        </div>
+      </div>
+
+      <div class="dcr-grid">
+        <!-- Commitment Levels -->
+        <div class="dcr-card">
+          <svg class="dcr-card-icon" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M4 8 L20 4 L36 8 L36 28 L20 36 L4 28 Z"/>
+            <line x1="20" y1="4" x2="20" y2="36"/>
+            <line x1="4" y1="8" x2="20" y2="36"/>
+            <line x1="36" y1="8" x2="20" y2="36"/>
+          </svg>
+          <div class="dcr-card-title">Commitment Levels</div>
+          <p class="dcr-card-desc">
+            Every decision progresses through a formal commitment hierarchy, from tentative exploration
+            to fully committed. Rejected and superseded decisions are retained for audit trails.
+          </p>
+          <div class="dcr-levels">
+            <span class="dcr-level">Exploring</span>
+            <span class="dcr-level">Tentative</span>
+            <span class="dcr-level highlight">Adopted</span>
+            <span class="dcr-level highlight">Committed</span>
+            <span class="dcr-level">Rejected</span>
+            <span class="dcr-level">Superseded</span>
+          </div>
+        </div>
+
+        <!-- Drift Detection -->
+        <div class="dcr-card">
+          <svg class="dcr-card-icon" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M4 30 Q12 10 20 20 Q28 30 36 14"/>
+            <circle cx="20" cy="20" r="3" fill="currentColor"/>
+            <line x1="20" y1="20" x2="20" y2="8" stroke-dasharray="2 2"/>
+          </svg>
+          <div class="dcr-card-title">Drift Detection Engine</div>
+          <p class="dcr-card-desc">
+            Three scan types: <strong>commitment decay</strong> (14/7 day thresholds), <strong>assumption staleness</strong>
+            (21 day threshold), <strong>constitution violation</strong> (forbidden feature matching, NLP-based constraint
+            detection with Chinese-language support). O(n^2) pairwise contradiction cross-scan across all decisions.
+          </p>
+          <div class="dcr-levels">
+            <span class="dcr-level">Direct Conflict</span>
+            <span class="dcr-level">Scope Creep</span>
+            <span class="dcr-level highlight">Commitment Decay</span>
+            <span class="dcr-level">Assumption Invalidated</span>
+            <span class="dcr-level">Constitution Violation</span>
+          </div>
+        </div>
+
+        <!-- AI Bridge -->
+        <div class="dcr-card">
+          <svg class="dcr-card-icon" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="14" cy="14" r="6"/>
+            <circle cx="26" cy="26" r="6"/>
+            <line x1="18" y1="18" x2="22" y2="22"/>
+            <path d="M8 32 L14 24 L20 28 L26 20 L32 26"/>
+          </svg>
+          <div class="dcr-card-title">AI Bridge</div>
+          <p class="dcr-card-desc">
+            Dependency-injected AI analysis layer. Temperature 0.2 for deterministic outputs.
+            Non-blocking design — AI unavailability never blocks registration. Parses 3 response formats
+            (object, JSON string, markdown-wrapped JSON). Extracts decisions from conversation with
+            confidence >= 0.5 threshold.
+          </p>
+        </div>
+
+        <!-- SVG Canvas Board -->
+        <div class="dcr-card">
+          <svg class="dcr-card-icon" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="4" y="4" width="14" height="14" rx="1"/>
+            <rect x="22" y="4" width="14" height="14" rx="1"/>
+            <rect x="4" y="22" width="14" height="14" rx="1"/>
+            <rect x="22" y="22" width="14" height="14" rx="1"/>
+            <line x1="18" y1="11" x2="22" y2="11"/>
+            <line x1="11" y1="18" x2="11" y2="22"/>
+          </svg>
+          <div class="dcr-card-title">Sandboxer Board</div>
+          <p class="dcr-card-desc">
+            Native SVG canvas with 4-layer rendering (edges, nodes, temp-edges, root). Five custom arrow markers.
+            Zoom clamp 200-8000 viewBox. Drag-to-connect with auto-detection. 50-deep snapshot undo/redo.
+            Context menus per node, edge, and canvas. No React, no third-party graph library — pure SVG.
+          </p>
+          <div class="tech-specs">
+            <div class="tech-spec">
+              <span class="tech-spec-label">Rendering</span>
+              <span class="tech-spec-value">4-layer native SVG</span>
+            </div>
+            <div class="tech-spec">
+              <span class="tech-spec-label">Edge Types</span>
+              <span class="tech-spec-value">5 semantic types</span>
+            </div>
+            <div class="tech-spec">
+              <span class="tech-spec-label">Undo Depth</span>
+              <span class="tech-spec-value">50 snapshots</span>
+            </div>
+            <div class="tech-spec">
+              <span class="tech-spec-label">Dependencies</span>
+              <span class="tech-spec-value">Zero</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <div class="pull-quote">
+    <div class="container">
+      <p class="pull-quote-text">"Every decision is a commitment.<br>Every drift is <em>detectable</em>."</p>
+    </div>
+  </div>
 
   <hr class="section-rule" aria-hidden="true">
 
@@ -127,7 +840,6 @@
 
       <div class="capabilities-grid" style="margin-top:var(--space-xl);">
 
-        <!-- AI Chat & Inline Edit -->
         <div class="capability-card">
           <svg class="capability-icon" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M4 8a4 4 0 0 1 4-4h24a4 4 0 0 1 4 4v16a4 4 0 0 1-4 4H16l-8 8v-8H8a4 4 0 0 1-4-4V8z"/>
@@ -135,7 +847,7 @@
             <line x1="12" y1="22" x2="24" y2="22"/>
           </svg>
           <div class="capability-name">AI Chat &amp; Inline Edit</div>
-          <p class="capability-desc">Context-aware AI assistant with Ctrl+K/L inline editing. Streaming diffs, fast/slow apply modes, and autocomplete with LRU caching.</p>
+          <p class="capability-desc">Context-aware AI assistant with Ctrl+K/L inline editing. Streaming diffs, fast/slow apply modes, 4 retries for search/replace, and autocomplete with LRU caching and parenthesis balancing.</p>
           <div class="capability-tags">
             <span class="capability-tag">Chat</span>
             <span class="capability-tag">Ctrl+K</span>
@@ -143,7 +855,6 @@
           </div>
         </div>
 
-        <!-- Sandboxer Board -->
         <div class="capability-card">
           <svg class="capability-icon" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <rect x="3" y="3" width="14" height="14" rx="1"/>
@@ -153,7 +864,7 @@
             <line x1="10" y1="10" x2="10" y2="10"/>
           </svg>
           <div class="capability-name">Sandboxer Board</div>
-          <p class="capability-desc">Strategic planning canvas with native SVG rendering. DCR drift detection, 50-step undo/redo, and automatic layout with column/dagre modes.</p>
+          <p class="capability-desc">Strategic planning canvas with native SVG rendering. DCR drift detection, 50-step undo/redo, 5 edge types, automatic layout, and drag-to-connect. No third-party dependencies.</p>
           <div class="capability-tags">
             <span class="capability-tag">SVG Canvas</span>
             <span class="capability-tag">DCR</span>
@@ -161,7 +872,6 @@
           </div>
         </div>
 
-        <!-- Agent Management -->
         <div class="capability-card">
           <svg class="capability-icon" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <circle cx="20" cy="14" r="6"/>
@@ -169,7 +879,7 @@
             <circle cx="20" cy="14" r="10" stroke-dasharray="2 2"/>
           </svg>
           <div class="capability-name">Agent Management</div>
-          <p class="capability-desc">ECC catalog browser with one-click install/uninstall. Harness visualization canvas for skills, commands, agents, and rules.</p>
+          <p class="capability-desc">ECC catalog browser with one-click install/uninstall. Harness visualization canvas for skills, commands, agents, and rules. Full catalog with 60+ components and 87 commands.</p>
           <div class="capability-tags">
             <span class="capability-tag">ECC</span>
             <span class="capability-tag">Catalog</span>
@@ -177,7 +887,6 @@
           </div>
         </div>
 
-        <!-- 17 AI Providers -->
         <div class="capability-card">
           <svg class="capability-icon" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <rect x="4" y="4" width="32" height="32" rx="4"/>
@@ -187,8 +896,8 @@
             <circle cx="26" cy="20" r="5"/>
             <line x1="29" y1="23" x2="32" y2="26"/>
           </svg>
-          <div class="capability-name">17 AI Providers</div>
-          <p class="capability-desc">Anthropic, OpenAI, Gemini, Groq, Mistral, Ollama, DeepSeek, OpenRouter, xAI, LM Studio, and more. Per-model capability configuration.</p>
+          <div class="capability-name">16 AI Providers</div>
+          <p class="capability-desc">Anthropic, OpenAI, Gemini, Groq, Mistral, Ollama, DeepSeek, OpenRouter, xAI, LM Studio, vLLM, Azure, Vertex AI, Bedrock, liteLLM, OAI Compat. Per-model capability configuration with reasoning support.</p>
           <div class="capability-tags">
             <span class="capability-tag">Multi-Model</span>
             <span class="capability-tag">Local</span>
@@ -196,7 +905,6 @@
           </div>
         </div>
 
-        <!-- MCP Protocol -->
         <div class="capability-card">
           <svg class="capability-icon" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <rect x="4" y="10" width="12" height="20" rx="2"/>
@@ -206,7 +914,7 @@
             <circle cx="30" cy="20" r="2" fill="currentColor"/>
           </svg>
           <div class="capability-name">MCP Protocol</div>
-          <p class="capability-desc">Model Context Protocol integration. Full tool discovery, server management, and dynamic tool calling across MCP-compatible servers.</p>
+          <p class="capability-desc">Model Context Protocol integration. Full tool discovery, server management, dynamic tool calling. 3 native tool formats + XML fallback. Chat modes: normal, gather, agent.</p>
           <div class="capability-tags">
             <span class="capability-tag">MCP</span>
             <span class="capability-tag">Tool Discovery</span>
@@ -214,7 +922,6 @@
           </div>
         </div>
 
-        <!-- VS Code Ecosystem -->
         <div class="capability-card">
           <svg class="capability-icon" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <rect x="4" y="4" width="32" height="20" rx="2"/>
@@ -226,7 +933,7 @@
             <line x1="27" y1="28" x2="27" y2="36"/>
           </svg>
           <div class="capability-name">VS Code Ecosystem</div>
-          <p class="capability-desc">100% compatibility with the VS Code extension marketplace. 80+ built-in extensions, themes, language servers, and debuggers.</p>
+          <p class="capability-desc">100% compatibility with the VS Code extension marketplace. 80+ built-in extensions, themes, language servers, and debuggers. Full terminal, Git, and language protocol support.</p>
           <div class="capability-tags">
             <span class="capability-tag">Extensions</span>
             <span class="capability-tag">Marketplace</span>
@@ -241,6 +948,133 @@
   <hr class="section-rule" aria-hidden="true">
 
   <!-- ============================================================
+       WHY STATUZ (Comparison)
+       ============================================================ -->
+  <section class="section" id="why-statuz">
+    <div class="container">
+      <p class="section-label">Why Statuz</p>
+      <h2 class="section-title">Topology vs. text.<br>The difference is qualitative.</h2>
+
+      <p class="body-large" style="max-width:640px; margin-bottom:var(--space-xl);">
+        Every modern IDE gives you a text editor with AI features. Statuz gives you a topological
+        runtime with AI as a substrate. The difference is not incremental — it is categorical.
+      </p>
+
+      <div class="comparison-table-wrapper">
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>Feature</th>
+              <th class="highlight">Statuz</th>
+              <th>VS Code</th>
+              <th>Cursor</th>
+              <th>JetBrains</th>
+              <th>Zed</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="feature-name">Topological Graph Engine</td>
+              <td class="highlight-cell"><span class="check check-yes">&#10003;</span> Rust-native</td>
+              <td><span class="check check-no">&#10007;</span></td>
+              <td><span class="check check-no">&#10007;</span></td>
+              <td><span class="check check-no">&#10007;</span></td>
+              <td><span class="check check-no">&#10007;</span></td>
+            </tr>
+            <tr>
+              <td class="feature-name">Three Primitive Queries</td>
+              <td class="highlight-cell"><span class="check check-yes">&#10003;</span> O(1) traversal</td>
+              <td><span class="check check-no">&#10007;</span></td>
+              <td><span class="check check-no">&#10007;</span></td>
+              <td><span class="check check-no">&#10007;</span></td>
+              <td><span class="check check-no">&#10007;</span></td>
+            </tr>
+            <tr>
+              <td class="feature-name">AI Providers</td>
+              <td class="highlight-cell"><span class="check check-yes">&#10003;</span> 16</td>
+              <td><span class="check check-partial">~</span> 2 (GitHub Copilot)</td>
+              <td><span class="check check-yes">&#10003;</span> 8</td>
+              <td><span class="check check-partial">~</span> 3</td>
+              <td><span class="check check-yes">&#10003;</span> 6</td>
+            </tr>
+            <tr>
+              <td class="feature-name">Decision Commitment Registry</td>
+              <td class="highlight-cell"><span class="check check-yes">&#10003;</span> 6 levels</td>
+              <td><span class="check check-no">&#10007;</span></td>
+              <td><span class="check check-no">&#10007;</span></td>
+              <td><span class="check check-no">&#10007;</span></td>
+              <td><span class="check check-no">&#10007;</span></td>
+            </tr>
+            <tr>
+              <td class="feature-name">Drift Detection Engine</td>
+              <td class="highlight-cell"><span class="check check-yes">&#10003;</span> 5 scan types</td>
+              <td><span class="check check-no">&#10007;</span></td>
+              <td><span class="check check-no">&#10007;</span></td>
+              <td><span class="check check-no">&#10007;</span></td>
+              <td><span class="check check-no">&#10007;</span></td>
+            </tr>
+            <tr>
+              <td class="feature-name">Strategy Canvas</td>
+              <td class="highlight-cell"><span class="check check-yes">&#10003;</span> Native SVG</td>
+              <td><span class="check check-no">&#10007;</span></td>
+              <td><span class="check check-no">&#10007;</span></td>
+              <td><span class="check check-no">&#10007;</span></td>
+              <td><span class="check check-no">&#10007;</span></td>
+            </tr>
+            <tr>
+              <td class="feature-name">MCP Protocol</td>
+              <td class="highlight-cell"><span class="check check-yes">&#10003;</span> Full</td>
+              <td><span class="check check-no">&#10007;</span></td>
+              <td><span class="check check-yes">&#10003;</span> Limited</td>
+              <td><span class="check check-no">&#10007;</span></td>
+              <td><span class="check check-no">&#10007;</span></td>
+            </tr>
+            <tr>
+              <td class="feature-name">Binary .stz Format</td>
+              <td class="highlight-cell"><span class="check check-yes">&#10003;</span> Encrypted</td>
+              <td><span class="check check-no">&#10007;</span></td>
+              <td><span class="check check-no">&#10007;</span></td>
+              <td><span class="check check-no">&#10007;</span></td>
+              <td><span class="check check-no">&#10007;</span></td>
+            </tr>
+            <tr>
+              <td class="feature-name">VS Code Extension Compatible</td>
+              <td class="highlight-cell"><span class="check check-yes">&#10003;</span> 100%</td>
+              <td><span class="check check-yes">&#10003;</span> Native</td>
+              <td><span class="check check-yes">&#10003;</span> 100%</td>
+              <td><span class="check check-no">&#10007;</span></td>
+              <td><span class="check check-partial">~</span> Partial</td>
+            </tr>
+            <tr>
+              <td class="feature-name">Open Source</td>
+              <td class="highlight-cell"><span class="check check-yes">&#10003;</span> Apache 2.0</td>
+              <td><span class="check check-yes">&#10003;</span> MIT</td>
+              <td><span class="check check-no">&#10007;</span> Proprietary</td>
+              <td><span class="check check-no">&#10007;</span> Proprietary</td>
+              <td><span class="check check-yes">&#10003;</span> GPL</td>
+            </tr>
+            <tr>
+              <td class="feature-name">ECC Agent Catalog</td>
+              <td class="highlight-cell"><span class="check check-yes">&#10003;</span> 60+ agents</td>
+              <td><span class="check check-no">&#10007;</span></td>
+              <td><span class="check check-no">&#10007;</span></td>
+              <td><span class="check check-no">&#10007;</span></td>
+              <td><span class="check check-no">&#10007;</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p class="body-small text-center" style="margin-top:var(--space-md);">
+        Feature coverage as of Q3 2026. Third-party IDEs may add features over time.
+        Statuz is the only IDE with a native topological graph engine at its core.
+      </p>
+    </div>
+  </section>
+
+  <hr class="section-rule" aria-hidden="true">
+
+  <!-- ============================================================
        ARCHITECTURE
        ============================================================ -->
   <section class="section" id="architecture">
@@ -249,26 +1083,23 @@
       <h2 class="section-title">Three layers. One unified<br>development experience.</h2>
 
       <div class="arch-diagram">
-        <!-- Layer 1: VS Code Core -->
         <div class="arch-layer">
           <div class="arch-layer-name">VS Code Core</div>
-          <div class="arch-layer-items">Editor &middot; Terminal &middot; Debug &middot; Git &middot; Language Servers &middot; Extension Host</div>
+          <div class="arch-layer-items">Editor &middot; Terminal &middot; Debug &middot; Git &middot; Language Servers &middot; Extension Host &middot; 80+ Built-in Extensions</div>
         </div>
 
         <div class="arch-connector" aria-hidden="true"></div>
 
-        <!-- Layer 2: Statuz Layer -->
         <div class="arch-layer">
           <div class="arch-layer-name">Statuz Layer</div>
-          <div class="arch-layer-items">AI Chat &middot; Inline Edit &middot; Board Canvas &middot; Agent Management &middot; ECC &middot; MCP Bridge &middot; 17 Providers</div>
+          <div class="arch-layer-items">AI Chat &middot; Inline Edit &middot; Board Canvas &middot; Agent Management &middot; ECC &middot; MCP Bridge &middot; DCR Engine &middot; 16 Providers</div>
         </div>
 
         <div class="arch-connector" aria-hidden="true"></div>
 
-        <!-- Layer 3: Rust Graph Engine -->
         <div class="arch-layer" style="border-style:dashed;">
           <div class="arch-layer-name">Rust Graph Engine</div>
-          <div class="arch-layer-items">GraphEngine &middot; Cluster &middot; Field &middot; .stz Format &middot; traverse &middot; impact &middot; path</div>
+          <div class="arch-layer-items">GraphEngine &middot; Cluster &middot; Field &middot; .stz Format &middot; traverse &middot; impact &middot; path &middot; blake3 &middot; ChaCha20</div>
           <div class="arch-layer-coming">Coming Soon</div>
         </div>
       </div>
@@ -276,9 +1107,16 @@
       <p class="arch-note">
         The Statuz Layer sits on top of the full VS Code Core, preserving all native capabilities.
         The Rust Graph Engine (in development) provides the topological reasoning foundation.
+        This is additive engineering — nothing is removed, only enriched.
       </p>
     </div>
   </section>
+
+  <div class="pull-quote">
+    <div class="container">
+      <p class="pull-quote-text">"The text era is over.<br>The <em>topology</em> era has begun."</p>
+    </div>
+  </div>
 
   <hr class="section-rule" aria-hidden="true">
 
@@ -303,7 +1141,6 @@
       </div>
 
       <div class="download-platforms">
-        <!-- Windows -->
         <div class="download-card">
           <svg class="download-card-icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <rect x="4" y="4" width="40" height="40" rx="4"/>
@@ -319,7 +1156,6 @@
           <span class="download-card-status">Build from Source</span>
         </div>
 
-        <!-- macOS -->
         <div class="download-card">
           <svg class="download-card-icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M36 4c-4 0-8 2-10 6-2 4-1 8 1 10s4 4 6 2c2-2 4-6 3-10-1-4-4-8-8-8"/>
@@ -331,7 +1167,6 @@
           <span class="download-card-status">Build from Source</span>
         </div>
 
-        <!-- Linux -->
         <div class="download-card">
           <svg class="download-card-icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M24 4c-4 0-6 2-6 6v4l-6 10c-2 4-2 8 0 12l4 6c2 2 4 4 8 4s6-2 8-4l4-6c2-4 2-8 0-12l-6-10v-4c0-4-2-6-6-6z"/>
@@ -386,7 +1221,7 @@
           <div class="phase-bar">
             <div class="phase-bar-fill" style="width:70%"></div>
           </div>
-          <div class="phase-desc">Product branding, icon replacement, codebase cleanup, license compliance. Brand migration from Void is in progress.</div>
+          <div class="phase-desc">Product branding, icon replacement, codebase cleanup, license compliance. 33 legal issues identified and resolved. Brand migration from Void is in progress.</div>
           <span class="phase-status">Active</span>
         </div>
 
@@ -398,7 +1233,7 @@
           <div class="phase-bar">
             <div class="phase-bar-fill" style="width:0%"></div>
           </div>
-          <div class="phase-desc">napi-rs native module, IStatuzEngineService IPC channel, .stz file format support, core graph operations.</div>
+          <div class="phase-desc">napi-rs native module, IStatuzEngineService IPC channel, .stz file format support, GraphEngine with 3 primitive queries, 5,200+ lines of Rust code.</div>
           <span class="phase-status">Planned</span>
         </div>
 
@@ -410,7 +1245,7 @@
           <div class="phase-bar">
             <div class="phase-bar-fill" style="width:0%"></div>
           </div>
-          <div class="phase-desc">Cluster Explorer, Graph Visualizer, Query Console, Impact Analyzer, .stz file editor.</div>
+          <div class="phase-desc">Cluster Explorer, Graph Visualizer, Query Console, Impact Analyzer, .stz file editor, real-time dependency visualization.</div>
           <span class="phase-status">Planned</span>
         </div>
 
@@ -422,7 +1257,7 @@
           <div class="phase-bar">
             <div class="phase-bar-fill" style="width:0%"></div>
           </div>
-          <div class="phase-desc">Graph-aware AI commands, auto-graph-builder, context bridge, semantic query enhancement.</div>
+          <div class="phase-desc">Graph-aware AI commands, auto-graph-builder, context bridge, semantic query enhancement, topology-aware code generation.</div>
           <span class="phase-status">Planned</span>
         </div>
 
@@ -434,7 +1269,7 @@
           <div class="phase-bar">
             <div class="phase-bar-fill" style="width:0%"></div>
           </div>
-          <div class="phase-desc">Health dashboard, cross-field bridges, clone/merge, MCP server integration, signal bus, .stz standardization.</div>
+          <div class="phase-desc">Health dashboard, cross-field bridges, clone/merge, MCP server integration, signal bus, .stz standardization, cluster registry.</div>
           <span class="phase-status">Planned</span>
         </div>
 
@@ -450,7 +1285,6 @@
   <footer class="footer" id="legal">
     <div class="container">
       <div class="footer-grid">
-        <!-- Brand -->
         <div class="footer-brand">
           <svg class="footer-logo" viewBox="0 0 256 256" fill="none" aria-hidden="true">
             <line x1="40" y1="184" x2="144" y2="168" stroke="currentColor" stroke-width="16" stroke-linecap="round"/>
@@ -461,19 +1295,18 @@
           <p>Statuz IDE is a topology-aware development environment built on VS Code. Developed by Oasis Company.</p>
         </div>
 
-        <!-- Product -->
         <div class="footer-col">
           <h4>Product</h4>
           <ul>
+            <li><a href="#philosophy">Philosophy</a></li>
             <li><a href="#core-idea">Core Idea</a></li>
-            <li><a href="#capabilities">Capabilities</a></li>
-            <li><a href="#architecture">Architecture</a></li>
+            <li><a href="#technical">Technical</a></li>
+            <li><a href="#ai-pipeline">AI Pipeline</a></li>
+            <li><a href="#dcr">DCR System</a></li>
             <li><a href="#download">Download</a></li>
-            <li><a href="#status">Roadmap</a></li>
           </ul>
         </div>
 
-        <!-- Resources -->
         <div class="footer-col">
           <h4>Resources</h4>
           <ul>
@@ -484,7 +1317,6 @@
           </ul>
         </div>
 
-        <!-- Organization -->
         <div class="footer-col">
           <h4>Oasis Company</h4>
           <ul>
@@ -494,7 +1326,6 @@
         </div>
       </div>
 
-      <!-- License Details -->
       <div class="license-section">
         <h3>License Information</h3>
         <p>
@@ -517,7 +1348,6 @@
         </p>
       </div>
 
-      <!-- Bottom Bar -->
       <div class="footer-bottom">
         <p>&copy; 2025&ndash;2026 Oasis Company. All rights reserved.</p>
         <div class="footer-legal-links">
@@ -531,7 +1361,6 @@
     </div>
   </footer>
 
-  <!-- JavaScript -->
   <script src="js/main.js"></script>
 </body>
 </html>
