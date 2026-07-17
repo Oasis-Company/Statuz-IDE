@@ -1,5 +1,6 @@
-Void is a fork of VS Code, which is licensed under the MIT License (below).
-Void's additions and modifications are licensed under the Apache 2.0 License (see LICENSE.txt).
+Statuz IDE is a fork of Void, which is itself a fork of VS Code.
+The original VS Code portions are licensed under the MIT License (below).
+Statuz additions and modifications are licensed under the Apache 2.0 License (see LICENSE.txt).
 
 --------------------
 
