@@ -2,6 +2,8 @@
 	"name": "open-remote-wsl",
 	"displayName": "Remote - WSL",
 	"description": "Open any folder in the Windows Subsystem for Linux (WSL).",
+	"publisher": "statuz",
+	"license": "MIT",
 	"version": "0.0.4",
 	"icon": "resources/icon.png",
 	"engines": {
