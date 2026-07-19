@@ -117,6 +117,11 @@ import './board/boardDataService.js'
 
 import './supabase/supabaseAuthContribution.js'
 
+// ---------- Agent Definition Storage ----------
+
+import { IAgentDefinitionStorage, AgentDefinitionStorage } from './agentdef/agentDefinitionStorage.js';
+registerSingleton(IAgentDefinitionStorage, AgentDefinitionStorage, 0);
+
 // ---------- Statuz Core services ----------
 
 import { IStatuzService, StatuzService } from './statuz/statuzService.js';

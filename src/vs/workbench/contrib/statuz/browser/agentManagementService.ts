@@ -4,20 +4,49 @@
  *--------------------------------------------------------------------------------------*/
 
 import { createDecorator } from '../../../../platform/instantiation/common/instantiation.js';
-import { IAgentSkillItem, IAgentSkillFilter, ItemState } from './agentManagement.types.js';
 import { Emitter, Event } from '../../../../base/common/event.js';
 import { IEccCatalogService } from './ecc/eccCatalogService.js';
 import { IEccInstallService } from './ecc/eccInstallService.js';
+import { IAgentDefinitionStorage } from './agentdef/agentDefinitionStorage.js';
+import {
+	AgentDefinition,
+	AgentDefinitionWithState,
+	AgentDefinitionFilter,
+	AgentRuntimeState,
+	DEFAULT_FILTER,
+} from './agentdef/agentDefinitionTypes.js';
+import { extractEccComponentId } from './agentdef/eccAdapter.js';
 import { IStorageService, StorageScope, StorageTarget } from '../../../../platform/storage/common/storage.js';
+
+// ─── Deprecated imports (for backward-compatible API) ──────────
+import { IAgentSkillItem, IAgentSkillFilter, ItemState } from './agentManagement.types.js';
 
 export const IAgentManagementService = createDecorator<IAgentManagementService>('agentManagementService');
 
 export interface IAgentManagementService {
 	readonly _serviceBrand: undefined;
 	readonly onDidChangeItems: Event<void>;
+
+	// ── New API (preferred) ──────────────────────────────────
+	/** Get all definitions with runtime state */
+	getDefinitionStates(): AgentDefinitionWithState[];
+	/** Get filtered definitions with runtime state */
+	getFilteredDefinitionStates(filter: AgentDefinitionFilter): AgentDefinitionWithState[];
+	/** Get a single definition's state */
+	getDefinitionState(id: string): AgentDefinitionWithState | undefined;
+	/** Set runtime state for a definition */
+	setDefinitionState(id: string, state: AgentRuntimeState): void;
+	/** Update config for a definition */
+	updateDefinitionConfig(id: string, config: Record<string, unknown>): void;
+
+	// ── Deprecated API (backward-compatible) ──────────────────
+	/** @deprecated Use getDefinitionStates() instead */
 	getItems(): IAgentSkillItem[];
+	/** @deprecated Use getFilteredDefinitionStates() instead */
 	getFilteredItems(filter: IAgentSkillFilter): IAgentSkillItem[];
+	/** @deprecated Use getDefinitionState() instead */
 	getItem(id: string): IAgentSkillItem | undefined;
+	/** @deprecated Use setDefinitionState() instead */
 	setItemState(id: string, state: ItemState): void;
 	updateConfig(id: string, config: Record<string, any>): void;
 	installItem(id: string): Promise<void>;
@@ -31,136 +60,137 @@ export class AgentManagementService implements IAgentManagementService {
 	private readonly _onDidChangeItems = new Emitter<void>();
 	readonly onDidChangeItems: Event<void> = this._onDidChangeItems.event;
 
-	/** Tracks per-item state overrides (config, lastUsed, etc.) */
-	private stateOverrides: Map<string, Partial<IAgentSkillItem>> = new Map();
-	private readonly STATE_KEY = 'statuz.agent.overrides.v2';
+	/** Runtime state overrides: definitionId → { state, lastUsed, usageCount } */
+	private runtimeStates: Map<string, { state: AgentRuntimeState; lastUsed: number; usageCount: number }> = new Map();
+	private readonly STATE_KEY = 'statuz.agent.runtimeStates.v3';
 
 	constructor(
 		@IEccCatalogService private readonly eccCatalogService: IEccCatalogService,
 		@IEccInstallService private readonly eccInstallService: IEccInstallService,
+		@IAgentDefinitionStorage private readonly definitionStorage: IAgentDefinitionStorage,
 		@IStorageService private readonly storageService: IStorageService,
 	) {
-		this.loadStateOverrides();
+		this.loadRuntimeStates();
 
-		// Forward catalog changes to UI
+		// Forward catalog changes
 		this.eccCatalogService.onDidChangeCatalog(() => {
 			this._onDidChangeItems.fire();
 		});
 
-		// Forward install changes to UI
+		// Forward install changes
 		this.eccInstallService.onDidChangeInstalled(() => {
 			this._onDidChangeItems.fire();
 		});
 
-		// Trigger initial catalog load from disk (not from cache)
-		this.ensureCatalogLoaded();
-	}
-
-	private async ensureCatalogLoaded(): Promise<void> {
-		if (!this.eccCatalogService.getCachedCatalog()) {
-			await this.eccCatalogService.fetchCatalog();
+		// Forward storage changes
+		this.definitionStorage.onDidChangeDefinitions(() => {
 			this._onDidChangeItems.fire();
-		} else {
-			// Try to refresh from disk in background
-			this.eccCatalogService.fetchCatalog().then(() => {
-				this._onDidChangeItems.fire();
-			}).catch(() => {
-				// Use cached version if disk load fails
-			});
-		}
+		});
+
+		// Initialize
+		this.ensureInitialized();
 	}
 
-	// ─── State Override Persistence ───────────────────────────
+	private async ensureInitialized(): Promise<void> {
+		await Promise.all([
+			this.eccCatalogService.fetchCatalog().catch(() => { }),
+			this.definitionStorage.ensureStorage().catch(() => { }),
+		]);
+		this._onDidChangeItems.fire();
+	}
 
-	private loadStateOverrides(): void {
+	// ─── Runtime State Persistence ─────────────────────────────
+
+	private loadRuntimeStates(): void {
 		const raw = this.storageService.get(this.STATE_KEY, StorageScope.PROFILE);
 		if (raw) {
 			try {
-				const entries = JSON.parse(raw) as [string, Partial<IAgentSkillItem>][];
-				this.stateOverrides = new Map(entries);
+				const entries = JSON.parse(raw) as [string, { state: AgentRuntimeState; lastUsed: number; usageCount: number }][];
+				this.runtimeStates = new Map(entries);
 			} catch { /* ignore */ }
 		}
 	}
 
-	private saveStateOverrides(): void {
+	private saveRuntimeStates(): void {
 		this.storageService.store(
 			this.STATE_KEY,
-			JSON.stringify([...this.stateOverrides.entries()]),
+			JSON.stringify([...this.runtimeStates.entries()]),
 			StorageScope.PROFILE,
 			StorageTarget.MACHINE,
 		);
 	}
 
-	// ─── Build Items from ECC Catalog ─────────────────────────
+	private getRuntimeState(id: string): { state: AgentRuntimeState; lastUsed: number; usageCount: number } {
+		return this.runtimeStates.get(id) || { state: 'disabled', lastUsed: 0, usageCount: 0 };
+	}
 
-	private buildItems(): IAgentSkillItem[] {
-		const catalog = this.eccCatalogService.getCachedCatalog();
-		if (!catalog) {
-			return [];
+	// ─── Build Merged Definitions ──────────────────────────────
+
+	private buildDefinitionStates(): AgentDefinitionWithState[] {
+		const result: AgentDefinitionWithState[] = [];
+
+		// 1. ECC definitions from catalog
+		const eccDefs = this.eccCatalogService.getAgentDefinitions();
+		for (const def of eccDefs) {
+			const rt = this.getRuntimeState(def.id);
+			// Override state based on ECC install status
+			const eccId = extractEccComponentId(def);
+			if (eccId && this.eccInstallService.isInstalled(eccId)) {
+				rt.state = 'enabled';
+			}
+			result.push({
+				definition: def,
+				state: rt.state,
+				lastUsed: rt.lastUsed,
+				usageCount: rt.usageCount,
+			});
 		}
 
-		return catalog.components.map(comp => {
-			// Start with the catalog item
-			const item: IAgentSkillItem = this.eccCatalogService.toAgentSkillItem(comp);
-
-			// Apply state from install service
-			if (this.eccInstallService.isInstalled(comp.id)) {
-				item.state = 'enabled';
-			}
-
-			// Apply state overrides
-			const override = this.stateOverrides.get(comp.id);
-			if (override) {
-				if (override.state !== undefined) item.state = override.state;
-				if (override.config !== undefined) item.config = { ...item.config, ...override.config };
-				if (override.lastUsed !== undefined) item.lastUsed = override.lastUsed;
-				if (override.usageCount !== undefined) item.usageCount = override.usageCount;
-			}
-
-			return item;
-		});
+		return result;
 	}
 
-	// ─── Public API ───────────────────────────────────────────
+	// ─── New API ───────────────────────────────────────────────
 
-	getItems(): IAgentSkillItem[] {
-		return this.buildItems();
+	getDefinitionStates(): AgentDefinitionWithState[] {
+		return this.buildDefinitionStates();
 	}
 
-	getFilteredItems(filter: IAgentSkillFilter): IAgentSkillItem[] {
-		// Start with catalog-level filtering (type + search)
-		let result = this.eccCatalogService.getFilteredCatalog(filter);
+	getFilteredDefinitionStates(filter: AgentDefinitionFilter): AgentDefinitionWithState[] {
+		let result = this.buildDefinitionStates();
 
-		// Apply state overrides to filtered items
-		result = result.map(item => {
-			// Apply install state
-			if (this.eccInstallService.isInstalled(item.id)) {
-				item.state = 'enabled';
-			}
-			// Apply overrides
-			const override = this.stateOverrides.get(item.id);
-			if (override) {
-				if (override.state !== undefined) item.state = override.state;
-				if (override.config !== undefined) item.config = { ...item.config, ...override.config };
-				if (override.lastUsed !== undefined) item.lastUsed = override.lastUsed;
-				if (override.usageCount !== undefined) item.usageCount = override.usageCount;
-			}
-			return item;
-		});
+		// Filter by kind
+		if (filter.kinds.length > 0) {
+			result = result.filter(ds => filter.kinds.includes(ds.definition.kind));
+		}
 
-		// Apply state filter (only for catalog items, since we already filtered)
+		// Filter by source type
+		if (filter.sourceTypes.length > 0) {
+			result = result.filter(ds => filter.sourceTypes.includes(ds.definition.source.type));
+		}
+
+		// Filter by state
 		if (filter.state !== 'all') {
-			result = result.filter(item => item.state === filter.state);
+			result = result.filter(ds => ds.state === filter.state);
 		}
 
-		// Apply sort
+		// Search
+		if (filter.query.trim()) {
+			const q = filter.query.toLowerCase();
+			result = result.filter(ds =>
+				ds.definition.name.toLowerCase().includes(q) ||
+				ds.definition.description.toLowerCase().includes(q) ||
+				ds.definition.tags.some(t => t.toLowerCase().includes(q))
+			);
+		}
+
+		// Sort
 		result.sort((a, b) => {
 			let cmp = 0;
 			switch (filter.sortBy) {
-				case 'name': cmp = a.name.localeCompare(b.name); break;
+				case 'name': cmp = a.definition.name.localeCompare(b.definition.name); break;
+				case 'kind': cmp = a.definition.kind.localeCompare(b.definition.kind); break;
 				case 'lastUsed': cmp = a.lastUsed - b.lastUsed; break;
 				case 'usageCount': cmp = a.usageCount - b.usageCount; break;
-				case 'state': cmp = a.state.localeCompare(b.state); break;
 			}
 			return filter.sortAsc ? cmp : -cmp;
 		});
@@ -168,40 +198,98 @@ export class AgentManagementService implements IAgentManagementService {
 		return result;
 	}
 
+	getDefinitionState(id: string): AgentDefinitionWithState | undefined {
+		return this.buildDefinitionStates().find(ds => ds.definition.id === id);
+	}
+
+	setDefinitionState(id: string, state: AgentRuntimeState): void {
+		const current = this.getRuntimeState(id);
+		this.runtimeStates.set(id, { ...current, state });
+		this.saveRuntimeStates();
+		this._onDidChangeItems.fire();
+	}
+
+	updateDefinitionConfig(id: string, config: Record<string, unknown>): void {
+		// Config is stored in the definition YAML file via IAgentDefinitionStorage
+		// For now, we only track runtime state
+		this._onDidChangeItems.fire();
+	}
+
+	// ─── Deprecated API (backward-compatible) ──────────────────
+
+	/** @deprecated Converts new model to old IAgentSkillItem for backward compatibility */
+	private toLegacyItem(ds: AgentDefinitionWithState): IAgentSkillItem {
+		return {
+			id: ds.definition.id,
+			name: ds.definition.name,
+			type: ds.definition.kind as IAgentSkillItem['type'],
+			description: ds.definition.description,
+			version: ds.definition.version,
+			author: ds.definition.author,
+			state: ds.state as IAgentSkillItem['state'],
+			iconCodicon: ds.definition.icon,
+			installPath: ds.definition.source.type === 'ecc' ? `.trae/ecc/${ds.definition.source.componentId}/` : '',
+			config: ds.definition.config as Record<string, any>,
+			lastUsed: ds.lastUsed,
+			usageCount: ds.usageCount,
+			tags: [...ds.definition.tags],
+			category: ds.definition.category,
+		};
+	}
+
+	getItems(): IAgentSkillItem[] {
+		return this.buildDefinitionStates().map(ds => this.toLegacyItem(ds));
+	}
+
+	getFilteredItems(filter: IAgentSkillFilter): IAgentSkillItem[] {
+		const newFilter: AgentDefinitionFilter = {
+			query: filter.query,
+			kinds: filter.types,
+			sourceTypes: [],
+			state: filter.state as AgentRuntimeState | 'all',
+			sortBy: filter.sortBy as 'name' | 'kind' | 'lastUsed' | 'usageCount',
+			sortAsc: filter.sortAsc,
+		};
+		return this.getFilteredDefinitionStates(newFilter).map(ds => this.toLegacyItem(ds));
+	}
+
 	getItem(id: string): IAgentSkillItem | undefined {
-		const items = this.buildItems();
-		return items.find(item => item.id === id);
+		const ds = this.getDefinitionState(id);
+		return ds ? this.toLegacyItem(ds) : undefined;
 	}
 
 	setItemState(id: string, state: ItemState): void {
-		let override = this.stateOverrides.get(id) || {};
-		override.state = state;
-		this.stateOverrides.set(id, override);
-		this.saveStateOverrides();
-		this._onDidChangeItems.fire();
+		this.setDefinitionState(id, state as AgentRuntimeState);
 	}
 
 	updateConfig(id: string, config: Record<string, any>): void {
-		let override = this.stateOverrides.get(id) || {};
-		override.config = { ...(override.config || {}), ...config };
-		this.stateOverrides.set(id, override);
-		this.saveStateOverrides();
-		this._onDidChangeItems.fire();
+		this.updateDefinitionConfig(id, config);
 	}
 
 	async installItem(id: string): Promise<void> {
-		// Ensure catalog is loaded before install
-		const catalog = this.eccCatalogService.getCachedCatalog();
-		if (!catalog) {
-			await this.eccCatalogService.fetchCatalog();
+		const ds = this.getDefinitionState(id);
+		if (!ds) { return; }
+
+		const eccId = extractEccComponentId(ds.definition);
+		if (eccId) {
+			// ECC-sourced definition: use ECC install pipeline
+			await this.eccInstallService.install(eccId);
+			this.setDefinitionState(id, 'enabled');
+		} else {
+			// Local definition: just enable it
+			this.setDefinitionState(id, 'enabled');
 		}
-		await this.eccInstallService.install(id);
-		this._onDidChangeItems.fire();
 	}
 
 	async uninstallItem(id: string): Promise<void> {
-		await this.eccInstallService.uninstall(id);
-		this._onDidChangeItems.fire();
+		const ds = this.getDefinitionState(id);
+		if (!ds) { return; }
+
+		const eccId = extractEccComponentId(ds.definition);
+		if (eccId) {
+			await this.eccInstallService.uninstall(eccId);
+		}
+		this.setDefinitionState(id, 'disabled');
 	}
 
 	refresh(): void {
