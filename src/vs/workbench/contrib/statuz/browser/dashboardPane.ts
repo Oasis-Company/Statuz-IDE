@@ -31,14 +31,12 @@ import { Action2, registerAction2 } from '../../../../platform/actions/common/ac
 import { ServicesAccessor } from '../../../../editor/browser/editorExtensions.js';
 import { IViewsService } from '../../../services/views/common/viewsService.js';
 import { FileAccess } from '../../../../base/common/network.js';
-import { IStatuzService } from './statuz/statuzService.js';
-import { buildDashboardViewModel, type DashboardViewModel } from './statuz/statuzViewModel.js';
 
 
-// ─── CSS (injected once) ───────────────────────────────────────
+// ─── CSS ───────────────────────────────────────────────────────
 
 const DASHBOARD_CSS = `
-.statuz-dashboard {
+.agent-mgmt-dashboard {
 	display: flex;
 	flex-direction: column;
 	height: 100%;
@@ -47,343 +45,255 @@ const DASHBOARD_CSS = `
 	font-size: 13px;
 	color: var(--vscode-foreground);
 }
-.statuz-dashboard-header {
+.agent-mgmt-header {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	padding: 12px 16px 8px;
+	padding: 16px 16px 12px;
 	border-bottom: 1px solid var(--vscode-sideBarSectionHeader-border);
 	flex-shrink: 0;
 }
-.statuz-dashboard-header h3 {
+.agent-mgmt-header-left h2 {
 	margin: 0;
-	font-size: 14px;
+	font-size: 15px;
 	font-weight: 600;
 	color: var(--vscode-foreground);
 }
-.statuz-dashboard-refresh {
-	background: none;
-	border: 1px solid var(--vscode-button-border);
-	color: var(--vscode-foreground);
-	border-radius: 3px;
-	padding: 2px 10px;
-	font-size: 12px;
-	cursor: pointer;
-	font-family: var(--vscode-font-family);
-}
-.statuz-dashboard-refresh:hover {
-	background: var(--vscode-toolbar-hoverBackground);
-}
-.statuz-dashboard-scroll {
-	flex: 1;
-	overflow-y: auto;
-	padding: 12px 16px 16px;
-}
-.statuz-dashboard-footer {
-	padding: 6px 16px;
-	border-top: 1px solid var(--vscode-sideBarSectionHeader-border);
+.agent-mgmt-header-left p {
+	margin: 4px 0 0;
 	font-size: 11px;
 	color: var(--vscode-descriptionForeground);
-	flex-shrink: 0;
+}
+.agent-mgmt-header-right {
 	display: flex;
-	justify-content: space-between;
+	gap: 8px;
+}
+.agent-mgmt-btn {
+	display: inline-flex;
+	align-items: center;
+	gap: 5px;
+	padding: 5px 12px;
+	border-radius: 4px;
+	font-size: 12px;
+	font-family: var(--vscode-font-family);
+	cursor: pointer;
+	border: 1px solid var(--vscode-button-border);
+	background: none;
+	color: var(--vscode-foreground);
+}
+.agent-mgmt-btn:hover {
+	background: var(--vscode-toolbar-hoverBackground);
+}
+.agent-mgmt-btn.primary {
+	background: var(--vscode-button-background);
+	color: var(--vscode-button-foreground);
+	border: 1px solid var(--vscode-button-background);
+}
+.agent-mgmt-btn.primary:hover {
+	background: var(--vscode-button-hoverBackground);
+}
+.agent-mgmt-scroll {
+	flex: 1;
+	overflow-y: auto;
+	padding: 16px;
 }
 
-/* Cards */
-.statuz-card {
-	background: var(--vscode-editor-background);
-	border: 1px solid var(--vscode-sideBarSectionHeader-border);
-	border-radius: 6px;
-	margin-bottom: 12px;
-	overflow: hidden;
+/* Section */
+.agent-mgmt-section {
+	margin-bottom: 20px;
 }
-.statuz-card-header {
+.agent-mgmt-section-header {
 	display: flex;
 	align-items: center;
-	gap: 6px;
-	padding: 8px 12px;
-	background: var(--vscode-sideBar-background);
-	border-bottom: 1px solid var(--vscode-sideBarSectionHeader-border);
-	font-size: 11px;
+	justify-content: space-between;
+	margin-bottom: 10px;
+}
+.agent-mgmt-section-header h3 {
+	margin: 0;
+	font-size: 12px;
 	font-weight: 600;
 	text-transform: uppercase;
 	letter-spacing: 0.5px;
 	color: var(--vscode-descriptionForeground);
 }
-.statuz-card-body {
-	padding: 10px 12px;
-}
-
-/* Identity Card */
-.statuz-identity-grid {
-	display: grid;
-	grid-template-columns: 1fr 1fr;
-	gap: 6px 16px;
-}
-.statuz-identity-item {
-	display: flex;
-	flex-direction: column;
-	gap: 1px;
-}
-.statuz-identity-label {
-	font-size: 10px;
-	color: var(--vscode-descriptionForeground);
-	text-transform: uppercase;
-	letter-spacing: 0.3px;
-}
-.statuz-identity-value {
-	font-size: 13px;
-	font-weight: 500;
-}
-
-/* State Card */
-.statuz-state-row {
-	display: grid;
-	grid-template-columns: 1fr 1fr;
-	gap: 8px 16px;
-}
-.statuz-state-item {
-	display: flex;
-	flex-direction: column;
-	gap: 2px;
-}
-.statuz-state-label {
-	font-size: 10px;
-	color: var(--vscode-descriptionForeground);
-	text-transform: uppercase;
-}
-.statuz-state-value {
-	font-size: 13px;
-}
-.statuz-status-badge {
-	display: inline-flex;
-	align-items: center;
-	gap: 4px;
-	padding: 2px 8px;
-	border-radius: 10px;
-	font-size: 12px;
-	font-weight: 500;
-}
-.statuz-status-dot {
-	width: 6px;
-	height: 6px;
-	border-radius: 50%;
-	flex-shrink: 0;
-}
-
-/* Progress Card */
-.statuz-progress-bar-container {
-	display: flex;
-	align-items: center;
-	gap: 8px;
-	margin-bottom: 10px;
-}
-.statuz-progress-bar {
-	flex: 1;
-	height: 6px;
-	background: var(--vscode-progressBar-background);
-	border-radius: 3px;
-	overflow: hidden;
-}
-.statuz-progress-fill {
-	height: 100%;
-	background: var(--vscode-charts-green);
-	border-radius: 3px;
-	transition: width 0.3s ease;
-}
-.statuz-progress-text {
-	font-size: 12px;
-	font-weight: 600;
-	color: var(--vscode-charts-green);
-	white-space: nowrap;
-}
-.statuz-progress-lists {
-	display: grid;
-	grid-template-columns: 1fr 1fr;
-	gap: 8px 16px;
-}
-.statuz-progress-section h4 {
-	margin: 0 0 4px;
-	font-size: 11px;
-	text-transform: uppercase;
-	color: var(--vscode-descriptionForeground);
-}
-.statuz-progress-section ul {
-	margin: 0;
-	padding-left: 16px;
-	font-size: 12px;
-	line-height: 1.6;
-}
-.statuz-progress-section.completed ul { color: var(--vscode-charts-green); }
-.statuz-progress-section.blocked ul { color: var(--vscode-errorForeground); }
-.statuz-progress-section.questions ul { color: var(--vscode-charts-yellow); }
-
-/* Timeline */
-.statuz-timeline {
-	position: relative;
-	padding-left: 16px;
-}
-.statuz-timeline::before {
-	content: '';
-	position: absolute;
-	left: 5px;
-	top: 0;
-	bottom: 0;
-	width: 1px;
-	background: var(--vscode-sideBarSectionHeader-border);
-}
-.statuz-timeline-item {
-	position: relative;
-	padding: 0 0 12px 14px;
-}
-.statuz-timeline-item:last-child {
-	padding-bottom: 0;
-}
-.statuz-timeline-dot {
-	position: absolute;
-	left: -17px;
-	top: 4px;
-	width: 9px;
-	height: 9px;
-	border-radius: 50%;
-	border: 2px solid var(--vscode-descriptionForeground);
-	background: var(--vscode-editor-background);
-}
-.statuz-timeline-dot.latest {
-	border-color: var(--vscode-charts-blue);
-	background: var(--vscode-charts-blue);
-}
-.statuz-timeline-time {
-	font-size: 10px;
-	color: var(--vscode-descriptionForeground);
-}
-.statuz-timeline-summary {
-	font-size: 13px;
-	font-weight: 500;
-	margin-top: 2px;
-}
-.statuz-timeline-next {
+.agent-mgmt-section-count {
 	font-size: 11px;
 	color: var(--vscode-descriptionForeground);
-	margin-top: 2px;
-}
-
-/* Relations */
-.statuz-relations-grid {
-	display: grid;
-	grid-template-columns: 1fr 1fr;
-	gap: 8px 16px;
-}
-.statuz-relations-section h4 {
-	margin: 0 0 4px;
-	font-size: 11px;
-	text-transform: uppercase;
-	color: var(--vscode-descriptionForeground);
-}
-.statuz-tag-list {
-	display: flex;
-	flex-wrap: wrap;
-	gap: 4px;
-}
-.statuz-tag {
-	font-size: 11px;
-	padding: 1px 6px;
-	border-radius: 3px;
 	background: var(--vscode-badge-background);
 	color: var(--vscode-badge-foreground);
+	padding: 1px 8px;
+	border-radius: 10px;
 }
 
-/* Empty State */
-.statuz-empty {
+/* Agent Card */
+.agent-mgmt-card {
+	background: var(--vscode-editor-background);
+	border: 1px solid var(--vscode-sideBarSectionHeader-border);
+	border-radius: 6px;
+	padding: 12px;
+	margin-bottom: 8px;
+	cursor: pointer;
+	transition: background 0.1s ease;
+	display: flex;
+	align-items: center;
+	gap: 12px;
+}
+.agent-mgmt-card:hover {
+	background: var(--vscode-list-hoverBackground);
+}
+.agent-mgmt-card-icon {
+	width: 32px;
+	height: 32px;
+	border-radius: 6px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 16px;
+	flex-shrink: 0;
+}
+.agent-mgmt-card-icon.agent { background: var(--vscode-charts-blue); color: #fff; }
+.agent-mgmt-card-icon.skill { background: var(--vscode-charts-purple); color: #fff; }
+.agent-mgmt-card-icon.command { background: var(--vscode-charts-orange); color: #fff; }
+.agent-mgmt-card-icon.rule { background: var(--vscode-charts-green); color: #fff; }
+
+.agent-mgmt-card-body {
+	flex: 1;
+	min-width: 0;
+}
+.agent-mgmt-card-name {
+	font-size: 13px;
+	font-weight: 500;
+	color: var(--vscode-foreground);
+}
+.agent-mgmt-card-desc {
+	font-size: 11px;
+	color: var(--vscode-descriptionForeground);
+	margin-top: 2px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+.agent-mgmt-card-meta {
+	display: flex;
+	gap: 8px;
+	margin-top: 4px;
+	font-size: 10px;
+	color: var(--vscode-descriptionForeground);
+}
+.agent-mgmt-card-actions {
+	display: flex;
+	gap: 4px;
+	flex-shrink: 0;
+}
+.agent-mgmt-card-action {
+	background: none;
+	border: 1px solid var(--vscode-button-border);
+	color: var(--vscode-foreground);
+	border-radius: 3px;
+	padding: 2px 8px;
+	font-size: 11px;
+	cursor: pointer;
+	font-family: var(--vscode-font-family);
+	white-space: nowrap;
+}
+.agent-mgmt-card-action:hover {
+	background: var(--vscode-toolbar-hoverBackground);
+}
+
+/* Vision banner */
+.agent-mgmt-vision {
+	background: linear-gradient(135deg, var(--vscode-editor-background), var(--vscode-sideBar-background));
+	border: 1px solid var(--vscode-sideBarSectionHeader-border);
+	border-radius: 8px;
+	padding: 16px;
+	margin-bottom: 20px;
+}
+.agent-mgmt-vision h3 {
+	margin: 0 0 6px;
+	font-size: 14px;
+	font-weight: 600;
+}
+.agent-mgmt-vision p {
+	margin: 0;
+	font-size: 12px;
+	line-height: 1.5;
+	color: var(--vscode-descriptionForeground);
+	max-width: 320px;
+}
+.agent-mgmt-vision-pills {
+	display: flex;
+	gap: 6px;
+	margin-top: 10px;
+	flex-wrap: wrap;
+}
+.agent-mgmt-vision-pill {
+	font-size: 10px;
+	padding: 2px 8px;
+	border-radius: 10px;
+	border: 1px solid var(--vscode-button-border);
+	color: var(--vscode-descriptionForeground);
+}
+
+/* Empty state */
+.agent-mgmt-empty {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
-	height: 100%;
-	padding: 24px;
+	padding: 32px 16px;
 	text-align: center;
 	color: var(--vscode-descriptionForeground);
 }
-.statuz-empty-icon {
-	font-size: 40px;
-	margin-bottom: 12px;
-	opacity: 0.4;
+.agent-mgmt-empty-icon {
+	font-size: 36px;
+	margin-bottom: 10px;
+	opacity: 0.3;
 }
-.statuz-empty-title {
-	font-size: 15px;
+.agent-mgmt-empty-title {
+	font-size: 14px;
 	font-weight: 600;
 	color: var(--vscode-foreground);
-	margin: 0 0 6px;
+	margin: 0 0 4px;
 }
-.statuz-empty-desc {
+.agent-mgmt-empty-desc {
 	font-size: 12px;
 	line-height: 1.5;
-	max-width: 260px;
-	margin: 0 0 16px;
+	max-width: 240px;
+	margin: 0 0 14px;
 }
-.statuz-empty-action {
+.agent-mgmt-empty-action {
 	background: var(--vscode-button-background);
 	color: var(--vscode-button-foreground);
 	border: none;
-	border-radius: 3px;
-	padding: 6px 14px;
+	border-radius: 4px;
+	padding: 6px 16px;
 	font-size: 12px;
 	cursor: pointer;
 	font-family: var(--vscode-font-family);
 }
-.statuz-empty-action:hover {
+.agent-mgmt-empty-action:hover {
 	background: var(--vscode-button-hoverBackground);
-}
-
-/* Error State */
-.statuz-error {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
-	height: 100%;
-	padding: 24px;
-	text-align: center;
-}
-.statuz-error-icon {
-	font-size: 40px;
-	margin-bottom: 12px;
-	opacity: 0.4;
-	color: var(--vscode-errorForeground);
-}
-.statuz-error-title {
-	font-size: 15px;
-	font-weight: 600;
-	color: var(--vscode-errorForeground);
-	margin: 0 0 6px;
-}
-.statuz-error-desc {
-	font-size: 12px;
-	line-height: 1.5;
-	max-width: 280px;
-	margin: 0 0 16px;
-	color: var(--vscode-descriptionForeground);
-}
-
-/* Loading */
-.statuz-loading {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	height: 100%;
-	color: var(--vscode-descriptionForeground);
-	font-size: 13px;
 }
 `;
 
 
 // ─── ViewPane ──────────────────────────────────────────────────
 
+/** Placeholder agent definition (will be replaced by real .statuzide/ loader) */
+interface AgentDefinition {
+	id: string;
+	name: string;
+	type: 'agent' | 'skill' | 'command' | 'rule';
+	description: string;
+	source: 'local' | 'ecc';
+	version: string;
+	enabled: boolean;
+}
+
 class DashboardViewPane extends ViewPane {
 
 	private dashboardEl: HTMLElement | null = null;
 	private scrollEl: HTMLElement | null = null;
-	private footerEl: HTMLElement | null = null;
 
 	constructor(
 		options: IViewPaneOptions,
@@ -397,7 +307,6 @@ class DashboardViewPane extends ViewPane {
 		@IOpenerService openerService: IOpenerService,
 		@ITelemetryService telemetryService: ITelemetryService,
 		@IHoverService hoverService: IHoverService,
-		@IStatuzService private readonly statuzService: IStatuzService,
 	) {
 		super(options, keybindingService, contextMenuService, configurationService, contextKeyService, viewDescriptorService, instantiationService, openerService, themeService, hoverService)
 	}
@@ -405,8 +314,7 @@ class DashboardViewPane extends ViewPane {
 	protected override renderBody(parent: HTMLElement): void {
 		super.renderBody(parent);
 
-		// Inject CSS once
-		const styleId = 'statuz-dashboard-styles';
+		const styleId = 'agent-mgmt-dashboard-styles';
 		if (!document.getElementById(styleId)) {
 			const style = document.createElement('style');
 			style.id = styleId;
@@ -414,13 +322,11 @@ class DashboardViewPane extends ViewPane {
 			document.head.appendChild(style);
 		}
 
-		// Create dashboard structure
 		this.dashboardEl = document.createElement('div');
-		this.dashboardEl.className = 'statuz-dashboard';
+		this.dashboardEl.className = 'agent-mgmt-dashboard';
 		parent.appendChild(this.dashboardEl);
 
-		// Load data
-		this.loadDashboard();
+		this.renderDashboard();
 	}
 
 	protected override layoutBody(height: number, width: number): void {
@@ -429,480 +335,222 @@ class DashboardViewPane extends ViewPane {
 		this.element.style.width = `${width}px`;
 	}
 
-	private async loadDashboard(): Promise<void> {
-		if (!this.dashboardEl) return;
-		this.showLoading();
-
-		const result = await this.statuzService.readStatuz();
-
-		if (!result.ok || !result.document) {
-			this.showError(result.error || 'Unknown error');
-			return;
-		}
-
-		const vm = buildDashboardViewModel(result.document, result.filePath);
-		this.renderDashboard(vm);
-	}
-
-	private showLoading(): void {
-		if (!this.dashboardEl) return;
-		this.dashboardEl.innerHTML = '';
-		const loading = document.createElement('div');
-		loading.className = 'statuz-loading';
-		loading.textContent = 'Loading statuz.yaml...';
-		this.dashboardEl.appendChild(loading);
-	}
-
-	private showError(message: string): void {
+	private renderDashboard(): void {
 		if (!this.dashboardEl) return;
 		this.dashboardEl.innerHTML = '';
 
-		const isNotFound = message.includes('No .statuz/statuz.yaml found');
-
-		if (isNotFound) {
-			this.renderEmptyState();
-			return;
-		}
-
-		const container = document.createElement('div');
-		container.className = 'statuz-error';
-
-		const icon = document.createElement('div');
-		icon.className = 'statuz-error-icon codicon codicon-warning';
-
-		const title = document.createElement('h3');
-		title.className = 'statuz-error-title';
-		title.textContent = 'Parse Error';
-
-		const desc = document.createElement('p');
-		desc.className = 'statuz-error-desc';
-		desc.textContent = message;
-
-		const retryBtn = document.createElement('button');
-		retryBtn.className = 'statuz-empty-action';
-		retryBtn.textContent = 'Retry';
-		retryBtn.addEventListener('click', () => this.loadDashboard());
-
-		container.appendChild(icon);
-		container.appendChild(title);
-		container.appendChild(desc);
-		container.appendChild(retryBtn);
-		this.dashboardEl.appendChild(container);
-	}
-
-	private renderEmptyState(): void {
-		if (!this.dashboardEl) return;
-
-		const container = document.createElement('div');
-		container.className = 'statuz-empty';
-
-		const icon = document.createElement('div');
-		icon.className = 'statuz-empty-icon codicon codicon-file-code';
-
-		const title = document.createElement('h3');
-		title.className = 'statuz-empty-title';
-		title.textContent = 'No statuz.yaml Found';
-
-		const desc = document.createElement('p');
-		desc.className = 'statuz-empty-desc';
-		desc.textContent = 'Create a .statuz/statuz.yaml file in your workspace root to power this dashboard with agent status data.';
-
-		const actionBtn = document.createElement('button');
-		actionBtn.className = 'statuz-empty-action';
-		actionBtn.textContent = 'Retry';
-		actionBtn.addEventListener('click', () => this.loadDashboard());
-
-		container.appendChild(icon);
-		container.appendChild(title);
-		container.appendChild(desc);
-		container.appendChild(actionBtn);
-		this.dashboardEl.appendChild(container);
-	}
-
-	private renderDashboard(vm: DashboardViewModel): void {
-		if (!this.dashboardEl) return;
-		this.dashboardEl.innerHTML = '';
-
-		// Header
+		// ── Header ──
 		const header = document.createElement('div');
-		header.className = 'statuz-dashboard-header';
+		header.className = 'agent-mgmt-header';
 
-		const title = document.createElement('h3');
-		title.textContent = 'Statuz Dashboard';
+		const headerLeft = document.createElement('div');
+		headerLeft.className = 'agent-mgmt-header-left';
+		const h2 = document.createElement('h2');
+		h2.textContent = 'Agent Management';
+		const p = document.createElement('p');
+		p.textContent = 'Create, customize, and orchestrate your AI agents.';
+		headerLeft.appendChild(h2);
+		headerLeft.appendChild(p);
 
-		const refreshBtn = document.createElement('button');
-		refreshBtn.className = 'statuz-dashboard-refresh';
-		refreshBtn.textContent = '\u21bb Refresh';
-		refreshBtn.addEventListener('click', () => this.loadDashboard());
+		const headerRight = document.createElement('div');
+		headerRight.className = 'agent-mgmt-header-right';
 
-		header.appendChild(title);
-		header.appendChild(refreshBtn);
+		const createBtn = document.createElement('button');
+		createBtn.className = 'agent-mgmt-btn primary';
+		createBtn.innerHTML = '<span class="codicon codicon-add"></span> New Agent';
+		createBtn.addEventListener('click', () => this.showComingSoon('Agent creation wizard will open here.'));
+
+		const importBtn = document.createElement('button');
+		importBtn.className = 'agent-mgmt-btn';
+		importBtn.innerHTML = '<span class="codicon codicon-cloud-download"></span> Import from ECC';
+		importBtn.addEventListener('click', () => this.showComingSoon('ECC import browser will open here.'));
+
+		headerRight.appendChild(createBtn);
+		headerRight.appendChild(importBtn);
+		header.appendChild(headerLeft);
+		header.appendChild(headerRight);
 		this.dashboardEl.appendChild(header);
 
-		// Scrollable content
+		// ── Scrollable content ──
 		this.scrollEl = document.createElement('div');
-		this.scrollEl.className = 'statuz-dashboard-scroll';
+		this.scrollEl.className = 'agent-mgmt-scroll';
 		this.dashboardEl.appendChild(this.scrollEl);
 
-		// Cards
-		this.renderIdentityCard(vm);
-		this.renderStateCard(vm);
-		this.renderProgressCard(vm);
-		this.renderTimelineCard(vm);
-		this.renderRelationsCard(vm);
-		this.renderRulesCard(vm);
+		// ── Vision banner ──
+		this.renderVisionBanner();
 
-		// Footer
-		this.footerEl = document.createElement('div');
-		this.footerEl.className = 'statuz-dashboard-footer';
+		// ── My Agents section ──
+		this.renderAgentSection('My Agents', 'local', [
+			// Placeholder: will be loaded from .statuzide/
+		]);
 
-		const fileInfo = document.createElement('span');
-		fileInfo.textContent = vm.filePath ? `Source: ${vm.filePath}` : '';
-
-		const updateInfo = document.createElement('span');
-		updateInfo.textContent = vm.updatedAt ? `Updated: ${new Date(vm.updatedAt).toLocaleString()}` : '';
-
-		this.footerEl.appendChild(fileInfo);
-		this.footerEl.appendChild(updateInfo);
-		this.dashboardEl.appendChild(this.footerEl);
+		// ── ECC Catalog section ──
+		this.renderAgentSection('ECC Catalog', 'ecc', [
+			{
+				id: 'ecc-code-reviewer',
+				name: 'Code Reviewer',
+				type: 'agent',
+				description: 'Automated code review agent with PR analysis',
+				source: 'ecc',
+				version: '2.0.0',
+				enabled: false,
+			},
+			{
+				id: 'ecc-test-writer',
+				name: 'Test Writer',
+				type: 'skill',
+				description: 'Generates unit tests and integration tests',
+				source: 'ecc',
+				version: '2.0.0',
+				enabled: false,
+			},
+			{
+				id: 'ecc-refactor',
+				name: 'Refactor Assistant',
+				type: 'command',
+				description: 'Safe code refactoring with validation',
+				source: 'ecc',
+				version: '2.0.0',
+				enabled: false,
+			},
+		]);
 	}
 
-	private renderIdentityCard(vm: DashboardViewModel): void {
-		const card = this.createCard('Identity');
-		const grid = document.createElement('div');
-		grid.className = 'statuz-identity-grid';
+	private renderVisionBanner(): void {
+		const banner = document.createElement('div');
+		banner.className = 'agent-mgmt-vision';
 
-		const items: [string, string][] = [
-			['Agent', vm.identity.agentName],
-			['Project', vm.identity.projectName],
-			['Role', vm.identity.roleName],
-			['Organization', vm.identity.organization],
-			['Environment', vm.identity.environment],
-		];
+		const h3 = document.createElement('h3');
+		h3.textContent = '\u2699 Agent Workbench';
 
-		for (const [label, value] of items) {
-			const item = document.createElement('div');
-			item.className = 'statuz-identity-item';
-			const lbl = document.createElement('span');
-			lbl.className = 'statuz-identity-label';
-			lbl.textContent = label;
-			const val = document.createElement('span');
-			val.className = 'statuz-identity-value';
-			val.textContent = value;
-			item.appendChild(lbl);
-			item.appendChild(val);
-			grid.appendChild(item);
+		const p = document.createElement('p');
+		p.textContent = 'Design agents with full autonomy. Visual architecture canvas, custom harness engineering, and pipeline orchestration \u2014 all in one workbench.';
+
+		const pills = document.createElement('div');
+		pills.className = 'agent-mgmt-vision-pills';
+		for (const label of ['Visual Architecture', 'Harness Engineering', 'Pipeline Orchestration', 'ECC Integration', 'Full Autonomy']) {
+			const pill = document.createElement('span');
+			pill.className = 'agent-mgmt-vision-pill';
+			pill.textContent = label;
+			pills.appendChild(pill);
 		}
 
-		card.querySelector('.statuz-card-body')!.appendChild(grid);
-		this.scrollEl!.appendChild(card);
+		banner.appendChild(h3);
+		banner.appendChild(p);
+		banner.appendChild(pills);
+		this.scrollEl!.appendChild(banner);
 	}
 
-	private renderStateCard(vm: DashboardViewModel): void {
-		const card = this.createCard('Current State');
+	private renderAgentSection(title: string, source: 'local' | 'ecc', agents: AgentDefinition[]): void {
+		const section = document.createElement('div');
+		section.className = 'agent-mgmt-section';
 
-		// Status badge
-		const badgeRow = document.createElement('div');
-		badgeRow.style.cssText = 'margin-bottom:10px;';
+		// Section header
+		const sectionHeader = document.createElement('div');
+		sectionHeader.className = 'agent-mgmt-section-header';
+		const h3 = document.createElement('h3');
+		h3.textContent = title;
+		const count = document.createElement('span');
+		count.className = 'agent-mgmt-section-count';
+		count.textContent = String(agents.length);
+		sectionHeader.appendChild(h3);
+		sectionHeader.appendChild(count);
+		section.appendChild(sectionHeader);
 
-		const badge = document.createElement('span');
-		badge.className = 'statuz-status-badge';
-		badge.style.cssText = `background:${vm.state.statusColor}22;color:${vm.state.statusColor};`;
-
-		const dot = document.createElement('span');
-		dot.className = 'statuz-status-dot';
-		dot.style.backgroundColor = vm.state.statusColor;
-
-		const badgeText = document.createElement('span');
-		badgeText.textContent = vm.state.statusLabel;
-
-		badge.appendChild(dot);
-		badge.appendChild(badgeText);
-		badgeRow.appendChild(badge);
-
-		// Grid
-		const grid = document.createElement('div');
-		grid.className = 'statuz-state-row';
-
-		const stateItems: [string, string][] = [
-			['Stage', vm.state.stageLabel],
-			['Task', vm.state.task],
-			['Last Checkpoint', vm.state.lastCheckpoint],
-			['Next Action', vm.state.nextAction],
-		];
-
-		for (const [label, value] of stateItems) {
-			const item = document.createElement('div');
-			item.className = 'statuz-state-item';
-			const lbl = document.createElement('span');
-			lbl.className = 'statuz-state-label';
-			lbl.textContent = label;
-			const val = document.createElement('span');
-			val.className = 'statuz-state-value';
-			val.textContent = value;
-			item.appendChild(lbl);
-			item.appendChild(val);
-			grid.appendChild(item);
-		}
-
-		const body = card.querySelector('.statuz-card-body')!;
-		body.appendChild(badgeRow);
-		body.appendChild(grid);
-		this.scrollEl!.appendChild(card);
-	}
-
-	private renderProgressCard(vm: DashboardViewModel): void {
-		const card = this.createCard('Progress');
-		const body = card.querySelector('.statuz-card-body')!;
-
-		// Progress bar
-		const barContainer = document.createElement('div');
-		barContainer.className = 'statuz-progress-bar-container';
-
-		const bar = document.createElement('div');
-		bar.className = 'statuz-progress-bar';
-
-		const fill = document.createElement('div');
-		fill.className = 'statuz-progress-fill';
-		fill.style.width = `${vm.progress.percentComplete}%`;
-
-		const text = document.createElement('span');
-		text.className = 'statuz-progress-text';
-		text.textContent = `${vm.progress.percentComplete}%`;
-
-		bar.appendChild(fill);
-		barContainer.appendChild(bar);
-		barContainer.appendChild(text);
-		body.appendChild(barContainer);
-
-		// Lists
-		const lists = document.createElement('div');
-		lists.className = 'statuz-progress-lists';
-
-		// Completed
-		if (vm.progress.completedItems.length > 0) {
-			const section = document.createElement('div');
-			section.className = 'statuz-progress-section completed';
-			const h4 = document.createElement('h4');
-			h4.textContent = `\u2713 Completed (${vm.progress.completedCount})`;
-			const ul = document.createElement('ul');
-			for (const item of vm.progress.completedItems) {
-				const li = document.createElement('li');
-				li.textContent = item;
-				ul.appendChild(li);
-			}
-			section.appendChild(h4);
-			section.appendChild(ul);
-			lists.appendChild(section);
-		}
-
-		// Blocked
-		if (vm.progress.blockedItems.length > 0) {
-			const section = document.createElement('div');
-			section.className = 'statuz-progress-section blocked';
-			const h4 = document.createElement('h4');
-			h4.textContent = `\u2298 Blocked (${vm.progress.blockedCount})`;
-			const ul = document.createElement('ul');
-			for (const item of vm.progress.blockedItems) {
-				const li = document.createElement('li');
-				li.textContent = item;
-				ul.appendChild(li);
-			}
-			section.appendChild(h4);
-			section.appendChild(ul);
-			lists.appendChild(section);
-		}
-
-		// Open questions
-		if (vm.progress.openQuestions.length > 0) {
-			const section = document.createElement('div');
-			section.className = 'statuz-progress-section questions';
-			const h4 = document.createElement('h4');
-			h4.textContent = `? Questions (${vm.progress.openQuestionsCount})`;
-			const ul = document.createElement('ul');
-			for (const item of vm.progress.openQuestions) {
-				const li = document.createElement('li');
-				li.textContent = item;
-				ul.appendChild(li);
-			}
-			section.appendChild(h4);
-			section.appendChild(ul);
-			lists.appendChild(section);
-		}
-
-		if (lists.children.length > 0) {
-			body.appendChild(lists);
+		if (agents.length === 0) {
+			const empty = document.createElement('div');
+			empty.className = 'agent-mgmt-empty';
+			empty.innerHTML = `
+				<div class="agent-mgmt-empty-icon codicon codicon-${source === 'local' ? 'package' : 'library'}"></div>
+				<div class="agent-mgmt-empty-title">${source === 'local' ? 'No agents defined yet' : 'Catalog not loaded'}</div>
+				<div class="agent-mgmt-empty-desc">${source === 'local' ? 'Create your first custom agent with full control over tools, memory, and context strategy.' : 'Open the ECC catalog to browse and import agent templates.'}</div>
+				<button class="agent-mgmt-empty-action">${source === 'local' ? 'Create First Agent' : 'Browse Catalog'}</button>
+			`;
+			const actionBtn = empty.querySelector('button')!;
+			actionBtn.addEventListener('click', () => {
+				this.showComingSoon(source === 'local' ? 'Agent creation wizard will open here.' : 'ECC catalog browser will open here.');
+			});
+			section.appendChild(empty);
 		} else {
-			const empty = document.createElement('div');
-			empty.style.cssText = 'font-size:12px;color:var(--vscode-descriptionForeground);';
-			empty.textContent = 'No progress items tracked yet.';
-			body.appendChild(empty);
+			for (const agent of agents) {
+				section.appendChild(this.renderAgentCard(agent));
+			}
 		}
 
-		this.scrollEl!.appendChild(card);
+		this.scrollEl!.appendChild(section);
 	}
 
-	private renderTimelineCard(vm: DashboardViewModel): void {
-		const card = this.createCard('Checkpoint Timeline');
-		const body = card.querySelector('.statuz-card-body')!;
-
-		if (vm.checkpoints.length === 0) {
-			const empty = document.createElement('div');
-			empty.style.cssText = 'font-size:12px;color:var(--vscode-descriptionForeground);';
-			empty.textContent = 'No checkpoints recorded yet.';
-			body.appendChild(empty);
-			this.scrollEl!.appendChild(card);
-			return;
-		}
-
-		const timeline = document.createElement('div');
-		timeline.className = 'statuz-timeline';
-
-		for (const cp of vm.checkpoints) {
-			const item = document.createElement('div');
-			item.className = 'statuz-timeline-item';
-
-			const dot = document.createElement('div');
-			dot.className = 'statuz-timeline-dot' + (cp.isLatest ? ' latest' : '');
-			item.appendChild(dot);
-
-			const time = document.createElement('div');
-			time.className = 'statuz-timeline-time';
-			time.textContent = cp.timeFormatted;
-
-			const summary = document.createElement('div');
-			summary.className = 'statuz-timeline-summary';
-			summary.textContent = cp.summary;
-
-			item.appendChild(time);
-			item.appendChild(summary);
-
-			if (cp.nextAction) {
-				const next = document.createElement('div');
-				next.className = 'statuz-timeline-next';
-				next.textContent = `\u2192 ${cp.nextAction}`;
-				item.appendChild(next);
-			}
-
-			timeline.appendChild(item);
-		}
-
-		body.appendChild(timeline);
-		this.scrollEl!.appendChild(card);
-	}
-
-	private renderRelationsCard(vm: DashboardViewModel): void {
-		const card = this.createCard('Relations');
-		const body = card.querySelector('.statuz-card-body')!;
-
-		if (!vm.relations.hasAny) {
-			const empty = document.createElement('div');
-			empty.style.cssText = 'font-size:12px;color:var(--vscode-descriptionForeground);';
-			empty.textContent = 'No relations defined.';
-			body.appendChild(empty);
-			this.scrollEl!.appendChild(card);
-			return;
-		}
-
-		const grid = document.createElement('div');
-		grid.className = 'statuz-relations-grid';
-
-		const sections: [string, string[]][] = [
-			['Agents', vm.relations.agents],
-			['Projects', vm.relations.projects],
-			['Files', vm.relations.files],
-			['Tools', vm.relations.tools],
-		];
-
-		for (const [label, items] of sections) {
-			if (items.length === 0) continue;
-			const section = document.createElement('div');
-			section.className = 'statuz-relations-section';
-			const h4 = document.createElement('h4');
-			h4.textContent = label;
-			section.appendChild(h4);
-
-			const tagList = document.createElement('div');
-			tagList.className = 'statuz-tag-list';
-			for (const item of items) {
-				const tag = document.createElement('span');
-				tag.className = 'statuz-tag';
-				tag.textContent = item;
-				tagList.appendChild(tag);
-			}
-			section.appendChild(tagList);
-			grid.appendChild(section);
-		}
-
-		body.appendChild(grid);
-		this.scrollEl!.appendChild(card);
-	}
-
-	private renderRulesCard(vm: DashboardViewModel): void {
-		const card = this.createCard('Rules');
-		const body = card.querySelector('.statuz-card-body')!;
-
-		if (!vm.rules.hasAny) {
-			const empty = document.createElement('div');
-			empty.style.cssText = 'font-size:12px;color:var(--vscode-descriptionForeground);';
-			empty.textContent = 'No rules defined.';
-			body.appendChild(empty);
-			this.scrollEl!.appendChild(card);
-			return;
-		}
-
-		if (vm.rules.shoulds.length > 0) {
-			const section = document.createElement('div');
-			section.style.cssText = 'margin-bottom:8px;';
-			const h4 = document.createElement('h4');
-			h4.style.cssText = 'margin:0 0 4px;font-size:11px;text-transform:uppercase;color:var(--vscode-charts-green);';
-			h4.textContent = 'Should';
-			section.appendChild(h4);
-			const ul = document.createElement('ul');
-			ul.style.cssText = 'margin:0;padding-left:16px;font-size:12px;line-height:1.6;';
-			for (const rule of vm.rules.shoulds) {
-				const li = document.createElement('li');
-				li.textContent = rule;
-				ul.appendChild(li);
-			}
-			section.appendChild(ul);
-			body.appendChild(section);
-		}
-
-		if (vm.rules.shouldNots.length > 0) {
-			const section = document.createElement('div');
-			const h4 = document.createElement('h4');
-			h4.style.cssText = 'margin:0 0 4px;font-size:11px;text-transform:uppercase;color:var(--vscode-errorForeground);';
-			h4.textContent = 'Should Not';
-			section.appendChild(h4);
-			const ul = document.createElement('ul');
-			ul.style.cssText = 'margin:0;padding-left:16px;font-size:12px;line-height:1.6;';
-			for (const rule of vm.rules.shouldNots) {
-				const li = document.createElement('li');
-				li.textContent = rule;
-				ul.appendChild(li);
-			}
-			section.appendChild(ul);
-			body.appendChild(section);
-		}
-
-		this.scrollEl!.appendChild(card);
-	}
-
-	private createCard(title: string): HTMLElement {
+	private renderAgentCard(agent: AgentDefinition): HTMLElement {
 		const card = document.createElement('div');
-		card.className = 'statuz-card';
+		card.className = 'agent-mgmt-card';
+		card.addEventListener('click', () => this.showComingSoon(`Agent editor for "${agent.name}" will open here.`));
 
-		const header = document.createElement('div');
-		header.className = 'statuz-card-header';
-		header.textContent = title;
+		// Icon
+		const icon = document.createElement('div');
+		icon.className = `agent-mgmt-card-icon ${agent.type}`;
+		const iconMap: Record<string, string> = {
+			agent: 'robot',
+			skill: 'zap',
+			command: 'terminal',
+			rule: 'law',
+		};
+		icon.innerHTML = `<span class="codicon codicon-${iconMap[agent.type] || 'symbol-misc'}"></span>`;
 
+		// Body
 		const body = document.createElement('div');
-		body.className = 'statuz-card-body';
+		body.className = 'agent-mgmt-card-body';
 
-		card.appendChild(header);
+		const name = document.createElement('div');
+		name.className = 'agent-mgmt-card-name';
+		name.textContent = agent.name;
+
+		const desc = document.createElement('div');
+		desc.className = 'agent-mgmt-card-desc';
+		desc.textContent = agent.description;
+
+		const meta = document.createElement('div');
+		meta.className = 'agent-mgmt-card-meta';
+		meta.innerHTML = `<span>${agent.type}</span><span>v${agent.version}</span><span>${agent.source === 'ecc' ? 'ECC' : 'Local'}</span>`;
+
+		body.appendChild(name);
+		body.appendChild(desc);
+		body.appendChild(meta);
+
+		// Actions
+		const actions = document.createElement('div');
+		actions.className = 'agent-mgmt-card-actions';
+
+		if (agent.source === 'ecc') {
+			const installBtn = document.createElement('button');
+			installBtn.className = 'agent-mgmt-card-action';
+			installBtn.textContent = 'Install';
+			installBtn.addEventListener('click', (e) => {
+				e.stopPropagation();
+				this.showComingSoon(`Installing "${agent.name}" from ECC catalog...`);
+			});
+			actions.appendChild(installBtn);
+		} else {
+			const editBtn = document.createElement('button');
+			editBtn.className = 'agent-mgmt-card-action';
+			editBtn.textContent = 'Edit';
+			editBtn.addEventListener('click', (e) => {
+				e.stopPropagation();
+				this.showComingSoon(`Opening harness editor for "${agent.name}"...`);
+			});
+			actions.appendChild(editBtn);
+		}
+
+		card.appendChild(icon);
 		card.appendChild(body);
+		card.appendChild(actions);
+
 		return card;
+	}
+
+	private showComingSoon(message: string): void {
+		// For now, we show a subtle notification. In the future, this will trigger
+		// actual editor openings, catalog browsers, and creation wizards.
+		console.log('[Agent Management]', message);
 	}
 }
 
@@ -917,7 +565,7 @@ const dashboardViewIcon = FileAccess.asFileUri('vs/workbench/contrib/statuz/brow
 const viewContainerRegistry = Registry.as<IViewContainersRegistry>(ViewContainerExtensions.ViewContainersRegistry);
 const dashboardContainer = viewContainerRegistry.registerViewContainer({
 	id: STATUZ_DASHBOARD_VIEW_CONTAINER_ID,
-	title: nls.localize2('statuzDashboard', 'Dashboard'),
+	title: nls.localize2('statuzDashboard', 'Agent Management'),
 	ctorDescriptor: new SyncDescriptor(ViewPaneContainer, [STATUZ_DASHBOARD_VIEW_CONTAINER_ID, {
 		mergeViewWithContainerWhenSingleView: true,
 		orientation: Orientation.HORIZONTAL,
@@ -933,7 +581,7 @@ const dashboardContainer = viewContainerRegistry.registerViewContainer({
 const viewsRegistry = Registry.as<IViewsRegistry>(ViewExtensions.ViewsRegistry);
 viewsRegistry.registerViews([{
 	id: STATUZ_DASHBOARD_VIEW_ID,
-	name: nls.localize2('statuzDashboard', 'Dashboard'),
+	name: nls.localize2('statuzDashboard', 'Agent Management'),
 	ctorDescriptor: new SyncDescriptor(DashboardViewPane),
 	canToggleVisibility: false,
 	canMoveView: false,
@@ -948,7 +596,7 @@ registerAction2(class extends Action2 {
 	constructor() {
 		super({
 			id: STATUZ_OPEN_DASHBOARD_ACTION_ID,
-			title: nls.localize2('openStatuzDashboard', 'Open Statuz Dashboard'),
+			title: nls.localize2('openStatuzDashboard', 'Open Agent Management'),
 		})
 	}
 	run(accessor: ServicesAccessor): void {
