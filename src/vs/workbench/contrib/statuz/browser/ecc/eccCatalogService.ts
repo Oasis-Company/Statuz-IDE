@@ -11,6 +11,8 @@ import { Emitter, Event } from '../../../../../base/common/event.js';
 import { EccCatalog, EccComponentMeta, EccInstallComponent, EccInstallModule, mapFamilyToType, mapFamilyToCategory, mapFamilyToIcon } from './eccCatalogTypes.js';
 import { parseYamlFrontmatter } from './eccMetadataParser.js';
 import { IAgentSkillItem, IAgentSkillFilter } from '../agentManagement.types.js';
+import { AgentDefinition } from '../agentdef/agentDefinitionTypes.js';
+import { eccComponentToAgentDefinition, eccCatalogToAgentDefinitions } from '../agentdef/eccAdapter.js';
 
 export const IEccCatalogService = createDecorator<IEccCatalogService>('eccCatalogService');
 
@@ -24,6 +26,10 @@ export interface IEccCatalogService {
 	refresh(): Promise<void>;
 	/** Get the ECC source root path */
 	getSourcePath(): string;
+	/** Convert a single component to generic AgentDefinition (new model) */
+	toAgentDefinition(meta: EccComponentMeta): AgentDefinition;
+	/** Convert all catalog components to AgentDefinitions */
+	getAgentDefinitions(): AgentDefinition[];
 }
 
 // ─── ECC Source Root ──────────────────────────────────────────
@@ -333,6 +339,20 @@ export class EccCatalogService implements IEccCatalogService {
 			tags: meta.tags,
 			category: meta.category,
 		};
+	}
+
+	toAgentDefinition(meta: EccComponentMeta): AgentDefinition {
+		if (!this.catalog) {
+			throw new Error('Catalog not loaded. Call fetchCatalog() first.');
+		}
+		return eccComponentToAgentDefinition(meta, this.catalog);
+	}
+
+	getAgentDefinitions(): AgentDefinition[] {
+		if (!this.catalog) {
+			return [];
+		}
+		return eccCatalogToAgentDefinitions(this.catalog);
 	}
 
 	async refresh(): Promise<void> {
