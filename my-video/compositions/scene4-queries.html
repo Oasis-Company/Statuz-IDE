@@ -1,0 +1,411 @@
+<template>
+  <div data-hf-id="hf-ygfl" data-composition-id="scene4" data-start="0" data-duration="13" data-width="1920" data-height="1080" class="clip" style="
+      width:1920px; height:1080px; position:relative; overflow:hidden;
+      background:#0A0A0A; font-family:'Inter',system-ui,-apple-system,sans-serif;
+    ">
+    <!-- ===== LIGHTING LAYER 1: Ambient Glow ===== -->
+    <div data-hf-id="hf-fk79" style="
+        position:absolute; top:0; left:0; width:100%; height:100%; z-index:1;
+        background:radial-gradient(ellipse at 40% 40%, rgba(0,127,212,0.08) 0%, transparent 60%);
+        pointer-events:none;
+      " id="s4-ambient-glow"></div>
+
+    <!-- ===== LIGHTING LAYER 2: Rim Light ===== -->
+    <div data-hf-id="hf-tjha" style="
+        position:absolute; top:0; left:0; width:100%; height:100%; z-index:1;
+        background:radial-gradient(ellipse at 50% 0%, rgba(255,255,255,0.04) 0%, transparent 50%);
+        pointer-events:none;
+      "></div>
+
+    <!-- ===== LIGHTING LAYER 3: Vignette ===== -->
+    <div data-hf-id="hf-d0rv" style="
+        position:absolute; top:0; left:0; width:100%; height:100%; z-index:1;
+        background:radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.4) 100%);
+        pointer-events:none;
+      "></div>
+
+    <!-- ===== GRID PATTERN ===== -->
+    <div data-hf-id="hf-gcx2" style="
+        position:absolute; top:0; left:0; width:100%; height:100%; z-index:1;
+        background-image: radial-gradient(circle, rgba(255,255,255,0.03) 1px, transparent 1px);
+        background-size: 16px 16px;
+        pointer-events:none; opacity:0.3;
+      " id="s4-grid"></div>
+
+    <!-- ===== GHOST TEXT ===== -->
+    <div data-hf-id="hf-tplj" id="s4-ghost" style="
+        position:absolute; top:50%; left:35%;
+        font-family:'Inter',system-ui,-apple-system,sans-serif; font-weight:900;
+        font-size:280px; color:#FFFFFF; opacity:0.025; z-index:1;
+        letter-spacing:12px; pointer-events:none; white-space:nowrap;
+      ">STATUZ</div>
+
+    <!-- ===== PARTICLES ===== -->
+    <div data-hf-id="hf-bu6w" id="s4-particles" style="position:absolute;top:0;left:0;width:100%;height:100%;z-index:2;pointer-events:none;"></div>
+
+    <!-- ===== DIVIDER: Graph (55%) | Terminal (45%) ===== -->
+    <div data-hf-id="hf-15jm" style="
+        position:absolute; top:0; left:1056px; width:1px; height:100%; z-index:5;
+        background:#333333; opacity:0.5;
+      "></div>
+
+    <!-- ===== QUERY LABEL ===== -->
+    <div data-hf-id="hf-wdr3" id="s4-query-label" style="
+        position:absolute; top:40px; left:40px; z-index:6;
+        font-family:'Inter',system-ui,-apple-system,sans-serif; font-weight:700;
+        font-size:24px; color:#007FD4; letter-spacing:0px;
+      ">Traverse</div>
+
+    <!-- ===== GRAPH AREA (left 55%) ===== -->
+    <div data-hf-id="hf-ypcv" id="s4-graph-area" style="position:absolute;top:0;left:0;width:1056px;height:1080px;z-index:3;pointer-events:none;">
+
+      <!-- SVG EDGES -->
+      <svg data-hf-id="hf-8be3" id="s4-edges" width="1056" height="1080" style="position:absolute;top:0;left:0;pointer-events:none;">
+        <defs data-hf-id="hf-mh0t">
+          <filter data-hf-id="hf-ozh0" id="s4-edgeGlow" x="-50%" y="-50%" width="200%" height="200%">
+            <fegaussianblur data-hf-id="hf-uvae" in="SourceGraphic" stdDeviation="3" result="blur1" />
+            <fegaussianblur data-hf-id="hf-m7mq" in="SourceGraphic" stdDeviation="6" result="blur2" />
+            <femerge data-hf-id="hf-zn2o">
+              <femergenode data-hf-id="hf-wheu" in="blur2" />
+              <femergenode data-hf-id="hf-sjat" in="blur1" />
+              <femergenode data-hf-id="hf-cmaw" in="SourceGraphic" />
+            </femerge>
+          </filter>
+        </defs>
+        <!-- Edge 0: api-gateway -> auth-service -->
+        <line data-hf-id="hf-oe1g" x1="300" y1="250" x2="500" y2="180" stroke="#333333" stroke-width="1.5" class="s4-edge" />
+        <!-- Edge 1: api-gateway -> orchestrator -->
+        <line data-hf-id="hf-l20z" x1="300" y1="250" x2="650" y2="280" stroke="#333333" stroke-width="1.5" class="s4-edge" />
+        <!-- Edge 2: api-gateway -> rate-limiter -->
+        <line data-hf-id="hf-v6qb" x1="300" y1="250" x2="350" y2="380" stroke="#333333" stroke-width="1.5" class="s4-edge" />
+        <!-- Edge 3: auth-service -> db-primary -->
+        <line data-hf-id="hf-khq3" x1="500" y1="180" x2="450" y2="550" stroke="#333333" stroke-width="1.5" class="s4-edge" />
+        <!-- Edge 4: orchestrator -> payment-service -->
+        <line data-hf-id="hf-x3af" x1="650" y1="280" x2="550" y2="420" stroke="#333333" stroke-width="1.5" class="s4-edge" />
+        <!-- Edge 5: orchestrator -> cache-layer -->
+        <line data-hf-id="hf-27e3" x1="650" y1="280" x2="700" y2="450" stroke="#333333" stroke-width="1.5" class="s4-edge" />
+        <!-- Edge 6: payment-service -> db-primary -->
+        <line data-hf-id="hf-6vur" x1="550" y1="420" x2="450" y2="550" stroke="#333333" stroke-width="1.5" class="s4-edge" />
+        <!-- Edge 7: cache-layer -> db-replica -->
+        <line data-hf-id="hf-n1zy" x1="700" y1="450" x2="650" y2="580" stroke="#333333" stroke-width="1.5" class="s4-edge" />
+        <!-- Edge 8: rate-limiter -> payment-service -->
+        <line data-hf-id="hf-qkvj" x1="350" y1="380" x2="550" y2="420" stroke="#333333" stroke-width="1.5" class="s4-edge" />
+        <!-- Edge 9: db-primary -> db-replica -->
+        <line data-hf-id="hf-iglx" x1="450" y1="550" x2="650" y2="580" stroke="#333333" stroke-width="1.5" class="s4-edge" />
+        <!-- Edge 10: auth-service -> orchestrator -->
+        <line data-hf-id="hf-5dk5" x1="500" y1="180" x2="650" y2="280" stroke="#333333" stroke-width="1.5" class="s4-edge" />
+        <!-- Edge 11: orchestrator -> db-primary -->
+        <line data-hf-id="hf-szki" x1="650" y1="280" x2="450" y2="550" stroke="#333333" stroke-width="1.5" class="s4-edge" />
+        <!-- Edge 12: api-gateway -> payment-service -->
+        <line data-hf-id="hf-7xn8" x1="300" y1="250" x2="550" y2="420" stroke="#333333" stroke-width="1.5" class="s4-edge" />
+      </svg>
+
+      <!-- NODES -->
+      <div data-hf-id="hf-7xqi" id="s4-nodes" style="position:absolute;top:0;left:0;width:100%;height:100%;">
+        <!-- api-gateway (300, 250) - index 0 -->
+        <div data-hf-id="hf-8mi7" class="s4-node-group" style="position:absolute;left:288px;top:238px;width:24px;height:24px;">
+          <div data-hf-id="hf-9sr6" class="s4-node-glow" style="position:absolute;top:-12px;left:-12px;width:48px;height:48px;border-radius:50%;border:3px solid rgba(0,127,212,0.3);"></div>
+          <div data-hf-id="hf-ks79" class="s4-node-circle" style="width:24px;height:24px;border-radius:50%;background:#007FD4;"></div>
+          <div data-hf-id="hf-hftk" class="s4-node-label" style="position:absolute;left:16px;top:-6px;font-family:monospace;font-size:14px;color:#FFFFFF;background:#242424;padding:5px 8px;border-radius:4px;white-space:nowrap;line-height:1;">api-gateway</div>
+        </div>
+        <!-- auth-service (500, 180) - index 1 -->
+        <div data-hf-id="hf-h5z1" class="s4-node-group" style="position:absolute;left:488px;top:168px;width:24px;height:24px;">
+          <div data-hf-id="hf-itjq" class="s4-node-glow" style="position:absolute;top:-12px;left:-12px;width:48px;height:48px;border-radius:50%;border:3px solid rgba(0,127,212,0.3);"></div>
+          <div data-hf-id="hf-036h" class="s4-node-circle" style="width:24px;height:24px;border-radius:50%;background:#007FD4;"></div>
+          <div data-hf-id="hf-ydcl" class="s4-node-label" style="position:absolute;left:16px;top:-6px;font-family:monospace;font-size:14px;color:#FFFFFF;background:#242424;padding:5px 8px;border-radius:4px;white-space:nowrap;line-height:1;">auth-service</div>
+        </div>
+        <!-- orchestrator (650, 280) - index 2 -->
+        <div data-hf-id="hf-lfel" class="s4-node-group" style="position:absolute;left:638px;top:268px;width:24px;height:24px;">
+          <div data-hf-id="hf-j7ur" class="s4-node-glow" style="position:absolute;top:-12px;left:-12px;width:48px;height:48px;border-radius:50%;border:3px solid rgba(0,127,212,0.3);"></div>
+          <div data-hf-id="hf-1a3k" class="s4-node-circle" style="width:24px;height:24px;border-radius:50%;background:#007FD4;"></div>
+          <div data-hf-id="hf-pbmp" class="s4-node-label" style="position:absolute;left:16px;top:-6px;font-family:monospace;font-size:14px;color:#FFFFFF;background:#242424;padding:5px 8px;border-radius:4px;white-space:nowrap;line-height:1;">orchestrator</div>
+        </div>
+        <!-- rate-limiter (350, 380) - index 3 -->
+        <div data-hf-id="hf-05sl" class="s4-node-group" style="position:absolute;left:338px;top:368px;width:24px;height:24px;">
+          <div data-hf-id="hf-jm5s" class="s4-node-glow" style="position:absolute;top:-12px;left:-12px;width:48px;height:48px;border-radius:50%;border:3px solid rgba(0,127,212,0.3);"></div>
+          <div data-hf-id="hf-0vsj" class="s4-node-circle" style="width:24px;height:24px;border-radius:50%;background:#007FD4;"></div>
+          <div data-hf-id="hf-dr7a" class="s4-node-label" style="position:absolute;left:16px;top:-6px;font-family:monospace;font-size:14px;color:#FFFFFF;background:#242424;padding:5px 8px;border-radius:4px;white-space:nowrap;line-height:1;">rate-limiter</div>
+        </div>
+        <!-- payment-service (550, 420) - index 4 -->
+        <div data-hf-id="hf-4lqa" class="s4-node-group" style="position:absolute;left:538px;top:408px;width:24px;height:24px;">
+          <div data-hf-id="hf-gu0l" class="s4-node-glow" style="position:absolute;top:-12px;left:-12px;width:48px;height:48px;border-radius:50%;border:3px solid rgba(0,127,212,0.3);"></div>
+          <div data-hf-id="hf-yw9e" class="s4-node-circle" style="width:24px;height:24px;border-radius:50%;background:#007FD4;"></div>
+          <div data-hf-id="hf-osgf" class="s4-node-label" style="position:absolute;left:16px;top:-6px;font-family:monospace;font-size:14px;color:#FFFFFF;background:#242424;padding:5px 8px;border-radius:4px;white-space:nowrap;line-height:1;">payment-service</div>
+        </div>
+        <!-- cache-layer (700, 450) - index 5 -->
+        <div data-hf-id="hf-kfjp" class="s4-node-group" style="position:absolute;left:688px;top:438px;width:24px;height:24px;">
+          <div data-hf-id="hf-h8bm" class="s4-node-glow" style="position:absolute;top:-12px;left:-12px;width:48px;height:48px;border-radius:50%;border:3px solid rgba(0,127,212,0.3);"></div>
+          <div data-hf-id="hf-yhyd" class="s4-node-circle" style="width:24px;height:24px;border-radius:50%;background:#007FD4;"></div>
+          <div data-hf-id="hf-y1et" class="s4-node-label" style="position:absolute;left:16px;top:-6px;font-family:monospace;font-size:14px;color:#FFFFFF;background:#242424;padding:5px 8px;border-radius:4px;white-space:nowrap;line-height:1;">cache-layer</div>
+        </div>
+        <!-- db-primary (450, 550) - index 6 -->
+        <div data-hf-id="hf-2g4j" class="s4-node-group" style="position:absolute;left:438px;top:538px;width:24px;height:24px;">
+          <div data-hf-id="hf-hmmn" class="s4-node-glow" style="position:absolute;top:-12px;left:-12px;width:48px;height:48px;border-radius:50%;border:3px solid rgba(0,127,212,0.3);"></div>
+          <div data-hf-id="hf-zovg" class="s4-node-circle" style="width:24px;height:24px;border-radius:50%;background:#007FD4;"></div>
+          <div data-hf-id="hf-b9hg" class="s4-node-label" style="position:absolute;left:16px;top:-6px;font-family:monospace;font-size:14px;color:#FFFFFF;background:#242424;padding:5px 8px;border-radius:4px;white-space:nowrap;line-height:1;">db-primary</div>
+        </div>
+        <!-- db-replica (650, 580) - index 7 -->
+        <div data-hf-id="hf-r9sy" class="s4-node-group" style="position:absolute;left:638px;top:568px;width:24px;height:24px;">
+          <div data-hf-id="hf-i0xo" class="s4-node-glow" style="position:absolute;top:-12px;left:-12px;width:48px;height:48px;border-radius:50%;border:3px solid rgba(0,127,212,0.3);"></div>
+          <div data-hf-id="hf-zakf" class="s4-node-circle" style="width:24px;height:24px;border-radius:50%;background:#007FD4;"></div>
+          <div data-hf-id="hf-2qxe" class="s4-node-label" style="position:absolute;left:16px;top:-6px;font-family:monospace;font-size:14px;color:#FFFFFF;background:#242424;padding:5px 8px;border-radius:4px;white-space:nowrap;line-height:1;">db-replica</div>
+        </div>
+      </div>
+
+      <!-- CONCENTRIC RINGS (Phase 2 - Impact) -->
+      <div data-hf-id="hf-0bik" id="s4-rings" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;">
+        <svg data-hf-id="hf-a9ih" width="1056" height="1080" style="position:absolute;top:0;left:0;">
+          <circle data-hf-id="hf-6lh2" id="s4-ring1" cx="550" cy="420" r="0" fill="none" stroke="#EF4444" stroke-width="2" opacity="0" />
+          <circle data-hf-id="hf-glh5" id="s4-ring2" cx="550" cy="420" r="0" fill="none" stroke="#EF4444" stroke-width="2" opacity="0" />
+        </svg>
+      </div>
+
+      <!-- PATH DOT (Phase 3) -->
+      <div data-hf-id="hf-7wjr" id="s4-path-dot" style="position:absolute;width:8px;height:8px;border-radius:50%;background:#10B981;box-shadow:0 0 12px #10B981;left:300px;top:250px;opacity:0;z-index:6;"></div>
+    </div>
+
+    <!-- ===== TERMINAL AREA (right 45%) ===== -->
+    <div data-hf-id="hf-auhz" id="s4-terminal" style="
+        position:absolute; top:0; left:1056px; width:864px; height:1080px; z-index:4;
+        background:#0A0A0A; font-family:'JetBrains Mono',monospace;
+        padding:60px 40px; box-sizing:border-box; overflow:hidden;
+      ">
+      <div data-hf-id="hf-hybj" style="display:flex;align-items:center;gap:8px;opacity:0.5;margin-bottom:30px;">
+        <div data-hf-id="hf-7gln" style="width:12px;height:12px;border-radius:50%;background:#EF4444;"></div>
+        <div data-hf-id="hf-1f69" style="width:12px;height:12px;border-radius:50%;background:#F59E0B;"></div>
+        <div data-hf-id="hf-7sen" style="width:12px;height:12px;border-radius:50%;background:#10B981;"></div>
+        <span data-hf-id="hf-q8lk" style="color:#888888;font-size:13px;margin-left:8px;letter-spacing:1px;">TERMINAL</span>
+      </div>
+      <div data-hf-id="hf-5r6q" id="s4-term-output" style="font-size:15px;line-height:1.8;color:#A0A0A0;white-space:pre-wrap;"></div>
+    </div>
+
+    <!-- ===== OASIS COMPANY BRANDING ===== -->
+    <div data-hf-id="hf-73cs" id="s4-oasis" style="
+        position:absolute; bottom:32px; left:28px; z-index:10;
+        font-family:'Inter',system-ui,-apple-system,sans-serif; font-weight:500;
+        font-size:13px; color:#999999; letter-spacing:4px; text-transform:uppercase;
+        opacity:0;
+      ">OASIS COMPANY</div>
+
+    <!-- ===== STATUZ LOGO ===== -->
+    <div data-hf-id="hf-qcqj" id="s4-logo" style="
+        position:absolute; bottom:28px; right:28px; z-index:10;
+        width:36px; height:36px; color:#FFFFFF; opacity:0;
+      ">
+      <svg data-hf-id="hf-7lm8" viewBox="0 0 256 256" width="36" height="36" fill="none" style="display:block;">
+        <line data-hf-id="hf-ta5v" x1="40" y1="184" x2="144" y2="168" stroke="currentColor" stroke-width="16" stroke-linecap="round" />
+        <line data-hf-id="hf-uzkn" x1="144" y1="168" x2="112" y2="72" stroke="currentColor" stroke-width="16" stroke-linecap="round" />
+        <line data-hf-id="hf-o14n" x1="112" y1="72" x2="216" y2="56" stroke="currentColor" stroke-width="16" stroke-linecap="round" />
+        <circle data-hf-id="hf-x91m" cx="128" cy="120" r="20" fill="currentColor" />
+      </svg>
+    </div>
+
+    <!-- ===== BOTTOM RULE ===== -->
+    <div data-hf-id="hf-tf3s" id="s4-rule" style="
+        position:absolute; bottom:24px; left:40px; right:40px; height:1px; z-index:9;
+        background:#333333; transform-origin:center; opacity:0;
+      "></div>
+  </div>
+
+
+<script>
+  window.__timelines = window.__timelines || {};
+
+  (function() {
+    var tl = gsap.timeline({ paused: true });
+
+    // ===== DETERMINISTIC PARTICLES (18) =====
+    var particleData = [
+      { x: 80, y: 150 }, { x: 200, y: 80 }, { x: 400, y: 200 },
+      { x: 600, y: 100 }, { x: 800, y: 250 }, { x: 100, y: 350 },
+      { x: 300, y: 300 }, { x: 500, y: 400 }, { x: 700, y: 320 },
+      { x: 900, y: 180 }, { x: 150, y: 500 }, { x: 450, y: 550 },
+      { x: 650, y: 480 }, { x: 850, y: 600 }, { x: 250, y: 650 },
+      { x: 550, y: 700 }, { x: 750, y: 620 }, { x: 950, y: 500 }
+    ];
+    var pContainer = document.getElementById('s4-particles');
+    var pEls = [];
+    particleData.forEach(function(p, i) {
+      var el = document.createElement('div');
+      el.style.cssText = 'position:absolute;width:3px;height:3px;border-radius:50%;background:rgba(255,255,255,0.03);left:' + p.x + 'px;top:' + p.y + 'px;';
+      pContainer.appendChild(el);
+      pEls.push(el);
+    });
+
+    // ===== NODE REFS =====
+    var nodeGroups = document.querySelectorAll('#s4-nodes .s4-node-group');
+    var nodeCircles = document.querySelectorAll('#s4-nodes .s4-node-circle');
+    var nodeGlows = document.querySelectorAll('#s4-nodes .s4-node-glow');
+
+    // ===== EDGE REFS =====
+    var edgeEls = document.querySelectorAll('#s4-edges .s4-edge');
+
+    // ===== TERMINAL =====
+    var termOutput = document.getElementById('s4-term-output');
+
+    // ===== RINGS =====
+    var ring1 = document.getElementById('s4-ring1');
+    var ring2 = document.getElementById('s4-ring2');
+
+    // ===== PATH DOT =====
+    var pathDot = document.getElementById('s4-path-dot');
+
+    // ===== QUERY LABEL =====
+    var queryLabel = document.getElementById('s4-query-label');
+
+    // ===== INITIAL SETUP =====
+    gsap.set('#s4-ghost', { opacity: 0.025, xPercent: -50, yPercent: -50 });
+    gsap.set('#s4-grid', { opacity: 0.3 });
+    gsap.set('#s4-ambient-glow', { opacity: 1 });
+    gsap.set('#s4-logo', { opacity: 0 });
+    gsap.set('#s4-oasis', { opacity: 0 });
+    gsap.set('#s4-rule', { scaleX: 0, opacity: 0 });
+    gsap.set(ring1, { opacity: 0 });
+    gsap.set(ring2, { opacity: 0 });
+    gsap.set(pathDot, { opacity: 0, x: 0, y: 0 });
+    gsap.set(edgeEls, { stroke: '#333333', strokeWidth: 1.5 });
+    // Set edges to #007FD4 initially for a nice look, they'll be used for glow
+    gsap.set('#s4-query-label', { opacity: 1 });
+
+    // ===== PARTICLES FLOATING =====
+    particleData.forEach(function(p, i) {
+      var driftY = -(15 + (i % 4) * 8);
+      var driftX = ((i % 5) - 2) * 6;
+      tl.to(pEls[i], { y: driftY, x: driftX, opacity: 0.5, duration: 5 + (i % 3), ease: 'sine.inOut' }, 0);
+      tl.to(pEls[i], { y: 0, x: 0, opacity: 0.03, duration: 5 + (i % 3), ease: 'sine.inOut' }, 5 + (i % 3));
+    });
+
+    // ===== GHOST TEXT DRIFT =====
+    tl.to('#s4-ghost', { x: '-=20', duration: 15, ease: 'sine.inOut' }, 0);
+
+    // ===== AMBIENT GLOW BREATHING =====
+    tl.to('#s4-ambient-glow', { opacity: 0.8, duration: 3, ease: 'sine.inOut', yoyo: true, repeat: 2 }, 0);
+    tl.to('#s4-ambient-glow', { opacity: 1, duration: 3, ease: 'sine.inOut', yoyo: true, repeat: 1 }, 9);
+
+    // ===== GRID PULSE =====
+    tl.to('#s4-grid', { opacity: 0.4, duration: 4, ease: 'sine.inOut', yoyo: true, repeat: 1 }, 0);
+
+    // ===== EDGES DRAW =====
+    edgeEls.forEach(function(edge, i) {
+      tl.to(edge, { strokeDashoffset: 0, duration: 0.35, ease: 'power2.out' }, i * 0.08);
+    });
+
+    // ===== NODES PULSE WAVE =====
+    nodeGroups.forEach(function(ng, i) {
+      tl.to(ng, { scale: 1.1, duration: 0.3, ease: 'sine.inOut', yoyo: true, repeat: 1 }, 0.5 + i * 0.06);
+    });
+
+    // ===== HELPER: typeText with Math.floor() =====
+    function typeText(el, text, startTime, charInterval) {
+      el.textContent = '';
+      for (var i = 0; i < text.length; i++) {
+        (function(idx) {
+          tl.call(function() {
+            el.textContent = text.substring(0, Math.floor(idx) + 1);
+          }, [], startTime + idx * charInterval);
+        })(i);
+      }
+    }
+
+    // ============================================================
+    // PHASE 1: TRAVERSE (0-5s)
+    // ============================================================
+    // Query label set to "Traverse" at start
+    tl.call(function() { queryLabel.textContent = 'Traverse'; }, [], 0);
+
+    // Node 0 (api-gateway) scales 1.2x at 1.0s
+    tl.to(nodeGroups[0], { scale: 1.2, duration: 0.4, ease: 'power2.out', yoyo: true, repeat: 1 }, 1.0);
+
+    // Connected nodes (1,2,3) glow #007FD4 at 1.5s
+    tl.to(nodeCircles[1], { backgroundColor: '#007FD4', duration: 0.3, ease: 'power2.out' }, 1.5);
+    tl.to(nodeCircles[2], { backgroundColor: '#007FD4', duration: 0.3, ease: 'power2.out' }, 1.5);
+    tl.to(nodeCircles[3], { backgroundColor: '#007FD4', duration: 0.3, ease: 'power2.out' }, 1.5);
+    // Connected edges (0,1,2) glow
+    tl.to(edgeEls[0], { stroke: '#007FD4', strokeWidth: 2, duration: 0.3, ease: 'power2.out' }, 1.5);
+    tl.to(edgeEls[1], { stroke: '#007FD4', strokeWidth: 2, duration: 0.3, ease: 'power2.out' }, 1.5);
+    tl.to(edgeEls[2], { stroke: '#007FD4', strokeWidth: 2, duration: 0.3, ease: 'power2.out' }, 1.5);
+
+    // Terminal: type command then result
+    typeText(termOutput, "> traverse('api-gateway')", 0.5, 0.035);
+    tl.call(function() {
+      termOutput.textContent = "> traverse('api-gateway')\n";
+    }, [], 0.5 + 27 * 0.035 + 0.3);
+    typeText(termOutput, "> traverse('api-gateway')\n→ [auth, orchestrator, rate-limiter]", 0.5 + 27 * 0.035 + 0.3, 0.035);
+
+    // ============================================================
+    // PHASE 2: IMPACT (5-10s)
+    // ============================================================
+    // Query label cycles to "Impact"
+    tl.call(function() { queryLabel.textContent = 'Impact'; }, [], 5.0);
+
+    // Node 4 (payment-service) shimmers at 5.5s
+    tl.to(nodeCircles[4], { opacity: 0.3, duration: 0.08, ease: 'none', yoyo: true, repeat: 5 }, 5.5);
+    tl.to(nodeGlows[4], { opacity: 0.5, duration: 0.08, ease: 'none', yoyo: true, repeat: 5 }, 5.5);
+
+    // 2 concentric rings (#EF4444, 2px) expand from node 4 (r: 0→60)
+    gsap.set(ring1, { opacity: 1, r: 0, cx: 550, cy: 420 });
+    gsap.set(ring2, { opacity: 1, r: 0, cx: 550, cy: 420 });
+    tl.to(ring1, { r: 60, opacity: 0, duration: 1.0, ease: 'power2.out' }, 5.5);
+    tl.to(ring2, { r: 60, opacity: 0, duration: 1.0, ease: 'power2.out' }, 5.8);
+
+    // Nodes 1,2,6 flash red then restore at 6.0s
+    tl.to(nodeCircles[1], { backgroundColor: '#EF4444', duration: 0.15, ease: 'none', yoyo: true, repeat: 1 }, 6.0);
+    tl.to(nodeCircles[2], { backgroundColor: '#EF4444', duration: 0.15, ease: 'none', yoyo: true, repeat: 1 }, 6.0);
+    tl.to(nodeCircles[6], { backgroundColor: '#EF4444', duration: 0.15, ease: 'none', yoyo: true, repeat: 1 }, 6.0);
+
+    // Terminal: type impact command
+    tl.call(function() {
+      termOutput.textContent = '';
+    }, [], 5.0);
+    typeText(termOutput, "> impact('payment-service')", 5.5, 0.035);
+    tl.call(function() {
+      termOutput.textContent = "> impact('payment-service')\n";
+    }, [], 5.5 + 27 * 0.035 + 0.3);
+    typeText(termOutput, "> impact('payment-service')\n→ 3 nodes · Critical path: YES", 5.5 + 27 * 0.035 + 0.3, 0.035);
+
+    // ============================================================
+    // PHASE 3: PATH (10-15s)
+    // ============================================================
+    // Query label cycles to "Path"
+    tl.call(function() { queryLabel.textContent = 'Path'; }, [], 10.0);
+
+    // Node 0 turns green (#10B981), node 6 turns red (#EF4444) at 10.5s
+    tl.to(nodeCircles[0], { backgroundColor: '#10B981', duration: 0.3, ease: 'power2.out' }, 10.5);
+    tl.to(nodeCircles[6], { backgroundColor: '#EF4444', duration: 0.3, ease: 'power2.out' }, 10.5);
+
+    // Path glow edges: api-gateway->auth-service (edge 0), auth-service->db-primary (edge 3)
+    tl.to(edgeEls[0], { stroke: '#10B981', strokeWidth: 2.5, duration: 0.3, ease: 'power2.out' }, 10.5);
+    tl.to(edgeEls[3], { stroke: '#10B981', strokeWidth: 2.5, duration: 0.3, ease: 'power2.out' }, 10.5);
+
+    // Animated dot travels: node 0(300,250) -> node 1(500,180) -> node 6(450,550)
+    gsap.set(pathDot, { opacity: 1, x: 0, y: 0 });
+    tl.to(pathDot, { x: 200, y: -70, duration: 1.0, ease: 'none' }, 11.0);
+    tl.to(pathDot, { x: 150, y: 300, duration: 1.2, ease: 'none' }, 12.0);
+    tl.to(pathDot, { opacity: 0, duration: 0.3 }, 13.2);
+
+    // Terminal: type path command
+    tl.call(function() {
+      termOutput.textContent = '';
+    }, [], 10.0);
+    typeText(termOutput, "> path('api-gateway', 'db-primary')", 10.5, 0.035);
+    tl.call(function() {
+      termOutput.textContent = "> path('api-gateway', 'db-primary')\n";
+    }, [], 10.5 + 37 * 0.035 + 0.3);
+    typeText(termOutput, "> path('api-gateway', 'db-primary')\n→ 2 steps: gateway → auth → db", 10.5 + 37 * 0.035 + 0.3, 0.035);
+
+    // ===== DECOR =====
+    // Logo fades in at 0.5s + breathing
+    tl.to('#s4-logo', { opacity: 1, duration: 0.4, ease: 'power2.out' }, 0.5);
+    tl.to('#s4-logo', { scale: 1.06, duration: 1.0, ease: 'sine.inOut', yoyo: true, repeat: 10 }, 0.9);
+
+    // Oasis fades in at 1.0s
+    tl.to('#s4-oasis', { opacity: 1, duration: 0.4, ease: 'power2.out' }, 1.0);
+
+    // Bottom rule
+    tl.to('#s4-rule', { scaleX: 1, opacity: 1, duration: 0.5, ease: 'power2.out' }, 1.0);
+
+    // ===== REGISTER =====
+    window.__timelines["scene4"] = tl;
+  })();
+</script>
+</template>

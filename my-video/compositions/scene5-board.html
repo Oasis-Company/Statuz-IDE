@@ -1,0 +1,165 @@
+<template>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+#scene5{position:relative;width:1920px;height:1080px;overflow:hidden;background:#0A0A0A;font-family:"Inter",system-ui,-apple-system,sans-serif}
+.ambient-glow{position:absolute;inset:0;background:radial-gradient(ellipse at center,#007FD4 0%,transparent 60%);opacity:.1;pointer-events:none}
+.rim-light{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,rgba(255,255,255,0.04) 0%,transparent 50%);pointer-events:none}
+.vignette{position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 50%,rgba(0,0,0,0.4) 100%);pointer-events:none}
+.ghost-text{position:absolute;top:50%;left:50%;font-size:360px;font-weight:900;color:#FFF;opacity:.02;letter-spacing:12px;pointer-events:none;font-family:"Inter",system-ui,-apple-system,sans-serif;white-space:nowrap}
+.grid-bg{position:absolute;top:0;left:0;width:1920px;height:1080px;pointer-events:none}
+.scene-label{position:absolute;top:40px;left:40px;font-size:14px;text-transform:uppercase;letter-spacing:2px;color:#999;font-weight:500;opacity:0;font-family:"Inter",system-ui,-apple-system,sans-serif}
+.toolbar{position:absolute;top:40px;left:320px;display:flex;gap:16px;font-size:12px;color:#666;font-family:"Inter",system-ui,-apple-system,sans-serif;letter-spacing:.5px;opacity:0}
+.toolbar span{color:#888}
+.toolbar .sep{color:#444}
+.card{position:absolute;width:200px;height:80px;border-radius:6px;padding:14px 16px;display:flex;flex-direction:column;justify-content:center;opacity:0}
+.card-label{font-size:14px;font-weight:600;color:#FFF;line-height:1.2;letter-spacing:.5px}
+.card-subtitle{font-size:11px;color:#999;line-height:1.3;margin-top:3px}
+.edges-svg{position:absolute;top:0;left:0;width:1920px;height:1080px;pointer-events:none}
+.edge-path{fill:none;stroke-linecap:round}
+.edge-label{font-family:"Inter",system-ui,-apple-system,sans-serif;font-size:10px;fill:#999;letter-spacing:.5px}
+.completeness-ring{position:absolute;left:1470px;top:300px;width:120px;height:120px;opacity:0;pointer-events:none}
+.ring-svg{width:120px;height:120px}
+.ring-bg{fill:none;stroke:#333;stroke-width:4}
+.ring-fill{fill:none;stroke:#10B981;stroke-width:4;stroke-linecap:round}
+.counter-text{position:absolute;left:1470px;top:430px;width:120px;text-align:center;font-size:28px;font-weight:800;color:#10B981;font-variant-numeric:tabular-nums;font-family:"Inter",system-ui,-apple-system,sans-serif;opacity:0;pointer-events:none}
+.detail-panel{position:absolute;left:1430px;top:510px;width:200px;background:rgba(26,26,26,0.8);border:1px solid #333;border-radius:8px;padding:14px 16px;opacity:0;pointer-events:none}
+.detail-item{font-size:12px;color:#CCC;line-height:1.8;font-family:"Inter",system-ui,-apple-system,sans-serif}
+.detail-item .count{color:#10B981;font-weight:600}
+.statuz-logo{position:absolute;bottom:28px;right:28px;width:36px;height:36px;color:#FFF;opacity:0;pointer-events:none}
+.oasis-text{position:absolute;bottom:32px;left:28px;font-size:13px;text-transform:uppercase;letter-spacing:4px;color:#999;font-weight:500;opacity:0;font-family:"Inter",system-ui,-apple-system,sans-serif}
+.bottom-rule{position:absolute;bottom:60px;left:0;width:1920px;height:1px;background:#333;transform:scaleX(0);transform-origin:center;pointer-events:none}
+</style>
+<div data-hf-id="hf-wqjm" id="scene5" data-composition-id="scene5" data-width="1920" data-height="1080" style="position:relative;width:1920px;height:1080px;overflow:hidden;background:#0A0A0A;font-family:'Inter',system-ui,-apple-system,sans-serif;">
+  <div data-hf-id="hf-yivn" class="ambient-glow" id="s5-ambient"></div>
+  <div data-hf-id="hf-euqb" class="rim-light"></div>
+  <div data-hf-id="hf-q7bi" class="vignette"></div>
+  <div data-hf-id="hf-wl2u" class="ghost-text" id="s5-ghost">STATUZ</div>
+  <svg data-hf-id="hf-g047" class="grid-bg">
+    <defs data-hf-id="hf-mh0t"><pattern data-hf-id="hf-1fir" id="grid5" width="60" height="60" patternUnits="userSpaceOnUse"><circle data-hf-id="hf-ykqr" cx="30" cy="30" r="1" fill="#FFF" opacity=".03" /></pattern></defs>
+    <rect data-hf-id="hf-3xmq" width="1920" height="1080" fill="url(#grid5)" />
+  </svg>
+  <div data-hf-id="hf-4edm" class="scene-label" id="s5-label">SANDBOXER BOARD</div>
+  <div data-hf-id="hf-96gd" class="toolbar" id="s5-toolbar">
+    <span data-hf-id="hf-ljqz">Undo</span><span data-hf-id="hf-kbj9" class="sep">|</span><span data-hf-id="hf-jazh">Redo</span><span data-hf-id="hf-rtmh" class="sep">|</span><span data-hf-id="hf-t7xs">Fit</span><span data-hf-id="hf-t0jk" class="sep">|</span><span data-hf-id="hf-9gez">Layout</span><span data-hf-id="hf-sm8j" class="sep">|</span><span data-hf-id="hf-6k5n">Zoom +</span><span data-hf-id="hf-ppy4" class="sep">/</span><span data-hf-id="hf-46bh">Zoom -</span>
+  </div>
+  <svg data-hf-id="hf-5rmw" class="edges-svg">
+    <path data-hf-id="hf-bo2z" class="edge-path" id="edge-1" stroke="#A8A29E" stroke-width="1.5" d="M 320,260 C 420,270 480,200 560,180" />
+    <text data-hf-id="hf-6zf3" class="edge-label" x="440" y="225">depends-on</text>
+    <path data-hf-id="hf-08i6" class="edge-path" id="edge-2" stroke="#EF4444" stroke-width="1.5" stroke-dasharray="6 4" d="M 220,300 C 220,360 420,340 440,395" />
+    <text data-hf-id="hf-d9yq" class="edge-label" x="330" y="340">blocks</text>
+    <path data-hf-id="hf-m051" class="edge-path" id="edge-3" stroke="#007FD4" stroke-width="1.5" stroke-dasharray="2 4" d="M 660,220 C 660,330 540,330 540,435" />
+    <text data-hf-id="hf-e6l8" class="edge-label" x="600" y="320">refines</text>
+    <path data-hf-id="hf-8pid" class="edge-path" id="edge-4" stroke="#10B981" stroke-width="1.5" d="M 440,480 C 440,550 330,540 330,595" />
+    <text data-hf-id="hf-qvoj" class="edge-label" x="385" y="535">triggers</text>
+    <path data-hf-id="hf-zsxw" class="edge-path" id="edge-5" stroke="#666" stroke-width="1" d="M 320,260 C 370,400 280,500 240,600" />
+    <text data-hf-id="hf-48yd" class="edge-label" x="300" y="425">relates-to</text>
+  </svg>
+  <div data-hf-id="hf-k1mw" class="card" id="s5-card-constitution" style="left:120px;top:220px;border:2px solid #007FD4;background:rgba(0,127,212,0.08);border-radius:10px;">
+    <div data-hf-id="hf-x96c" class="card-label">CONSTITUTION</div>
+    <div data-hf-id="hf-zgrd" class="card-subtitle">Foundation rules</div>
+  </div>
+  <div data-hf-id="hf-w761" class="card" id="s5-card-card" style="left:560px;top:140px;background:#1A1A1A;border:1px solid #2A2A2A;border-radius:8px;">
+    <div data-hf-id="hf-i7d9" class="card-label">CARD</div>
+    <div data-hf-id="hf-1gjl" class="card-subtitle">Standard entity</div>
+  </div>
+  <div data-hf-id="hf-cdmp" class="card" id="s5-card-decision" style="left:340px;top:400px;background:transparent;border:1px solid #FFF;border-radius:8px;overflow:visible;">
+    <div data-hf-id="hf-btv5" class="card-label">DECISION</div>
+    <div data-hf-id="hf-ps5t" class="card-subtitle">Branch point</div>
+    <svg data-hf-id="hf-uzhb" style="position:absolute;right:-8px;top:-8px;width:20px;height:20px;opacity:0;" id="s5-diamond" viewBox="0 0 20 20">
+      <polygon data-hf-id="hf-k6aj" points="10,0 20,10 10,20 0,10" fill="#007FD4" opacity=".9" />
+    </svg>
+  </div>
+  <div data-hf-id="hf-ppme" class="card" id="s5-card-placeholder" style="left:230px;top:600px;border:2px dashed #666;background:rgba(255,255,255,0.03);border-radius:8px;">
+    <div data-hf-id="hf-x1rz" class="card-label" style="color:#666;">PLACEHOLDER</div>
+    <div data-hf-id="hf-hqks" class="card-subtitle" style="color:#555;">To be defined</div>
+  </div>
+  <div data-hf-id="hf-z8rs" class="completeness-ring" id="s5-ring">
+    <svg data-hf-id="hf-tkmz" class="ring-svg" viewBox="0 0 120 120">
+      <circle data-hf-id="hf-j0ve" class="ring-bg" cx="60" cy="60" r="50" />
+      <circle data-hf-id="hf-8oow" class="ring-fill" id="s5-ring-fill" cx="60" cy="60" r="50" transform="rotate(-90 60 60)" />
+    </svg>
+  </div>
+  <div data-hf-id="hf-sm5y" class="counter-text" id="s5-counter">0%</div>
+  <div data-hf-id="hf-s9sj" class="detail-panel" id="s5-detail-panel">
+    <div data-hf-id="hf-sl5c" class="detail-item">Constitution: <span data-hf-id="hf-kgyy" class="count">2/3</span></div>
+    <div data-hf-id="hf-7ezq" class="detail-item">Cards: <span data-hf-id="hf-t52q" class="count">5/8</span></div>
+    <div data-hf-id="hf-ajxe" class="detail-item">Decisions: <span data-hf-id="hf-zj2o" class="count">1/2</span></div>
+  </div>
+  <div data-hf-id="hf-58xx" class="bottom-rule" id="s5-bottom-rule"></div>
+  <div data-hf-id="hf-ba6d" class="statuz-logo" id="s5-logo">
+    <svg data-hf-id="hf-u3yk" viewBox="0 0 256 256" width="36" height="36">
+      <line data-hf-id="hf-ta5v" x1="40" y1="184" x2="144" y2="168" stroke="currentColor" stroke-width="16" stroke-linecap="round" />
+      <line data-hf-id="hf-uzkn" x1="144" y1="168" x2="112" y2="72" stroke="currentColor" stroke-width="16" stroke-linecap="round" />
+      <line data-hf-id="hf-o14n" x1="112" y1="72" x2="216" y2="56" stroke="currentColor" stroke-width="16" stroke-linecap="round" />
+      <circle data-hf-id="hf-x91m" cx="128" cy="120" r="20" fill="currentColor" />
+    </svg>
+  </div>
+  <div data-hf-id="hf-b6gn" class="oasis-text" id="s5-oasis">OASIS COMPANY</div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script>
+(function(){
+  var tl = gsap.timeline({paused:true});
+  window.__timelines = window.__timelines || {};
+  window.__timelines["scene5"] = tl;
+  var c1=document.getElementById("s5-card-constitution"),
+      c2=document.getElementById("s5-card-card"),
+      c3=document.getElementById("s5-card-decision"),
+      c4=document.getElementById("s5-card-placeholder"),
+      e1=document.getElementById("edge-1"),
+      e2=document.getElementById("edge-2"),
+      e3=document.getElementById("edge-3"),
+      e4=document.getElementById("edge-4"),
+      e5=document.getElementById("edge-5"),
+      dm=document.getElementById("s5-diamond"),
+      rg=document.getElementById("s5-ring"),
+      rf=document.getElementById("s5-ring-fill"),
+      ct=document.getElementById("s5-counter"),
+      dp=document.getElementById("s5-detail-panel"),
+      lo=document.getElementById("s5-logo"),
+      oa=document.getElementById("s5-oasis"),
+      lb=document.getElementById("s5-label"),
+      tb=document.getElementById("s5-toolbar"),
+      am=document.getElementById("s5-ambient"),
+      gh=document.getElementById("s5-ghost"),
+      br=document.getElementById("s5-bottom-rule");
+  var cards=[c1,c2,c3,c4], edges=[e1,e2,e3,e4,e5], edgeTimes=[2.0,2.5,3.0,3.5,4.0];
+  var edgeLengths=[];
+  for(var i=0;i<edges.length;i++)edgeLengths.push(edges[i].getTotalLength());
+  gsap.set(gh,{xPercent:-50,yPercent:-50});
+  gsap.set(cards,{opacity:0});gsap.set(lb,{opacity:0});gsap.set(tb,{opacity:0});
+  gsap.set(lo,{opacity:0});gsap.set(oa,{opacity:0});gsap.set(dm,{scale:0,opacity:0});
+  gsap.set(rg,{opacity:0});gsap.set(ct,{opacity:0});gsap.set(dp,{opacity:0});gsap.set(br,{scaleX:0});
+  for(var j=0;j<edges.length;j++)gsap.set(edges[j],{strokeDasharray:edgeLengths[j],strokeDashoffset:edgeLengths[j]});
+  tl.to(am,{opacity:.15,duration:3,ease:"sine.inOut",yoyo:true,repeat:10},0);
+  tl.to(gh,{x:"-=20",duration:8,ease:"sine.inOut",yoyo:true,repeat:10},0);
+  tl.to(lb,{opacity:1,y:-2,duration:.5,ease:"power2.out"},.3);
+  tl.to(lo,{opacity:1,x:2,duration:.5,ease:"power2.out"},.5);
+  tl.to(lo,{scale:1.06,duration:2,ease:"sine.inOut",yoyo:true,repeat:2},.7);
+  tl.to(oa,{opacity:1,x:-2,duration:.5,ease:"power2.out"},.5);
+  tl.to(br,{scaleX:1,duration:.6,ease:"power2.out"},.5);
+  tl.to(tb,{opacity:1,duration:.4,ease:"power2.out"},.6);
+  tl.fromTo(c1,{x:-80,opacity:0},{x:0,opacity:1,duration:.5,ease:"power2.out"},.8);
+  tl.fromTo(c2,{x:80,opacity:0},{x:0,opacity:1,duration:.5,ease:"power2.out"},1.0);
+  tl.fromTo(c3,{y:60,opacity:0},{y:0,opacity:1,duration:.5,ease:"power2.out"},1.2);
+  tl.fromTo(c4,{y:60,opacity:0},{y:0,opacity:1,duration:.5,ease:"power2.out"},1.4);
+  tl.to(e1,{strokeDashoffset:0,duration:.6,ease:"power2.inOut"},edgeTimes[0]);
+  tl.to(e2,{strokeDashoffset:0,duration:.6,ease:"power2.inOut"},edgeTimes[1]);
+  tl.to(e3,{strokeDashoffset:0,duration:.6,ease:"power2.inOut"},edgeTimes[2]);
+  tl.to(e4,{strokeDashoffset:0,duration:.6,ease:"power2.inOut"},edgeTimes[3]);
+  tl.to(e5,{strokeDashoffset:0,duration:.6,ease:"power2.inOut"},edgeTimes[4]);
+  tl.to(dm,{scale:1,opacity:1,duration:.4,ease:"back.out(2)"},4.0);
+  tl.to(c4,{borderColor:"#888",duration:.3,ease:"power2.out",yoyo:true,repeat:1},4.5);
+  var circ=2*Math.PI*50,target=circ*0.22;
+  gsap.set(rf,{strokeDasharray:circ,strokeDashoffset:circ});
+  tl.set(rg,{opacity:1,scale:.5},5.0);
+  tl.to(rg,{scale:1,opacity:1,duration:.5,ease:"back.out(2)"},5.0);
+  tl.to(rf,{strokeDashoffset:target,duration:1.5,ease:"power2.out"},5.2);
+  var proxy={value:0};
+  tl.set(ct,{opacity:1},5.0);
+  tl.to(proxy,{value:78,duration:1.5,ease:"power2.out",onUpdate:function(){ct.textContent=Math.floor(proxy.value)+"%"}},5.2);
+  tl.to(dp,{opacity:1,x:5,duration:.5,ease:"power2.out"},6.0);
+  tl.to(cards,{scale:1.02,duration:1.5,ease:"sine.inOut",yoyo:true,repeat:5},7.0);
+})();
+</script>
+</template>

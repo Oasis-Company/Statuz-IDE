@@ -1,0 +1,330 @@
+<template>
+  <div data-hf-id="hf-ypvb" data-composition-id="scene3" data-start="0" data-duration="7" data-width="1920" data-height="1080" class="clip" style="
+      width:1920px; height:1080px; position:relative; overflow:hidden;
+      background:#0A0A0A; font-family:'Inter',system-ui,-apple-system,sans-serif;
+    ">
+    <!-- ===== LIGHTING LAYER 1: Ambient Glow ===== -->
+    <div data-hf-id="hf-bme8" style="
+        position:absolute; top:0; left:0; width:100%; height:100%; z-index:1;
+        background:radial-gradient(ellipse at 50% 40%, rgba(0,127,212,0.12) 0%, transparent 60%);
+        pointer-events:none;
+      " id="s3-ambient-glow"></div>
+
+    <!-- ===== LIGHTING LAYER 2: Rim Light ===== -->
+    <div data-hf-id="hf-tjha" style="
+        position:absolute; top:0; left:0; width:100%; height:100%; z-index:1;
+        background:radial-gradient(ellipse at 50% 0%, rgba(255,255,255,0.04) 0%, transparent 50%);
+        pointer-events:none;
+      "></div>
+
+    <!-- ===== LIGHTING LAYER 3: Vignette ===== -->
+    <div data-hf-id="hf-d0rv" style="
+        position:absolute; top:0; left:0; width:100%; height:100%; z-index:1;
+        background:radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.4) 100%);
+        pointer-events:none;
+      "></div>
+
+    <!-- ===== GRID PATTERN ===== -->
+    <div data-hf-id="hf-gsrd" style="
+        position:absolute; top:0; left:0; width:100%; height:100%; z-index:1;
+        background-image: radial-gradient(circle, rgba(255,255,255,0.04) 1px, transparent 1px);
+        background-size: 16px 16px;
+        pointer-events:none; opacity:0.35;
+      " id="s3-grid"></div>
+
+    <!-- ===== GHOST TEXT ===== -->
+    <div data-hf-id="hf-cv2f" id="s3-ghost" style="
+        position:absolute; top:50%; left:50%;
+        font-family:'Inter',system-ui,-apple-system,sans-serif; font-weight:900;
+        font-size:280px; color:#FFFFFF; opacity:0.03; z-index:1;
+        letter-spacing:12px; pointer-events:none; white-space:nowrap;
+      ">STATUZ</div>
+
+    <!-- ===== PARTICLES ===== -->
+    <div data-hf-id="hf-nk7d" id="s3-particles" style="position:absolute;top:0;left:0;width:100%;height:100%;z-index:2;pointer-events:none;"></div>
+
+    <!-- ===== SVG EDGES ===== -->
+    <svg data-hf-id="hf-fl2x" id="s3-edges" width="1920" height="1080" style="position:absolute;top:0;left:0;z-index:3;pointer-events:none;">
+      <defs data-hf-id="hf-mh0t">
+        <filter data-hf-id="hf-aj2f" id="s3-edgeGlow" x="-50%" y="-50%" width="200%" height="200%">
+          <fegaussianblur data-hf-id="hf-uvae" in="SourceGraphic" stdDeviation="3" result="blur1" />
+          <fegaussianblur data-hf-id="hf-m7mq" in="SourceGraphic" stdDeviation="6" result="blur2" />
+          <femerge data-hf-id="hf-zn2o">
+            <femergenode data-hf-id="hf-wheu" in="blur2" />
+            <femergenode data-hf-id="hf-sjat" in="blur1" />
+            <femergenode data-hf-id="hf-cmaw" in="SourceGraphic" />
+          </femerge>
+        </filter>
+      </defs>
+      <!-- Edge 0: cdn-layer -> api-gateway (GLOW) -->
+      <line data-hf-id="hf-opc9" x1="535" y1="350" x2="735" y2="400" stroke="#007FD4" stroke-width="2" filter="url(#s3-edgeGlow)" stroke-dasharray="1000" stroke-dashoffset="1000" class="s3-edge" />
+      <!-- Edge 1: api-gateway -> auth-service (REGULAR) -->
+      <line data-hf-id="hf-d2lg" x1="735" y1="400" x2="985" y2="330" stroke="#333333" stroke-width="1.5" stroke-dasharray="1000" stroke-dashoffset="1000" class="s3-edge" />
+      <!-- Edge 2: api-gateway -> orchestrator (GLOW) -->
+      <line data-hf-id="hf-1qu6" x1="735" y1="400" x2="1185" y2="450" stroke="#007FD4" stroke-width="2" filter="url(#s3-edgeGlow)" stroke-dasharray="1000" stroke-dashoffset="1000" class="s3-edge" />
+      <!-- Edge 3: api-gateway -> rate-limiter (REGULAR) -->
+      <line data-hf-id="hf-cz4t" x1="735" y1="400" x2="685" y2="530" stroke="#333333" stroke-width="1.5" stroke-dasharray="1000" stroke-dashoffset="1000" class="s3-edge" />
+      <!-- Edge 4: auth-service -> db-primary (REGULAR) -->
+      <line data-hf-id="hf-71ir" x1="985" y1="330" x2="1235" y2="630" stroke="#333333" stroke-width="1.5" stroke-dasharray="1000" stroke-dashoffset="1000" class="s3-edge" />
+      <!-- Edge 5: orchestrator -> payment-service (GLOW) -->
+      <line data-hf-id="hf-hapy" x1="1185" y1="450" x2="885" y2="570" stroke="#007FD4" stroke-width="2" filter="url(#s3-edgeGlow)" stroke-dasharray="1000" stroke-dashoffset="1000" class="s3-edge" />
+      <!-- Edge 6: orchestrator -> cache-layer (REGULAR) -->
+      <line data-hf-id="hf-jbyc" x1="1185" y1="450" x2="1085" y2="650" stroke="#333333" stroke-width="1.5" stroke-dasharray="1000" stroke-dashoffset="1000" class="s3-edge" />
+      <!-- Edge 7: payment-service -> db-primary (GLOW) -->
+      <line data-hf-id="hf-11fu" x1="885" y1="570" x2="1235" y2="630" stroke="#007FD4" stroke-width="2" filter="url(#s3-edgeGlow)" stroke-dasharray="1000" stroke-dashoffset="1000" class="s3-edge" />
+      <!-- Edge 8: cache-layer -> db-replica (REGULAR) -->
+      <line data-hf-id="hf-r1br" x1="1085" y1="650" x2="1385" y2="550" stroke="#333333" stroke-width="1.5" stroke-dasharray="1000" stroke-dashoffset="1000" class="s3-edge" />
+      <!-- Edge 9: rate-limiter -> payment-service (REGULAR) -->
+      <line data-hf-id="hf-kpu7" x1="685" y1="530" x2="885" y2="570" stroke="#333333" stroke-width="1.5" stroke-dasharray="1000" stroke-dashoffset="1000" class="s3-edge" />
+      <!-- Edge 10: db-primary -> db-replica (GLOW) -->
+      <line data-hf-id="hf-yzy4" x1="1235" y1="630" x2="1385" y2="550" stroke="#007FD4" stroke-width="2" filter="url(#s3-edgeGlow)" stroke-dasharray="1000" stroke-dashoffset="1000" class="s3-edge" />
+      <!-- Edge 11: cdn-layer -> orchestrator (REGULAR) -->
+      <line data-hf-id="hf-nek2" x1="535" y1="350" x2="1185" y2="450" stroke="#333333" stroke-width="1.5" stroke-dasharray="1000" stroke-dashoffset="1000" class="s3-edge" />
+      <!-- Edge 12: auth-service -> payment-service (REGULAR) -->
+      <line data-hf-id="hf-stus" x1="985" y1="330" x2="885" y2="570" stroke="#333333" stroke-width="1.5" stroke-dasharray="1000" stroke-dashoffset="1000" class="s3-edge" />
+      <!-- Edge 13: orchestrator -> db-primary (GLOW) -->
+      <line data-hf-id="hf-1eg3" x1="1185" y1="450" x2="1235" y2="630" stroke="#007FD4" stroke-width="2" filter="url(#s3-edgeGlow)" stroke-dasharray="1000" stroke-dashoffset="1000" class="s3-edge" />
+      <!-- Edge 14: api-gateway -> message-queue (REGULAR) -->
+      <line data-hf-id="hf-6br3" x1="735" y1="400" x2="935" y2="750" stroke="#333333" stroke-width="1.5" stroke-dasharray="1000" stroke-dashoffset="1000" class="s3-edge" />
+      <!-- Edge 15: payment-service -> message-queue (GLOW) -->
+      <line data-hf-id="hf-kmgr" x1="885" y1="570" x2="935" y2="750" stroke="#007FD4" stroke-width="2" filter="url(#s3-edgeGlow)" stroke-dasharray="1000" stroke-dashoffset="1000" class="s3-edge" />
+    </svg>
+
+    <!-- ===== NODES ===== -->
+    <div data-hf-id="hf-08hp" id="s3-nodes" style="position:absolute;top:0;left:0;width:100%;height:100%;z-index:4;pointer-events:none;">
+      <!-- cdn-layer (535, 350) -->
+      <div data-hf-id="hf-gxj7" class="s3-node-group" style="position:absolute;left:523px;top:338px;width:24px;height:24px;">
+        <div data-hf-id="hf-d925" class="s3-node-glow" style="position:absolute;top:-12px;left:-12px;width:48px;height:48px;border-radius:50%;border:3px solid rgba(0,127,212,0.3);"></div>
+        <div data-hf-id="hf-b2lc" class="s3-node-circle" style="width:24px;height:24px;border-radius:50%;background:#007FD4;"></div>
+        <div data-hf-id="hf-ehan" class="s3-node-label" style="position:absolute;left:16px;top:-6px;font-family:monospace;font-size:14px;color:#FFFFFF;background:#242424;padding:5px 8px;border-radius:4px;white-space:nowrap;line-height:1;">cdn-layer</div>
+      </div>
+      <!-- api-gateway (735, 400) -->
+      <div data-hf-id="hf-9u14" class="s3-node-group" style="position:absolute;left:723px;top:388px;width:24px;height:24px;">
+        <div data-hf-id="hf-094h" class="s3-node-glow" style="position:absolute;top:-12px;left:-12px;width:48px;height:48px;border-radius:50%;border:3px solid rgba(0,127,212,0.3);"></div>
+        <div data-hf-id="hf-c9ug" class="s3-node-circle" style="width:24px;height:24px;border-radius:50%;background:#007FD4;"></div>
+        <div data-hf-id="hf-4cz3" class="s3-node-label" style="position:absolute;left:16px;top:-6px;font-family:monospace;font-size:14px;color:#FFFFFF;background:#242424;padding:5px 8px;border-radius:4px;white-space:nowrap;line-height:1;">api-gateway</div>
+      </div>
+      <!-- auth-service (985, 330) -->
+      <div data-hf-id="hf-lo9a" class="s3-node-group" style="position:absolute;left:973px;top:318px;width:24px;height:24px;">
+        <div data-hf-id="hf-1g1k" class="s3-node-glow" style="position:absolute;top:-12px;left:-12px;width:48px;height:48px;border-radius:50%;border:3px solid rgba(0,127,212,0.3);"></div>
+        <div data-hf-id="hf-b2xd" class="s3-node-circle" style="width:24px;height:24px;border-radius:50%;background:#007FD4;"></div>
+        <div data-hf-id="hf-4vyw" class="s3-node-label" style="position:absolute;left:16px;top:-6px;font-family:monospace;font-size:14px;color:#FFFFFF;background:#242424;padding:5px 8px;border-radius:4px;white-space:nowrap;line-height:1;">auth-service</div>
+      </div>
+      <!-- orchestrator (1185, 450) -->
+      <div data-hf-id="hf-0w56" class="s3-node-group" style="position:absolute;left:1173px;top:438px;width:24px;height:24px;">
+        <div data-hf-id="hf-11qj" class="s3-node-glow" style="position:absolute;top:-12px;left:-12px;width:48px;height:48px;border-radius:50%;border:3px solid rgba(0,127,212,0.3);"></div>
+        <div data-hf-id="hf-bh8e" class="s3-node-circle" style="width:24px;height:24px;border-radius:50%;background:#007FD4;"></div>
+        <div data-hf-id="hf-7j94" class="s3-node-label" style="position:absolute;left:16px;top:-6px;font-family:monospace;font-size:14px;color:#FFFFFF;background:#242424;padding:5px 8px;border-radius:4px;white-space:nowrap;line-height:1;">orchestrator</div>
+      </div>
+      <!-- payment-service (885, 570) -->
+      <div data-hf-id="hf-tgy5" class="s3-node-group" style="position:absolute;left:873px;top:558px;width:24px;height:24px;">
+        <div data-hf-id="hf-z27e" class="s3-node-glow" style="position:absolute;top:-12px;left:-12px;width:48px;height:48px;border-radius:50%;border:3px solid rgba(0,127,212,0.3);"></div>
+        <div data-hf-id="hf-aabb" class="s3-node-circle" style="width:24px;height:24px;border-radius:50%;background:#007FD4;"></div>
+        <div data-hf-id="hf-exfc" class="s3-node-label" style="position:absolute;left:16px;top:-6px;font-family:monospace;font-size:14px;color:#FFFFFF;background:#242424;padding:5px 8px;border-radius:4px;white-space:nowrap;line-height:1;">payment-service</div>
+      </div>
+      <!-- cache-layer (1085, 650) -->
+      <div data-hf-id="hf-mxz1" class="s3-node-group" style="position:absolute;left:1073px;top:638px;width:24px;height:24px;">
+        <div data-hf-id="hf-ynwd" class="s3-node-glow" style="position:absolute;top:-12px;left:-12px;width:48px;height:48px;border-radius:50%;border:3px solid rgba(0,127,212,0.3);"></div>
+        <div data-hf-id="hf-aomc" class="s3-node-circle" style="width:24px;height:24px;border-radius:50%;background:#007FD4;"></div>
+        <div data-hf-id="hf-672u" class="s3-node-label" style="position:absolute;left:16px;top:-6px;font-family:monospace;font-size:14px;color:#FFFFFF;background:#242424;padding:5px 8px;border-radius:4px;white-space:nowrap;line-height:1;">cache-layer</div>
+      </div>
+      <!-- rate-limiter (685, 530) -->
+      <div data-hf-id="hf-jdir" class="s3-node-group" style="position:absolute;left:673px;top:518px;width:24px;height:24px;">
+        <div data-hf-id="hf-zutg" class="s3-node-glow" style="position:absolute;top:-12px;left:-12px;width:48px;height:48px;border-radius:50%;border:3px solid rgba(0,127,212,0.3);"></div>
+        <div data-hf-id="hf-9hp9" class="s3-node-circle" style="width:24px;height:24px;border-radius:50%;background:#007FD4;"></div>
+        <div data-hf-id="hf-a14r" class="s3-node-label" style="position:absolute;left:16px;top:-6px;font-family:monospace;font-size:14px;color:#FFFFFF;background:#242424;padding:5px 8px;border-radius:4px;white-space:nowrap;line-height:1;">rate-limiter</div>
+      </div>
+      <!-- db-primary (1235, 630) -->
+      <div data-hf-id="hf-t392" class="s3-node-group" style="position:absolute;left:1223px;top:618px;width:24px;height:24px;">
+        <div data-hf-id="hf-zgif" class="s3-node-glow" style="position:absolute;top:-12px;left:-12px;width:48px;height:48px;border-radius:50%;border:3px solid rgba(0,127,212,0.3);"></div>
+        <div data-hf-id="hf-9w0a" class="s3-node-circle" style="width:24px;height:24px;border-radius:50%;background:#007FD4;"></div>
+        <div data-hf-id="hf-z1m1" class="s3-node-label" style="position:absolute;left:16px;top:-6px;font-family:monospace;font-size:14px;color:#FFFFFF;background:#242424;padding:5px 8px;border-radius:4px;white-space:nowrap;line-height:1;">db-primary</div>
+      </div>
+      <!-- db-replica (1385, 550) -->
+      <div data-hf-id="hf-ogdx" class="s3-node-group" style="position:absolute;left:1373px;top:538px;width:24px;height:24px;">
+        <div data-hf-id="hf-3tvq" class="s3-node-glow" style="position:absolute;top:-12px;left:-12px;width:48px;height:48px;border-radius:50%;border:3px solid rgba(0,127,212,0.3);"></div>
+        <div data-hf-id="hf-f1zn" class="s3-node-circle" style="width:24px;height:24px;border-radius:50%;background:#007FD4;"></div>
+        <div data-hf-id="hf-lx2v" class="s3-node-label" style="position:absolute;left:16px;top:-6px;font-family:monospace;font-size:14px;color:#FFFFFF;background:#242424;padding:5px 8px;border-radius:4px;white-space:nowrap;line-height:1;">db-replica</div>
+      </div>
+      <!-- message-queue (935, 750) -->
+      <div data-hf-id="hf-vxpv" class="s3-node-group" style="position:absolute;left:923px;top:738px;width:24px;height:24px;">
+        <div data-hf-id="hf-3fkp" class="s3-node-glow" style="position:absolute;top:-12px;left:-12px;width:48px;height:48px;border-radius:50%;border:3px solid rgba(0,127,212,0.3);"></div>
+        <div data-hf-id="hf-fgao" class="s3-node-circle" style="width:24px;height:24px;border-radius:50%;background:#007FD4;"></div>
+        <div data-hf-id="hf-0289" class="s3-node-label" style="position:absolute;left:16px;top:-6px;font-family:monospace;font-size:14px;color:#FFFFFF;background:#242424;padding:5px 8px;border-radius:4px;white-space:nowrap;line-height:1;">message-queue</div>
+      </div>
+    </div>
+
+    <!-- ===== DATA FLOW PARTICLES ===== -->
+    <div data-hf-id="hf-vs2x" id="s3-data-particles" style="position:absolute;top:0;left:0;width:100%;height:100%;z-index:5;pointer-events:none;">
+      <div data-hf-id="hf-bhav" class="s3-data-particle" style="position:absolute;width:6px;height:6px;border-radius:50%;background:#007FD4;box-shadow:0 0 8px #007FD4;left:735px;top:400px;"></div>
+      <div data-hf-id="hf-fx5t" class="s3-data-particle" style="position:absolute;width:6px;height:6px;border-radius:50%;background:#007FD4;box-shadow:0 0 8px #007FD4;left:535px;top:350px;"></div>
+      <div data-hf-id="hf-lq1t" class="s3-data-particle" style="position:absolute;width:6px;height:6px;border-radius:50%;background:#007FD4;box-shadow:0 0 8px #007FD4;left:885px;top:570px;"></div>
+    </div>
+
+    <!-- ===== TITLE ===== -->
+    <div data-hf-id="hf-a6gm" id="s3-title" style="
+        position:absolute; top:140px; left:80px; z-index:6;
+        font-family:'Inter',system-ui,-apple-system,sans-serif; font-weight:800;
+        font-size:88px; color:#FFFFFF; letter-spacing:-1px;
+        opacity:0; transform:translateY(20px);
+      ">Statuz IDE</div>
+
+    <!-- ===== FORMULA ===== -->
+    <div data-hf-id="hf-mapy" id="s3-formula" style="
+        position:absolute; top:240px; left:80px; z-index:6;
+        font-family:'Inter',system-ui,-apple-system,sans-serif; font-weight:400;
+        font-size:32px; color:#A0A0A0; letter-spacing:0px;
+        opacity:0; transform:translateY(20px);
+      ">
+      <span data-hf-id="hf-k4f9">= VS Code + </span>
+      <span data-hf-id="hf-2owa" id="s3-formula-highlight">Rust Graph Engine</span>
+    </div>
+
+    <!-- ===== OASIS COMPANY BRANDING ===== -->
+    <div data-hf-id="hf-65iu" id="s3-oasis" style="
+        position:absolute; bottom:32px; left:28px; z-index:10;
+        font-family:'Inter',system-ui,-apple-system,sans-serif; font-weight:500;
+        font-size:13px; color:#999999; letter-spacing:4px; text-transform:uppercase;
+        opacity:0;
+      ">Built by Oasis Company</div>
+
+    <!-- ===== STATUZ LOGO ===== -->
+    <div data-hf-id="hf-69i4" id="s3-logo" style="
+        position:absolute; bottom:28px; right:28px; z-index:10;
+        width:36px; height:36px; color:#FFFFFF; opacity:0;
+      ">
+      <svg data-hf-id="hf-7lm8" viewBox="0 0 256 256" width="36" height="36" fill="none" style="display:block;">
+        <line data-hf-id="hf-ta5v" x1="40" y1="184" x2="144" y2="168" stroke="currentColor" stroke-width="16" stroke-linecap="round" />
+        <line data-hf-id="hf-uzkn" x1="144" y1="168" x2="112" y2="72" stroke="currentColor" stroke-width="16" stroke-linecap="round" />
+        <line data-hf-id="hf-o14n" x1="112" y1="72" x2="216" y2="56" stroke="currentColor" stroke-width="16" stroke-linecap="round" />
+        <circle data-hf-id="hf-x91m" cx="128" cy="120" r="20" fill="currentColor" />
+      </svg>
+    </div>
+
+    <!-- ===== BOTTOM RULE ===== -->
+    <div data-hf-id="hf-6zyh" id="s3-rule" style="
+        position:absolute; bottom:24px; left:40px; right:40px; height:1px; z-index:9;
+        background:#333333; transform-origin:center; opacity:0;
+      "></div>
+  </div>
+
+
+<script>
+  window.__timelines = window.__timelines || {};
+
+  (function() {
+    var tl = gsap.timeline({ paused: true });
+    var MAX = 7;
+
+    // ===== PARTICLES (20 deterministic) =====
+    var particleData = [
+      { x: 120, y: 200 }, { x: 340, y: 150 }, { x: 560, y: 300 },
+      { x: 780, y: 100 }, { x: 1000, y: 250 }, { x: 1220, y: 180 },
+      { x: 1440, y: 320 }, { x: 1660, y: 120 }, { x: 1800, y: 280 },
+      { x: 200, y: 400 }, { x: 420, y: 350 }, { x: 640, y: 500 },
+      { x: 860, y: 420 }, { x: 1080, y: 550 }, { x: 1300, y: 380 },
+      { x: 1520, y: 480 }, { x: 1740, y: 350 }, { x: 300, y: 600 },
+      { x: 700, y: 650 }, { x: 1500, y: 600 }
+    ];
+    var pContainer = document.getElementById('s3-particles');
+    var pEls = [];
+    particleData.forEach(function(p, i) {
+      var el = document.createElement('div');
+      el.style.cssText = 'position:absolute;width:3px;height:3px;border-radius:50%;background:rgba(255,255,255,0.035);left:' + p.x + 'px;top:' + p.y + 'px;';
+      pContainer.appendChild(el);
+      pEls.push(el);
+    });
+
+    // ===== NODES (10) =====
+    var nodeGroups = document.querySelectorAll('#s3-nodes .s3-node-group');
+    var nodeCircles = document.querySelectorAll('#s3-nodes .s3-node-circle');
+    var nodeGlows = document.querySelectorAll('#s3-nodes .s3-node-glow');
+
+    // ===== EDGES (16) =====
+    var edgeEls = document.querySelectorAll('#s3-edges .s3-edge');
+
+    // ===== DATA FLOW PARTICLES =====
+    var dataParticles = document.querySelectorAll('#s3-data-particles .s3-data-particle');
+
+    // ===== INITIAL SETUP =====
+    gsap.set('#s3-ghost', { opacity: 0.03, xPercent: -50, yPercent: -50 });
+    gsap.set('#s3-grid', { opacity: 0.35 });
+    gsap.set('#s3-ambient-glow', { opacity: 1 });
+    gsap.set('#s3-title', { opacity: 0, y: 20 });
+    gsap.set('#s3-formula', { opacity: 0, y: 20 });
+    gsap.set('#s3-logo', { opacity: 0 });
+    gsap.set('#s3-oasis', { opacity: 0 });
+    gsap.set('#s3-rule', { scaleX: 0, opacity: 0 });
+    gsap.set(dataParticles, { opacity: 0 });
+
+    // ===== PARTICLES FLOATING =====
+    particleData.forEach(function(p, i) {
+      var driftY = -(20 + (i % 3) * 10);
+      var driftX = ((i % 5) - 2) * 8;
+      tl.to(pEls[i], { y: driftY, x: driftX, opacity: 0.6, duration: 4 + (i % 3), ease: 'sine.inOut' }, 0);
+      tl.to(pEls[i], { y: 0, x: 0, opacity: 0.035, duration: 4 + (i % 3), ease: 'sine.inOut' }, 4 + (i % 3));
+    });
+
+    // ===== GHOST TEXT DRIFT =====
+    tl.to('#s3-ghost', { x: '-=30', duration: 7, ease: 'sine.inOut' }, 0);
+
+    // ===== AMBIENT GLOW BREATHING =====
+    tl.to('#s3-ambient-glow', { opacity: 0.85, duration: 2.5, ease: 'sine.inOut', yoyo: true, repeat: 1 }, 0);
+    tl.to('#s3-ambient-glow', { opacity: 1, duration: 2.5, ease: 'sine.inOut', yoyo: true, repeat: 1 }, 5);
+
+    // ===== GRID PULSE =====
+    tl.to('#s3-grid', { opacity: 0.45, duration: 3, ease: 'sine.inOut', yoyo: true, repeat: 1 }, 0);
+
+    // ===== EDGES DRAW SEQUENTIALLY (0.15s stagger) =====
+    edgeEls.forEach(function(edge, i) {
+      tl.to(edge, { strokeDashoffset: 0, duration: 0.45, ease: 'power2.out' }, i * 0.15);
+    });
+
+    // ===== NODES PULSE WAVE =====
+    nodeGroups.forEach(function(ng, i) {
+      tl.to(ng, { scale: 1.12, duration: 0.4, ease: 'sine.inOut', yoyo: true, repeat: 1 }, 0.8 + i * 0.08);
+    });
+
+    // ===== TITLE CLIP-PATH REVEAL at 1.0s =====
+    tl.to('#s3-title', { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out' }, 1.0);
+
+    // ===== FORMULA SLIDES UP at 2.0s =====
+    tl.to('#s3-formula', { opacity: 1, y: 0, duration: 0.5, ease: 'power3.out' }, 2.0);
+
+    // ===== RUST GRAPH ENGINE HIGHLIGHT at 2.5s =====
+    tl.to('#s3-formula-highlight', { color: '#007FD4', duration: 0.3, ease: 'power2.out' }, 2.5);
+
+    // ===== DATA FLOW PARTICLES at 3.0s =====
+    // Particle 1: api-gateway(735,400) -> orchestrator(1185,450) -> payment-service(885,570)
+    gsap.set(dataParticles[0], { opacity: 1, x: 0, y: 0 });
+    tl.to(dataParticles[0], { x: 450, y: 50, duration: 1.0, ease: 'none' }, 3.0);
+    tl.to(dataParticles[0], { x: 150, y: 170, duration: 1.0, ease: 'none' }, 4.0);
+    tl.to(dataParticles[0], { opacity: 0, duration: 0.2 }, 5.0);
+
+    // Particle 2: cdn-layer(535,350) -> api-gateway(735,400) -> orchestrator(1185,450)
+    gsap.set(dataParticles[1], { opacity: 1, x: 0, y: 0 });
+    tl.to(dataParticles[1], { x: 200, y: 50, duration: 1.0, ease: 'none' }, 3.2);
+    tl.to(dataParticles[1], { x: 650, y: 100, duration: 1.0, ease: 'none' }, 4.2);
+    tl.to(dataParticles[1], { opacity: 0, duration: 0.2 }, 5.2);
+
+    // Particle 3: payment-service(885,570) -> db-primary(1235,630) -> db-replica(1385,550)
+    gsap.set(dataParticles[2], { opacity: 1, x: 0, y: 0 });
+    tl.to(dataParticles[2], { x: 350, y: 60, duration: 1.0, ease: 'none' }, 3.4);
+    tl.to(dataParticles[2], { x: 500, y: -20, duration: 1.0, ease: 'none' }, 4.4);
+    tl.to(dataParticles[2], { opacity: 0, duration: 0.2 }, 5.4);
+
+    // ===== LOGO FADES IN at 3.5s + BREATHING =====
+    tl.to('#s3-logo', { opacity: 1, duration: 0.4, ease: 'power2.out' }, 3.5);
+    tl.to('#s3-logo', { scale: 1.06, duration: 1.0, ease: 'sine.inOut', yoyo: true, repeat: 2 }, 3.9);
+
+    // ===== OASIS COMPANY FADES IN at 4.0s =====
+    tl.to('#s3-oasis', { opacity: 1, duration: 0.4, ease: 'power2.out' }, 4.0);
+
+    // ===== BOTTOM RULE at 3.0s =====
+    tl.to('#s3-rule', { scaleX: 1, opacity: 1, duration: 0.5, ease: 'power2.out' }, 3.0);
+
+    // ===== REGISTER =====
+    window.__timelines["scene3"] = tl;
+  })();
+</script>
+</template>

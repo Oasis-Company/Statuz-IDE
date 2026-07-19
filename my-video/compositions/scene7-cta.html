@@ -1,0 +1,230 @@
+<template>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  #scene7 {
+    position: relative;
+    width: 1920px;
+    height: 1080px;
+    overflow: hidden;
+    background: #0A0A0A;
+    font-family: "Inter", system-ui, -apple-system, sans-serif;
+  }
+  /* 3-layer lighting */
+  .ambient-glow {
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at center, #007FD4 0%, transparent 50%);
+    opacity: 0;
+    pointer-events: none;
+  }
+  .rim-light {
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 50% 0%, rgba(255,255,255,0.04) 0%, transparent 50%);
+    pointer-events: none;
+  }
+  .vignette {
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.4) 100%);
+    pointer-events: none;
+  }
+  /* Logo centered */
+  .statuz-logo-centered {
+    position: absolute;
+    left: 50%;
+    top: 100px;
+    width: 100px;
+    height: 100px;
+    color: #FFFFFF;
+    transform: translateX(-50%) scale(0.8);
+    opacity: 0;
+    pointer-events: none;
+  }
+  .statuz-logo-centered svg {
+    width: 100px;
+    height: 100px;
+  }
+  /* Headline */
+  .title-main {
+    position: absolute;
+    left: 0; top: 240px;
+    width: 1920px;
+    text-align: center;
+    font-size: 64px;
+    font-weight: 800;
+    color: #FFFFFF;
+    opacity: 0;
+    font-family: "Inter", system-ui, -apple-system, sans-serif;
+  }
+  .title-sub {
+    position: absolute;
+    left: 0; top: 320px;
+    width: 1920px;
+    text-align: center;
+    font-size: 24px;
+    font-weight: 400;
+    color: #A0A0A0;
+    opacity: 0;
+    font-family: "Inter", system-ui, -apple-system, sans-serif;
+  }
+  /* CTA Buttons */
+  .cta-button {
+    position: absolute;
+    left: 50%;
+    width: 240px;
+    height: 50px;
+    transform: translateX(-50%);
+    border: 2px solid #333333;
+    border-radius: 4px;
+    background: transparent;
+    color: #FFFFFF;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: "Inter", system-ui, -apple-system, sans-serif;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .cta-button:hover {
+    border-color: #007FD4;
+    background: rgba(0,127,212,0.1);
+  }
+  .cta-download { top: 560px; }
+  .cta-github { top: 630px; }
+  .cta-docs { top: 700px; }
+  /* Oasis bottom */
+  .oasis-bottom {
+    position: absolute;
+    left: 0; top: 800px;
+    width: 1920px;
+    text-align: center;
+    font-size: 16px;
+    color: #999999;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: 500;
+    opacity: 0;
+    font-family: "Inter", system-ui, -apple-system, sans-serif;
+  }
+  .copyright {
+    position: absolute;
+    left: 0; top: 830px;
+    width: 1920px;
+    text-align: center;
+    font-size: 14px;
+    color: #666666;
+    opacity: 0;
+    font-family: "Inter", system-ui, -apple-system, sans-serif;
+  }
+  /* Grid background */
+  .grid-bg {
+    position: absolute; top: 0; left: 0;
+    width: 1920px; height: 1080px;
+    pointer-events: none;
+  }
+</style>
+<div data-hf-id="hf-gbjt" id="scene7" data-composition-id="scene7" data-width="1920" data-height="1080">
+  <!-- 3-layer lighting -->
+  <div data-hf-id="hf-0gr9" class="ambient-glow" id="s7-ambient"></div>
+  <div data-hf-id="hf-euqb" class="rim-light"></div>
+  <div data-hf-id="hf-q7bi" class="vignette"></div>
+
+  <!-- Grid background -->
+  <svg data-hf-id="hf-g047" class="grid-bg">
+    <defs data-hf-id="hf-mh0t">
+      <pattern data-hf-id="hf-h071" id="grid7" width="60" height="60" patternUnits="userSpaceOnUse">
+        <path data-hf-id="hf-gjgv" d="M 60 0 L 0 0 0 60" fill="none" stroke="#FFFFFF" stroke-width="0.5" opacity="0.03" />
+      </pattern>
+    </defs>
+    <rect data-hf-id="hf-lzkg" width="1920" height="1080" fill="url(#grid7)" />
+  </svg>
+
+  <!-- Statuz logo CENTERED -->
+  <div data-hf-id="hf-ij1n" class="statuz-logo-centered" id="s7-logo-centered">
+    <svg data-hf-id="hf-2z8p" viewBox="0 0 256 256">
+      <line data-hf-id="hf-ta5v" x1="40" y1="184" x2="144" y2="168" stroke="currentColor" stroke-width="16" stroke-linecap="round" />
+      <line data-hf-id="hf-uzkn" x1="144" y1="168" x2="112" y2="72" stroke="currentColor" stroke-width="16" stroke-linecap="round" />
+      <line data-hf-id="hf-o14n" x1="112" y1="72" x2="216" y2="56" stroke="currentColor" stroke-width="16" stroke-linecap="round" />
+      <circle data-hf-id="hf-x91m" cx="128" cy="120" r="20" fill="currentColor" />
+    </svg>
+  </div>
+
+  <!-- Title -->
+  <div data-hf-id="hf-2k2s" class="title-main" id="s7-title-main">Statuz IDE</div>
+  <div data-hf-id="hf-b7th" class="title-sub" id="s7-title-sub">Topology-Aware Development Environment</div>
+
+  <!-- CTA Buttons -->
+  <div data-hf-id="hf-1a2s" class="cta-button cta-download" id="s7-btn-download">Download for Windows</div>
+  <div data-hf-id="hf-xkz1" class="cta-button cta-github" id="s7-btn-github">View on GitHub</div>
+  <div data-hf-id="hf-fgq6" class="cta-button cta-docs" id="s7-btn-docs">Read the Docs</div>
+
+  <!-- Oasis + Copyright -->
+  <div data-hf-id="hf-nar5" class="oasis-bottom" id="s7-oasis">OASIS COMPANY</div>
+  <div data-hf-id="hf-smkg" class="copyright" id="s7-copyright">© 2025-2026 Oasis Company</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script>
+(function() {
+  var tl = gsap.timeline({ paused: true });
+  window.__timelines = window.__timelines || {};
+  window.__timelines["scene7"] = tl;
+
+  var ambient = document.getElementById("s7-ambient");
+  var logo = document.getElementById("s7-logo-centered");
+  var titleMain = document.getElementById("s7-title-main");
+  var titleSub = document.getElementById("s7-title-sub");
+  var btnDownload = document.getElementById("s7-btn-download");
+  var btnGithub = document.getElementById("s7-btn-github");
+  var btnDocs = document.getElementById("s7-btn-docs");
+  var oasis = document.getElementById("s7-oasis");
+  var copyright = document.getElementById("s7-copyright");
+
+  // Initial states
+  gsap.set(ambient, { opacity: 0 });
+  gsap.set(logo, { opacity: 0, scale: 0.8 });
+  gsap.set(titleMain, { opacity: 0 });
+  gsap.set(titleSub, { opacity: 0 });
+  gsap.set(btnDownload, { opacity: 0, x: -80 });
+  gsap.set(btnGithub, { opacity: 0 });
+  gsap.set(btnDocs, { opacity: 0, x: 80 });
+  gsap.set(oasis, { opacity: 0 });
+  gsap.set(copyright, { opacity: 0 });
+
+  // Background glow dims (opacity 0 -> 0.3, 5s, power2.in)
+  tl.to(ambient, { opacity: 0.3, duration: 5, ease: "power2.in" }, 0);
+
+  // Logo appears at 0.5s (scale 0.8 -> 1, expo.out, 0.7s)
+  tl.to(logo, { opacity: 1, scale: 1, duration: 0.7, ease: "expo.out" }, 0.5);
+
+  // Logo breathing: scale 1.03, 2s, sine.inOut, yoyo, repeat 1
+  tl.to(logo, { scale: 1.03, duration: 2, ease: "sine.inOut", yoyo: true, repeat: 1 }, 1.2);
+
+  // "Statuz IDE" at 1.5s
+  tl.to(titleMain, { opacity: 1, duration: 0.5, ease: "power2.out" }, 1.5);
+
+  // "Topology-Aware..." at 2.5s
+  tl.to(titleSub, { opacity: 1, duration: 0.5, ease: "power2.out" }, 2.5);
+
+  // "Download for Windows" slides from left at 3.0s
+  tl.to(btnDownload, { opacity: 1, x: 0, duration: 0.5, ease: "power2.out" }, 3.0);
+
+  // "View on GitHub" fades in at 3.5s
+  tl.to(btnGithub, { opacity: 1, duration: 0.5, ease: "power2.out" }, 3.5);
+
+  // "Read the Docs" slides from right at 4.0s
+  tl.to(btnDocs, { opacity: 1, x: 0, duration: 0.5, ease: "power2.out" }, 4.0);
+
+  // OASIS COMPANY at 4.5s
+  tl.to(oasis, { opacity: 1, duration: 0.4, ease: "power2.out" }, 4.5);
+
+  // Copyright at 4.5s
+  tl.to(copyright, { opacity: 1, duration: 0.4, ease: "power2.out" }, 4.5);
+
+  // Final fade to black: all elements, 1.5s, power2.in, starting at 5.5s
+  var allElements = [ambient, logo, titleMain, titleSub, btnDownload, btnGithub, btnDocs, oasis, copyright];
+  tl.to(allElements, { opacity: 0, duration: 1.5, ease: "power2.in" }, 5.5);
+})();
+</script>
+</template>

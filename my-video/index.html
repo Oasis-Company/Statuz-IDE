@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1920, height=1080">
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { margin: 0; width: 1920px; height: 1080px; overflow: hidden; background: #0A0A0A; }
+      body { font-family: "Inter", sans-serif; }
+      code, pre, .monospace { font-family: "JetBrains Mono", monospace; }
+
+      /* --- Design System Tokens --- */
+      :root {
+        --bg-primary: #0A0A0A;
+        --bg-secondary: #1A1A1A;
+        --bg-tertiary: #242424;
+        --fg-primary: #FFFFFF;
+        --fg-secondary: #A0A0A0;
+        --fg-tertiary: #666666;
+        --accent: #007FD4;
+        --accent-glow: rgba(0, 127, 212, 0.15);
+        --border: #333333;
+        --border-light: #2A2A2A;
+        --success: #10B981;
+        --warning: #F59E0B;
+        --error: #EF4444;
+        --vision: #8B5CF6;
+        --user: #3B82F6;
+        --problem: #F59E0B;
+        --mvp: #10B981;
+      }
+
+      /* --- Caption Bar --- */
+      .caption-bar {
+        position: fixed;
+        bottom: 80px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 1000;
+        pointer-events: none;
+        text-align: center;
+      }
+      .caption-text {
+        display: inline-block;
+        font-family: "Inter", sans-serif;
+        font-weight: 600;
+        font-size: 28px;
+        color: #FFFFFF;
+        background: rgba(0, 0, 0, 0.6);
+        padding: 8px 24px;
+        border-radius: 6px;
+        opacity: 0;
+        white-space: nowrap;
+        max-width: 1600px;
+        overflow: hidden;
+      }
+
+      /* --- Shared Decor Layers --- */
+      .deco-grid {
+        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        pointer-events: none; z-index: 0;
+      }
+      .deco-glow {
+        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        pointer-events: none; z-index: 0;
+      }
+      .deco-ghost {
+        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        pointer-events: none; z-index: 0; overflow: hidden;
+      }
+      .deco-logo {
+        position: absolute; bottom: 32px; right: 40px;
+        pointer-events: none; z-index: 10; opacity: 0;
+      }
+      .deco-rule {
+        position: absolute; bottom: 24px; left: 40px; right: 40px;
+        height: 2px; background: #333333; transform-origin: center;
+        pointer-events: none; z-index: 10; opacity: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ========== MAIN COMPOSITION ========== -->
+    <div data-hf-id="hf-qbnw" id="root" data-composition-id="main" data-start="0" data-duration="60" data-width="1920" data-height="1080">
+      <!-- Scene 1: Hook -->
+      <div data-hf-id="hf-6tjo" id="el-s1" data-composition-id="scene1" data-composition-src="compositions/scene1-hook.html" data-start="0" data-duration="4" data-track-index="1"></div>
+
+      <!-- Scene 2: Problem -->
+      <div data-hf-id="hf-7rq4" id="el-s2" data-composition-id="scene2" data-composition-src="compositions/scene2-problem.html" data-start="4" data-duration="6" data-track-index="2"></div>
+
+      <!-- Scene 3: Solution -->
+      <div data-hf-id="hf-06wa" id="el-s3" data-composition-id="scene3" data-composition-src="compositions/scene3-solution.html" data-start="10" data-duration="7" data-track-index="3"></div>
+
+      <!-- Scene 4: Three Queries -->
+      <div data-hf-id="hf-bww9" id="el-s4" data-composition-id="scene4" data-composition-src="compositions/scene4-queries.html" data-start="17" data-duration="13" data-track-index="4"></div>
+
+      <!-- Scene 5: Sandboxer Board -->
+      <div data-hf-id="hf-tzsl" id="el-s5" data-composition-id="scene5" data-composition-src="compositions/scene5-board.html" data-start="30" data-duration="12" data-track-index="5"></div>
+
+      <!-- Scene 6: Agent Management -->
+      <div data-hf-id="hf-9tb6" id="el-s6" data-composition-id="scene6" data-composition-src="compositions/scene6-ai.html" data-start="42" data-duration="11" data-track-index="6"></div>
+
+      <!-- Scene 7: CTA -->
+      <div data-hf-id="hf-az3q" id="el-s7" data-composition-id="scene7" data-composition-src="compositions/scene7-cta.html" data-start="53" data-duration="7" data-track-index="7"></div>
+
+      <!-- ========== CAPTION BAR ========== -->
+      <div data-hf-id="hf-wtmm" class="caption-bar">
+        <div data-hf-id="hf-lab6" class="caption-text" id="caption-text">The text era is over.</div>
+      </div>
+    </div>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+
+      // ========== CAPTION SYSTEM ==========
+      const captionData = [
+        { t: 0.5,  text: "The text era is over." },
+        { t: 2.0,  text: "The topology era has begun." },
+        { t: 4.5,  text: "VS Code lets you edit code." },
+        { t: 6.5,  text: "But it hides what your code really means." },
+        { t: 10.5, text: "Statuz IDE." },
+        { t: 12.0, text: "VS Code + Rust Graph Engine." },
+        { t: 14.0, text: "Code is a graph." },
+        { t: 17.5, text: "Traverse — what does this connect to?" },
+        { t: 22.0, text: "Impact — if this changes, who is affected?" },
+        { t: 26.5, text: "Path — how do I get from A to B?" },
+        { t: 30.5, text: "Sandboxer Board — SVG strategy canvas." },
+        { t: 36.0, text: "4 card types, 5 edge types, real-time scoring." },
+        { t: 42.5, text: "Agent Management — Visual structured editing." },
+        { t: 47.0, text: "Browse, install, and orchestrate agents visually." },
+        { t: 53.5, text: "Statuz IDE — Topology-Aware Development." },
+        { t: 57.0, text: "The topology era has begun." }
+      ];
+
+      const captionEl = document.getElementById("caption-text");
+      const captionFade = 0.3;
+
+      captionData.forEach((c, i) => {
+        // Set text content at the exact time using callback
+        tl.call(function(text) { captionEl.textContent = text; }, [c.text], c.t);
+        // fade in
+        tl.to(captionEl, { opacity: 1, duration: captionFade, ease: "power2.out" }, c.t);
+        // fade out - stay visible for ~2s, then fade out before next
+        const nextT = i < captionData.length - 1 ? captionData[i + 1].t - captionFade : 60;
+        const showDuration = Math.min(nextT - c.t, 2.5);
+        if (showDuration > 0.5) {
+          tl.to(captionEl, { opacity: 0, duration: captionFade, ease: "power2.in" }, c.t + showDuration);
+        }
+      });
+
+      window.__timelines["main"] = tl;
+    </script>
+  </body>
+</html>

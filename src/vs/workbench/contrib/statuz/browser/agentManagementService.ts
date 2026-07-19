@@ -9,11 +9,9 @@ import { IEccCatalogService } from './ecc/eccCatalogService.js';
 import { IEccInstallService } from './ecc/eccInstallService.js';
 import { IAgentDefinitionStorage } from './agentdef/agentDefinitionStorage.js';
 import {
-	AgentDefinition,
 	AgentDefinitionWithState,
 	AgentDefinitionFilter,
 	AgentRuntimeState,
-	DEFAULT_FILTER,
 } from './agentdef/agentDefinitionTypes.js';
 import { extractEccComponentId } from './agentdef/eccAdapter.js';
 import { IStorageService, StorageScope, StorageTarget } from '../../../../platform/storage/common/storage.js';

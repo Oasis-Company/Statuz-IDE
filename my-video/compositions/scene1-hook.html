@@ -1,0 +1,304 @@
+<template>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  #root {
+    position: relative;
+    width: 1920px;
+    height: 1080px;
+    overflow: hidden;
+    background: #0A0A0A;
+    font-family: "Inter", system-ui, -apple-system, sans-serif;
+  }
+
+  /* ---- 3-layer lighting ---- */
+  .lighting-ambient {
+    position: absolute; top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: radial-gradient(ellipse at center, #007FD4 0%, transparent 60%);
+    opacity: 0.08;
+    pointer-events: none;
+  }
+  .lighting-rim {
+    position: absolute; top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: radial-gradient(ellipse at 50% 0%, rgba(255,255,255,0.04) 0%, transparent 50%);
+    pointer-events: none;
+  }
+  .lighting-vignette {
+    position: absolute; top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.4) 100%);
+    pointer-events: none;
+  }
+
+  /* ---- Ghost text ---- */
+  .ghost-text {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: "Inter", system-ui, -apple-system, sans-serif;
+    font-weight: 900;
+    font-size: 360px;
+    color: #FFFFFF;
+    opacity: 0.03;
+    pointer-events: none;
+    white-space: nowrap;
+  }
+
+  /* ---- Dot grid ---- */
+  .dot-grid-svg {
+    position: absolute; top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+  }
+
+  /* ---- Particles ---- */
+  .particle {
+    position: absolute;
+    border-radius: 50%;
+    background: #FFFFFF;
+    pointer-events: none;
+  }
+
+  /* ---- Line 1 - type-on ---- */
+  .line1-text {
+    position: absolute;
+    left: 50%;
+    top: 460px;
+    transform: translateX(-50%);
+    font-family: "Inter", system-ui, -apple-system, sans-serif;
+    font-weight: 800;
+    font-size: 72px;
+    color: #FFFFFF;
+    text-align: center;
+    white-space: nowrap;
+  }
+  .line1-char {
+    display: inline-block;
+  }
+
+  /* ---- Line 2 - slam-in ---- */
+  .line2-container {
+    position: absolute;
+    left: 50%;
+    top: 546px;
+    transform: translateX(-50%);
+    font-family: "Inter", system-ui, -apple-system, sans-serif;
+    font-weight: 800;
+    font-size: 72px;
+    color: #FFFFFF;
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  /* ---- Highlight for "topology" - via text color change ---- */
+  #topologyWord {
+    display: inline-block;
+    border-radius: 4px;
+  }
+
+  /* ---- Bottom rule ---- */
+  .bottom-rule {
+    position: absolute;
+    bottom: 60px;
+    left: 50%;
+    width: 200px;
+    height: 1px;
+    background: #333333;
+    margin-left: -100px;
+  }
+
+  /* ---- Statuz logo ---- */
+  .statuz-logo {
+    position: absolute;
+    bottom: 28px;
+    right: 28px;
+    width: 36px;
+    height: 36px;
+    color: #FFFFFF;
+  }
+
+  /* ---- Oasis Company ---- */
+  .oasis-company {
+    position: absolute;
+    bottom: 32px;
+    left: 28px;
+    font-family: "Inter", system-ui, -apple-system, sans-serif;
+    font-weight: 500;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    color: #999999;
+  }
+</style>
+
+<div data-hf-id="hf-5m5k" id="root" data-composition-id="scene1" data-width="1920" data-height="1080">
+  <!-- 3-layer lighting -->
+  <div data-hf-id="hf-7ij8" class="lighting-ambient" id="ambientGlow"></div>
+  <div data-hf-id="hf-dhp7" class="lighting-rim"></div>
+  <div data-hf-id="hf-onxr" class="lighting-vignette"></div>
+
+  <!-- Dot grid -->
+  <svg data-hf-id="hf-ubhu" class="dot-grid-svg" width="1920" height="1080">
+    <defs data-hf-id="hf-mh0t">
+      <pattern data-hf-id="hf-eeof" id="dotGrid" width="16" height="16" patternUnits="userSpaceOnUse">
+        <circle data-hf-id="hf-set5" cx="1" cy="1" r="1" fill="#FFFFFF" opacity="0.03" />
+      </pattern>
+    </defs>
+    <rect data-hf-id="hf-4gdq" width="1920" height="1080" fill="url(#dotGrid)" />
+  </svg>
+
+  <!-- Ghost text -->
+  <div data-hf-id="hf-7yxy" class="ghost-text" id="ghostText">STATUZ</div>
+
+  <!-- Particles container -->
+  <div data-hf-id="hf-41r3" id="particlesContainer"></div>
+
+  <!-- Line 1: type-on -->
+  <div data-hf-id="hf-hsjb" class="line1-text" id="line1Text"></div>
+
+  <!-- Line 2: slam-in -->
+  <div data-hf-id="hf-93bt" class="line2-container" id="line2Container">
+    <span data-hf-id="hf-sxk0">The </span><span data-hf-id="hf-xxhk" id="topologyWord">topology</span><span data-hf-id="hf-0mki"> era has begun.</span>
+  </div>
+
+  <!-- Bottom rule -->
+  <div data-hf-id="hf-5e8h" class="bottom-rule" id="bottomRule"></div>
+
+  <!-- Statuz logo -->
+  <div data-hf-id="hf-hfrl" class="statuz-logo" id="statuzLogo">
+    <svg data-hf-id="hf-jdga" viewBox="0 0 256 256" width="36" height="36">
+      <line data-hf-id="hf-ta5v" x1="40" y1="184" x2="144" y2="168" stroke="currentColor" stroke-width="16" stroke-linecap="round" />
+      <line data-hf-id="hf-uzkn" x1="144" y1="168" x2="112" y2="72" stroke="currentColor" stroke-width="16" stroke-linecap="round" />
+      <line data-hf-id="hf-o14n" x1="112" y1="72" x2="216" y2="56" stroke="currentColor" stroke-width="16" stroke-linecap="round" />
+      <circle data-hf-id="hf-x91m" cx="128" cy="120" r="20" fill="currentColor" />
+    </svg>
+  </div>
+
+  <!-- Oasis Company -->
+  <div data-hf-id="hf-02xb" class="oasis-company" id="oasisCompany">OASIS COMPANY</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script>
+(function() {
+  var tl = gsap.timeline({ paused: true });
+
+  /* ---- Create line 1 characters ---- */
+  var line1Text = "The text era is over.";
+  var line1Container = document.getElementById('line1Text');
+  var chars = [];
+  for (var i = 0; i < line1Text.length; i++) {
+    var span = document.createElement('span');
+    span.className = 'line1-char';
+    span.textContent = line1Text.charAt(i) === ' ' ? '\u00A0' : line1Text.charAt(i);
+    line1Container.appendChild(span);
+    chars.push(span);
+  }
+
+  /* ---- Create particles (deterministic) ---- */
+  var particlesData = [
+    { x: 200, y: 800, size: 2 },
+    { x: 450, y: 700, size: 3 },
+    { x: 700, y: 900, size: 2 },
+    { x: 950, y: 600, size: 4 },
+    { x: 1200, y: 850, size: 2 },
+    { x: 1450, y: 750, size: 3 },
+    { x: 1700, y: 800, size: 2 },
+    { x: 300, y: 500, size: 3 },
+    { x: 600, y: 400, size: 2 },
+    { x: 900, y: 300, size: 4 },
+    { x: 1100, y: 500, size: 2 },
+    { x: 1400, y: 400, size: 3 },
+    { x: 1600, y: 600, size: 2 },
+    { x: 500, y: 200, size: 3 },
+    { x: 1300, y: 200, size: 2 }
+  ];
+
+  var particlesContainer = document.getElementById('particlesContainer');
+  var particleEls = [];
+  for (var p = 0; p < particlesData.length; p++) {
+    var pd = particlesData[p];
+    var el = document.createElement('div');
+    el.className = 'particle';
+    el.style.width = pd.size + 'px';
+    el.style.height = pd.size + 'px';
+    el.style.left = pd.x + 'px';
+    el.style.top = pd.y + 'px';
+    el.style.opacity = 0.08 + (pd.size - 2) * 0.04;
+    particlesContainer.appendChild(el);
+    particleEls.push({ el: el, idx: p });
+  }
+
+  /* ---- Set initial states ---- */
+  gsap.set(chars, { autoAlpha: 0, y: 10 });
+  gsap.set('#line2Container', { autoAlpha: 0, y: 40 });
+  gsap.set('#bottomRule', { scaleX: 0, transformOrigin: 'center center' });
+  gsap.set('#statuzLogo', { autoAlpha: 0, scale: 1 });
+  gsap.set('#oasisCompany', { autoAlpha: 0 });
+
+  /* ---- Timeline animations ---- */
+  // Line 1 type-on (0s)
+  tl.to(chars, { autoAlpha: 1, y: 0, duration: 0.2, stagger: 0.035, ease: 'power2.out' }, 0);
+
+  // Oasis Company (1.0s)
+  tl.to('#oasisCompany', { autoAlpha: 1, duration: 0.3, ease: 'power2.out' }, 1.0);
+
+  // Line 2 slam-in from below (2.0s)
+  tl.to('#line2Container', { autoAlpha: 1, y: 0, duration: 0.5, ease: 'power3.out' }, 2.0);
+
+  // "topology" highlight - text color change + glow (2.8s)
+  tl.to('#topologyWord', { color: '#007FD4', textShadow: '0 0 20px rgba(0,127,212,0.4)', duration: 0.4, ease: 'power2.out' }, 2.8);
+
+  // Bottom rule draws from center (3.2s)
+  tl.fromTo('#bottomRule', { scaleX: 0 }, { scaleX: 1, duration: 0.5, ease: 'power2.out', transformOrigin: 'center center' }, 3.2);
+
+  // Statuz logo fades in (1.5s)
+  tl.to('#statuzLogo', { autoAlpha: 1, duration: 0.3, ease: 'power2.out' }, 1.5);
+
+  // Ghost text drift left
+  tl.to('#ghostText', { x: -30, duration: 4, ease: 'none' }, 0);
+
+  /* ---- Ambient glow breathing (looping, outside timeline) ---- */
+  gsap.to('#ambientGlow', {
+    opacity: 0.12,
+    duration: 2,
+    ease: 'sine.inOut',
+    yoyo: true,
+    repeat: 10
+  });
+
+  /* ---- Particle float animations (deterministic drift) ---- */
+  for (var q = 0; q < particleEls.length; q++) {
+    var pe = particleEls[q];
+    var driftY = -(20 + (pe.idx % 3) * 10);
+    var driftDuration = 4 + (pe.idx % 3);
+    var delayVal = pe.idx * 0.15;
+    gsap.to(pe.el, {
+      y: driftY,
+      duration: driftDuration,
+      ease: 'none',
+      repeat: 10,
+      delay: delayVal
+    });
+  }
+
+  /* ---- Logo breathing (looping, delayed) ---- */
+  gsap.to('#statuzLogo', {
+    scale: 1.06,
+    duration: 2,
+    ease: 'sine.inOut',
+    yoyo: true,
+    repeat: 10,
+    delay: 3.5
+  });
+
+  /* ---- Register timeline ---- */
+  window.__timelines = window.__timelines || {};
+  window.__timelines["scene1"] = tl;
+})();
+</script>
+</template>

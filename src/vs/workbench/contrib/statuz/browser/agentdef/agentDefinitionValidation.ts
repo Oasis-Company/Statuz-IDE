@@ -13,12 +13,6 @@ export interface ValidationResult<T> {
 	errors: string[];
 }
 
-// ─── Schema Interface ──────────────────────────────────────────
-
-interface FieldValidator<T> {
-	validate(value: unknown, path: string, errors: string[]): T | undefined;
-}
-
 // ─── Helpers ───────────────────────────────────────────────────
 
 function isString(value: unknown): value is string {
@@ -53,22 +47,12 @@ function requiredString(value: unknown, path: string, errors: string[], minLen =
 	return value;
 }
 
-function optionalString(value: unknown, path: string, errors: string[], maxLen = 4096): string | undefined {
-	if (value === undefined || value === null) { return undefined; }
-	return requiredString(value, path, errors, 0, maxLen);
-}
-
 function requiredNumber(value: unknown, path: string, errors: string[]): number | undefined {
 	if (!isNumber(value)) {
 		errors.push(`${path}: expected number, got ${typeof value}`);
 		return undefined;
 	}
 	return value;
-}
-
-function optionalNumber(value: unknown, path: string, errors: string[]): number | undefined {
-	if (value === undefined || value === null) { return undefined; }
-	return requiredNumber(value, path, errors);
 }
 
 // ─── Source Validators ─────────────────────────────────────────
@@ -166,6 +150,7 @@ export function validateAgentDefinition(data: unknown): ValidationResult<AgentDe
 	// All required fields are guaranteed non-undefined because errors.length === 0
 	return {
 		success: true,
+		errors: [],
 		data: {
 			id: id!,
 			name: name!,
@@ -220,6 +205,7 @@ export function validateAgentDefinitionIndex(data: unknown): ValidationResult<Ag
 
 	return {
 		success: true,
+		errors: [],
 		data: {
 			version: 1,
 			entries,

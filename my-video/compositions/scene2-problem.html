@@ -1,0 +1,423 @@
+<template>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  #root {
+    position: relative;
+    width: 1920px;
+    height: 1080px;
+    overflow: hidden;
+    background: #0A0A0A;
+    font-family: "Inter", system-ui, -apple-system, sans-serif;
+  }
+
+  /* ---- 3-layer lighting ---- */
+  .lighting-ambient {
+    position: absolute; top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: radial-gradient(ellipse at center, #007FD4 0%, transparent 60%);
+    opacity: 0.08;
+    pointer-events: none;
+  }
+  .lighting-rim {
+    position: absolute; top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: radial-gradient(ellipse at 50% 0%, rgba(255,255,255,0.04) 0%, transparent 50%);
+    pointer-events: none;
+  }
+  .lighting-vignette {
+    position: absolute; top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.4) 100%);
+    pointer-events: none;
+  }
+
+  /* ---- File tree (left panel) ---- */
+  .file-tree {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 220px;
+    height: 1080px;
+    background: #1A1A1A;
+    padding: 16px 0;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 13px;
+    color: #CCCCCC;
+    overflow: hidden;
+  }
+  .tree-header {
+    padding: 4px 16px 12px 16px;
+    font-family: "Inter", system-ui, -apple-system, sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #888888;
+  }
+  .tree-item {
+    padding: 3px 16px;
+    white-space: nowrap;
+    cursor: default;
+  }
+  .tree-item.folder { color: #D4D4D4; }
+  .tree-item.file { color: #9CDCFE; }
+  .tree-item.indent { padding-left: 36px; }
+  .tree-item.indent2 { padding-left: 56px; }
+  .folder-icon {
+    display: inline-block;
+    width: 14px;
+    color: #C8A06E;
+    font-size: 11px;
+  }
+  .file-icon {
+    display: inline-block;
+    width: 14px;
+    color: #888888;
+    font-size: 11px;
+  }
+  .tree-item:hover {
+    background: rgba(255,255,255,0.04);
+  }
+
+  /* ---- Code editor (right panel) ---- */
+  .code-editor {
+    position: absolute;
+    top: 0;
+    left: 220px;
+    width: 1700px;
+    height: 1080px;
+    background: #0D0D0D;
+    overflow: hidden;
+  }
+  .code-header {
+    display: flex;
+    align-items: center;
+    height: 36px;
+    padding: 0 16px;
+    background: #0D0D0D;
+    border-bottom: 1px solid #1E1E1E;
+  }
+  .code-tab {
+    display: inline-flex;
+    align-items: center;
+    height: 36px;
+    padding: 0 16px;
+    font-family: "Inter", system-ui, -apple-system, sans-serif;
+    font-size: 13px;
+    color: #CCCCCC;
+    background: #1E1E1E;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    border-bottom: 1px solid #0D0D0D;
+    margin-bottom: -1px;
+  }
+  .code-tab .tab-icon {
+    width: 12px;
+    height: 12px;
+    margin-right: 8px;
+    background: #569CD6;
+    border-radius: 2px;
+  }
+  .code-body {
+    padding: 12px 0;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #D4D4D4;
+  }
+  .code-line {
+    display: flex;
+    padding: 0 20px;
+    white-space: pre;
+  }
+  .line-number {
+    display: inline-block;
+    width: 40px;
+    text-align: right;
+    padding-right: 16px;
+    color: #858585;
+    user-select: none;
+    flex-shrink: 0;
+  }
+  .code-content {
+    flex: 1;
+  }
+
+  /* ---- Syntax highlighting ---- */
+  .kw  { color: #569CD6; }  /* keywords: import, from, function, const, return */
+  .fn  { color: #DCDCAA; }  /* functions */
+  .str { color: #CE9178; }  /* strings */
+  .vl  { color: #9CDCFE; }  /* variables */
+  .nm  { color: #B5CEA8; }  /* numbers */
+  .cm  { color: #6A9955; }  /* comments */
+  .br  { color: #D4D4D4; }  /* brackets */
+  .op  { color: #D4D4D4; }  /* operators */
+
+  /* ---- Red dashed lines SVG overlay ---- */
+  .red-lines-svg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1920px;
+    height: 1080px;
+    pointer-events: none;
+    overflow: visible;
+  }
+  .red-line {
+    stroke: #EF4444;
+    stroke-width: 2px;
+    stroke-dasharray: 8 6;
+    fill: none;
+    opacity: 0.8;
+  }
+
+  /* ---- Headline ---- */
+  .headline {
+    position: absolute;
+    top: 480px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: "Inter", system-ui, -apple-system, sans-serif;
+    font-weight: 400;
+    font-size: 36px;
+    color: #FFFFFF;
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  /* ---- Subheadline ---- */
+  .subheadline {
+    position: absolute;
+    top: 530px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: "Inter", system-ui, -apple-system, sans-serif;
+    font-weight: 300;
+    font-size: 24px;
+    color: #A0A0A0;
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  /* ---- Statuz logo ---- */
+  .statuz-logo {
+    position: absolute;
+    bottom: 28px;
+    right: 28px;
+    width: 36px;
+    height: 36px;
+    color: #FFFFFF;
+  }
+
+  /* ---- Oasis Company ---- */
+  .oasis-company {
+    position: absolute;
+    bottom: 32px;
+    left: 28px;
+    font-family: "Inter", system-ui, -apple-system, sans-serif;
+    font-weight: 500;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    color: #999999;
+  }
+
+  /* ---- Bottom rule ---- */
+  .bottom-rule {
+    position: absolute;
+    bottom: 60px;
+    left: 50%;
+    width: 200px;
+    height: 1px;
+    background: #333333;
+    margin-left: -100px;
+  }
+</style>
+
+<div data-hf-id="hf-wq2t" id="root" data-composition-id="scene2" data-width="1920" data-height="1080">
+  <!-- 3-layer lighting -->
+  <div data-hf-id="hf-7ij8" class="lighting-ambient" id="ambientGlow"></div>
+  <div data-hf-id="hf-dhp7" class="lighting-rim"></div>
+  <div data-hf-id="hf-onxr" class="lighting-vignette"></div>
+
+  <!-- File tree (left panel) -->
+  <div data-hf-id="hf-v6ib" class="file-tree" id="fileTree">
+    <div data-hf-id="hf-c4vp" class="tree-header">EXPLORER</div>
+    <div data-hf-id="hf-6d2i" class="tree-item folder"><span data-hf-id="hf-sekz" class="folder-icon">▼</span> src</div>
+    <div data-hf-id="hf-vkbm" class="tree-item folder indent"><span data-hf-id="hf-gr3n" class="folder-icon">▼</span> components</div>
+    <div data-hf-id="hf-ex1n" class="tree-item file indent2"><span data-hf-id="hf-uavx" class="file-icon">■</span> Button.tsx</div>
+    <div data-hf-id="hf-e7ne" class="tree-item file indent2"><span data-hf-id="hf-7kq9" class="file-icon">■</span> Header.tsx</div>
+    <div data-hf-id="hf-d83n" class="tree-item folder indent"><span data-hf-id="hf-gcsm" class="folder-icon">▼</span> utils</div>
+    <div data-hf-id="hf-wzmt" class="tree-item file indent2"><span data-hf-id="hf-8rnc" class="file-icon">■</span> api.ts</div>
+    <div data-hf-id="hf-tfwj" class="tree-item file indent2"><span data-hf-id="hf-8dcb" class="file-icon">■</span> auth.ts</div>
+    <div data-hf-id="hf-isx6" class="tree-item file indent"><span data-hf-id="hf-6dt6" class="file-icon">■</span> App.tsx</div>
+    <div data-hf-id="hf-2ko5" class="tree-item file indent"><span data-hf-id="hf-5zi5" class="file-icon">■</span> index.tsx</div>
+    <div data-hf-id="hf-gccu" class="tree-item file"><span data-hf-id="hf-76f8" class="file-icon">■</span> package.json</div>
+    <div data-hf-id="hf-aazf" class="tree-item file"><span data-hf-id="hf-6s47" class="file-icon">■</span> tsconfig.json</div>
+  </div>
+
+  <!-- Code editor (right panel) -->
+  <div data-hf-id="hf-ab39" class="code-editor" id="codeEditor">
+    <div data-hf-id="hf-eojj" class="code-header">
+      <div data-hf-id="hf-mtjp" class="code-tab">
+        <span data-hf-id="hf-pags" class="tab-icon"></span>
+        App.tsx
+      </div>
+    </div>
+    <div data-hf-id="hf-sb75" class="code-body" id="codeBody">
+      <div data-hf-id="hf-pnna" class="code-line"><span data-hf-id="hf-9j4e" class="line-number">1</span><span data-hf-id="hf-qynn" class="code-content"><span data-hf-id="hf-iusy" class="kw">import</span> { <span data-hf-id="hf-i6o9" class="fn">useState</span> } <span data-hf-id="hf-n65j" class="kw">from</span> <span data-hf-id="hf-m9h3" class="str">'react'</span>;</span></div>
+      <div data-hf-id="hf-2esa" class="code-line"><span data-hf-id="hf-9xff" class="line-number">2</span><span data-hf-id="hf-nej7" class="code-content"><span data-hf-id="hf-8852" class="kw">import</span> { <span data-hf-id="hf-egmg" class="fn">apiClient</span> } <span data-hf-id="hf-pguf" class="kw">from</span> <span data-hf-id="hf-c1ur" class="str">'./utils/api'</span>;</span></div>
+      <div data-hf-id="hf-2t3b" class="code-line"><span data-hf-id="hf-abqg" class="line-number">3</span><span data-hf-id="hf-n086" class="code-content"><span data-hf-id="hf-8mg3" class="kw">import</span> { <span data-hf-id="hf-gkdu" class="fn">authService</span> } <span data-hf-id="hf-p2je" class="kw">from</span> <span data-hf-id="hf-14wd" class="str">'./utils/auth'</span>;</span></div>
+      <div data-hf-id="hf-37ec" class="code-line"><span data-hf-id="hf-7jl9" class="line-number">4</span><span data-hf-id="hf-mlx5" class="code-content"><span data-hf-id="hf-90r4" class="kw">import</span> { <span data-hf-id="hf-2woh" class="fn">Button</span> } <span data-hf-id="hf-oo8d" class="kw">from</span> <span data-hf-id="hf-o7xu" class="str">'./components/Button'</span>;</span></div>
+      <div data-hf-id="hf-3lpd" class="code-line"><span data-hf-id="hf-7xwa" class="line-number">5</span><span data-hf-id="hf-7neq" class="code-content"></span></div>
+      <div data-hf-id="hf-400e" class="code-line"><span data-hf-id="hf-8c7b" class="line-number">6</span><span data-hf-id="hf-9akc" class="code-content"><span data-hf-id="hf-271n" class="kw">function</span> <span data-hf-id="hf-tyuk" class="fn">App</span>() {</span></div>
+      <div data-hf-id="hf-4ebf" class="code-line"><span data-hf-id="hf-8qic" class="line-number">7</span><span data-hf-id="hf-cq39" class="code-content">  <span data-hf-id="hf-qjvq" class="kw">const</span> [<span data-hf-id="hf-s4ha" class="vl">count</span>, <span data-hf-id="hf-qrd8" class="vl">setCount</span>] = <span data-hf-id="hf-yx4t" class="fn">useState</span>(<span data-hf-id="hf-do7e" class="nm">0</span>);</span></div>
+      <div data-hf-id="hf-4smg" class="code-line"><span data-hf-id="hf-cb9l" class="line-number">8</span><span data-hf-id="hf-d4fa" class="code-content"></span></div>
+      <div data-hf-id="hf-56xh" class="code-line"><span data-hf-id="hf-cpkm" class="line-number">9</span><span data-hf-id="hf-q18t" class="code-content">  <span data-hf-id="hf-vy8t" class="fn">useEffect</span>(() =&gt; {</span></div>
+      <div data-hf-id="hf-5l8i" class="code-line"><span data-hf-id="hf-ukyi" class="line-number">10</span><span data-hf-id="hf-ycw4" class="code-content">    <span data-hf-id="hf-878g" class="fn">apiClient</span>.<span data-hf-id="hf-apqj" class="fn">fetchData</span>();</span></div>
+      <div data-hf-id="hf-kx5q" class="code-line"><span data-hf-id="hf-u6nh" class="line-number">11</span><span data-hf-id="hf-86ws" class="code-content">    <span data-hf-id="hf-kzxy" class="fn">authService</span>.<span data-hf-id="hf-0ehe" class="fn">login</span>();</span></div>
+      <div data-hf-id="hf-kiup" class="code-line"><span data-hf-id="hf-vdkk" class="line-number">12</span><span data-hf-id="hf-zgyx" class="code-content">  }, []);</span></div>
+    </div>
+  </div>
+
+  <!-- Red dashed lines SVG overlay -->
+  <svg data-hf-id="hf-6z1h" class="red-lines-svg" id="redLinesSvg" />
+
+  <!-- Headline -->
+  <div data-hf-id="hf-4gso" class="headline" id="headline">VS Code lets you edit code.</div>
+
+  <!-- Subheadline -->
+  <div data-hf-id="hf-x4lq" class="subheadline" id="subheadline">But it hides what your code really means.</div>
+
+  <!-- Statuz logo -->
+  <div data-hf-id="hf-hfrl" class="statuz-logo" id="statuzLogo">
+    <svg data-hf-id="hf-jdga" viewBox="0 0 256 256" width="36" height="36">
+      <line data-hf-id="hf-ta5v" x1="40" y1="184" x2="144" y2="168" stroke="currentColor" stroke-width="16" stroke-linecap="round" />
+      <line data-hf-id="hf-uzkn" x1="144" y1="168" x2="112" y2="72" stroke="currentColor" stroke-width="16" stroke-linecap="round" />
+      <line data-hf-id="hf-o14n" x1="112" y1="72" x2="216" y2="56" stroke="currentColor" stroke-width="16" stroke-linecap="round" />
+      <circle data-hf-id="hf-x91m" cx="128" cy="120" r="20" fill="currentColor" />
+    </svg>
+  </div>
+
+  <!-- Bottom rule -->
+  <div data-hf-id="hf-5e8h" class="bottom-rule" id="bottomRule"></div>
+
+  <!-- Oasis Company -->
+  <div data-hf-id="hf-02xb" class="oasis-company" id="oasisCompany">OASIS COMPANY</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script>
+(function() {
+  var container = document.getElementById('root');
+  var tl = gsap.timeline({ paused: true });
+
+  /* ---- Create red dashed lines (deterministic positions) ---- */
+  var lineData = [
+    { x1: 560, y1: 60, x2: 280, y2: 190 },  // useState import → useState(0)
+    { x1: 600, y1: 85, x2: 280, y2: 240 },  // apiClient import → apiClient.fetchData()
+    { x1: 600, y1: 110, x2: 280, y2: 260 }, // authService import → authService.login()
+    { x1: 640, y1: 135, x2: 280, y2: 310 }  // Button import → &lt;Button
+  ];
+
+  var svg = document.getElementById('redLinesSvg');
+  var lineEls = [];
+  for (var i = 0; i < lineData.length; i++) {
+    var ld = lineData[i];
+    var line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line.setAttribute('x1', ld.x1);
+    line.setAttribute('y1', ld.y1);
+    line.setAttribute('x2', ld.x2);
+    line.setAttribute('y2', ld.y2);
+    line.classList.add('red-line');
+    svg.appendChild(line);
+    lineEls.push(line);
+  }
+
+  /* ---- Set initial states ---- */
+  // File tree starts off-screen left
+  gsap.set('#fileTree', { x: -220 });
+  // Code editor starts off-screen right
+  gsap.set('#codeEditor', { x: 1700 });
+  // Red lines start hidden (dashoffset large)
+  gsap.set(lineEls, { strokeDashoffset: 1000 });
+  // Headline hidden
+  gsap.set('#headline', { autoAlpha: 0 });
+  // Subheadline hidden
+  gsap.set('#subheadline', { autoAlpha: 0 });
+  // Logo hidden
+  gsap.set('#statuzLogo', { autoAlpha: 0, scale: 1 });
+  // Bottom rule hidden
+  gsap.set('#bottomRule', { scaleX: 0, transformOrigin: 'center center' });
+  // Oasis hidden
+  gsap.set('#oasisCompany', { autoAlpha: 0 });
+
+  /* ---- Timeline animations ---- */
+
+  // File tree slides in from left (0.3s)
+  tl.to('#fileTree', { x: 0, duration: 0.4, ease: 'power2.out' }, 0.3);
+
+  // Code editor slides in from right (0.3s)
+  tl.to('#codeEditor', { x: 0, duration: 0.4, ease: 'power2.out' }, 0.3);
+
+  // Statuz logo fades in (0.5s)
+  tl.to('#statuzLogo', { autoAlpha: 1, duration: 0.3, ease: 'power2.out' }, 0.5);
+
+  // Bottom rule draws from center (0.8s)
+  tl.fromTo('#bottomRule', { scaleX: 0 }, { scaleX: 1, duration: 0.5, ease: 'power2.out', transformOrigin: 'center center' }, 0.8);
+
+  // Oasis Company fades in (1.0s)
+  tl.to('#oasisCompany', { autoAlpha: 1, duration: 0.3, ease: 'power2.out' }, 1.0);
+
+  // Red dashed lines draw sequentially (1.2s - 2.4s)
+  tl.to(lineEls, {
+    strokeDashoffset: 0,
+    duration: 0.5,
+    stagger: 0.3,
+    ease: 'power2.out'
+  }, 1.2);
+
+  // Headline fades in (2.5s)
+  tl.to('#headline', { autoAlpha: 1, duration: 0.5, ease: 'power2.out' }, 2.5);
+
+  // Subheadline fades in (4.0s)
+  tl.to('#subheadline', { autoAlpha: 1, duration: 0.5, ease: 'power2.out' }, 4.0);
+
+  // Red lines pulse (4.5s)
+  tl.to(lineEls, {
+    opacity: 0.4,
+    duration: 0.3,
+    ease: 'sine.inOut',
+    yoyo: true,
+    repeat: 1
+  }, 4.5);
+
+  /* ---- Ambient glow breathing (looping, outside timeline) ---- */
+  gsap.to('#ambientGlow', {
+    opacity: 0.12,
+    duration: 2,
+    ease: 'sine.inOut',
+    yoyo: true,
+    repeat: 10
+  });
+
+  /* ---- Logo breathing (looping, delayed) ---- */
+  gsap.to('#statuzLogo', {
+    scale: 1.06,
+    duration: 2,
+    ease: 'sine.inOut',
+    yoyo: true,
+    repeat: 10,
+    delay: 0.5
+  });
+
+  /* ---- Register timeline ---- */
+  window.__timelines = window.__timelines || {};
+  window.__timelines["scene2"] = tl;
+})();
+</script>
+</template>

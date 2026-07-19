@@ -1,0 +1,361 @@
+<template>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+#scene6 {
+  position: relative;
+  width: 1920px;
+  height: 1080px;
+  overflow: hidden;
+  background: #0A0A0A;
+  font-family: "Inter", system-ui, -apple-system, sans-serif;
+}
+.ambient-glow {
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse at center, #007FD4 0%, transparent 60%);
+  opacity: 0.08;
+  pointer-events: none;
+}
+.rim-light {
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 50% 0%, rgba(255,255,255,0.04) 0%, transparent 50%);
+  pointer-events: none;
+}
+.vignette {
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.4) 100%);
+  pointer-events: none;
+}
+.statuz-logo {
+  position: absolute;
+  bottom: 28px; right: 28px;
+  width: 36px; height: 36px;
+  color: #FFFFFF;
+  opacity: 0;
+  pointer-events: none;
+}
+.oasis-text {
+  position: absolute;
+  bottom: 32px; left: 28px;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 4px;
+  color: #999999;
+  font-weight: 500;
+  opacity: 0;
+  font-family: "Inter", system-ui, -apple-system, sans-serif;
+}
+.bottom-rule {
+  position: absolute;
+  bottom: 60px; left: 0;
+  width: 1920px;
+  height: 1px;
+  background: #333333;
+  transform: scaleX(0);
+  transform-origin: center;
+  pointer-events: none;
+}
+</style>
+<div data-hf-id="hf-sy60" id="scene6" data-composition-id="scene6" data-width="1920" data-height="1080" style="position:relative;width:1920px;height:1080px;overflow:hidden;background:#0A0A0A;font-family:'Inter',system-ui,-apple-system,sans-serif;">
+
+  <!-- 3-layer lighting -->
+  <div data-hf-id="hf-krqs" class="ambient-glow" id="s6-ambient"></div>
+  <div data-hf-id="hf-euqb" class="rim-light"></div>
+  <div data-hf-id="hf-q7bi" class="vignette"></div>
+
+  <!-- Ghost text -->
+  <div data-hf-id="hf-tkbp" class="ghost-text" id="s6-ghost" style="position:absolute;top:50%;left:50%;font-size:500px;font-weight:900;color:#007FD4;opacity:0.015;letter-spacing:20px;pointer-events:none;user-select:none;white-space:nowrap;font-family:'Inter',system-ui,-apple-system,sans-serif;">AGENTS</div>
+
+  <!-- Dot grid -->
+  <svg data-hf-id="hf-wkl7" style="position:absolute;top:0;left:0;width:1920px;height:1080px;pointer-events:none;">
+    <defs data-hf-id="hf-mh0t">
+      <pattern data-hf-id="hf-0raz" id="g6-dotgrid" width="60" height="60" patternUnits="userSpaceOnUse">
+        <circle data-hf-id="hf-yguh" cx="30" cy="30" r="1" fill="#FFFFFF" opacity="0.03" />
+      </pattern>
+    </defs>
+    <rect data-hf-id="hf-ifu2" width="1920" height="1080" fill="url(#g6-dotgrid)" />
+  </svg>
+
+  <!-- Main layout: sidebar + canvas -->
+  <div data-hf-id="hf-qeu6" style="display:flex;width:1920px;height:100%;position:relative;">
+
+    <!-- Left Sidebar (40% = 768px) -->
+    <div data-hf-id="hf-tw2b" class="sidebar" id="s6-sidebar" style="width:768px;height:100%;padding:60px 40px 40px;border-right:1px solid rgba(255,255,255,0.05);display:flex;flex-direction:column;gap:22px;flex-shrink:0;">
+
+      <!-- Header: label + subtitle -->
+      <div data-hf-id="hf-ki9f" class="sidebar-header" id="s6-sidebar-header" style="display:flex;flex-direction:column;gap:6px;">
+        <div data-hf-id="hf-dtw9" class="sidebar-label" id="s6-label" style="font-size:14px;color:#999999;letter-spacing:2px;text-transform:uppercase;opacity:0;">AGENT MANAGEMENT</div>
+        <div data-hf-id="hf-laax" class="sidebar-subtitle" id="s6-subtitle" style="font-size:18px;color:#FFFFFF;font-weight:600;opacity:0;">Visual Structured Editing</div>
+      </div>
+
+      <!-- Search bar -->
+      <div data-hf-id="hf-n7ug" class="search-bar" id="s6-search" style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;opacity:0;">
+        <svg data-hf-id="hf-424q" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#666666" stroke-width="2"><circle data-hf-id="hf-4tbh" cx="10" cy="10" r="7" /><line data-hf-id="hf-3e1q" x1="15" y1="15" x2="21" y2="21" /></svg>
+        <span data-hf-id="hf-f9md" style="color:#666666;font-size:13px;">Search agents &amp; skills...</span>
+      </div>
+
+      <!-- Filter section -->
+      <div data-hf-id="hf-i2uu" class="filter-section" id="s6-filter" style="display:flex;flex-direction:column;gap:10px;opacity:0;">
+        <div data-hf-id="hf-jjtz" style="font-size:11px;color:#666666;text-transform:uppercase;letter-spacing:1px;">Type</div>
+        <div data-hf-id="hf-txne" style="display:flex;flex-wrap:wrap;gap:10px;">
+          <label data-hf-id="hf-liep" style="display:flex;align-items:center;gap:6px;font-size:12px;color:#CCCCCC;cursor:pointer;">
+            <input data-hf-id="hf-ol29" type="checkbox" checked style="accent-color:#4fc3f7;"><span data-hf-id="hf-at7l" style="color:#4fc3f7;">Agent</span>
+          </label>
+          <label data-hf-id="hf-uh5x" style="display:flex;align-items:center;gap:6px;font-size:12px;color:#CCCCCC;cursor:pointer;">
+            <input data-hf-id="hf-7mf3" type="checkbox" checked style="accent-color:#81c784;"><span data-hf-id="hf-ibs3" style="color:#81c784;">Skill</span>
+          </label>
+          <label data-hf-id="hf-vo30" style="display:flex;align-items:center;gap:6px;font-size:12px;color:#CCCCCC;cursor:pointer;">
+            <input data-hf-id="hf-xpzx" type="checkbox" checked style="accent-color:#ffb74d;"><span data-hf-id="hf-cxj9" style="color:#ffb74d;">Command</span>
+          </label>
+          <label data-hf-id="hf-v9rz" style="display:flex;align-items:center;gap:6px;font-size:12px;color:#CCCCCC;cursor:pointer;">
+            <input data-hf-id="hf-s4f6" type="checkbox" style="accent-color:#ce93d8;"><span data-hf-id="hf-20q5" style="color:#ce93d8;">Rule</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Card grid (2x2) -->
+      <div data-hf-id="hf-0869" class="card-grid" id="s6-cardgrid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px;opacity:0;">
+        <!-- Card 1: Architect Agent -->
+        <div data-hf-id="hf-96jw" class="card" id="s6-card0" style="background:rgba(255,255,255,0.03);border:1px solid rgba(79,195,247,0.2);border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:4px;">
+          <div data-hf-id="hf-llj6" style="display:flex;align-items:center;gap:6px;">
+            <div data-hf-id="hf-xxsn" style="width:8px;height:8px;border-radius:50%;background:#4fc3f7;"></div>
+            <span data-hf-id="hf-xr95" style="font-size:11px;color:#FFFFFF;font-weight:500;">Architect Agent</span>
+          </div>
+          <span data-hf-id="hf-f0zt" style="font-size:9px;color:#4fc3f7;text-transform:uppercase;letter-spacing:1px;margin-left:14px;">AGENT</span>
+        </div>
+        <!-- Card 2: Code Review Skill -->
+        <div data-hf-id="hf-49wy" class="card" id="s6-card1" style="background:rgba(255,255,255,0.03);border:1px solid rgba(129,199,132,0.2);border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:4px;">
+          <div data-hf-id="hf-09eu" style="display:flex;align-items:center;gap:6px;">
+            <div data-hf-id="hf-ke8t" style="width:8px;height:8px;border-radius:50%;background:#81c784;"></div>
+            <span data-hf-id="hf-d2z5" style="font-size:11px;color:#FFFFFF;font-weight:500;">Code Review Skill</span>
+          </div>
+          <span data-hf-id="hf-adq3" style="font-size:9px;color:#81c784;text-transform:uppercase;letter-spacing:1px;margin-left:14px;">SKILL</span>
+        </div>
+        <!-- Card 3: Deploy Command -->
+        <div data-hf-id="hf-0das" class="card" id="s6-card2" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,183,77,0.2);border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:4px;">
+          <div data-hf-id="hf-0npv" style="display:flex;align-items:center;gap:6px;">
+            <div data-hf-id="hf-u7pb" style="width:8px;height:8px;border-radius:50%;background:#ffb74d;"></div>
+            <span data-hf-id="hf-zdc7" style="font-size:11px;color:#FFFFFF;font-weight:500;">Deploy Command</span>
+          </div>
+          <span data-hf-id="hf-rh80" style="font-size:9px;color:#ffb74d;text-transform:uppercase;letter-spacing:1px;margin-left:14px;">CMD</span>
+        </div>
+        <!-- Card 4: Security Rule -->
+        <div data-hf-id="hf-ax4y" class="card" id="s6-card3" style="background:rgba(255,255,255,0.03);border:1px solid rgba(206,147,216,0.2);border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:4px;">
+          <div data-hf-id="hf-120w" style="display:flex;align-items:center;gap:6px;">
+            <div data-hf-id="hf-7wmc" style="width:8px;height:8px;border-radius:50%;background:#ce93d8;"></div>
+            <span data-hf-id="hf-txz7" style="font-size:11px;color:#FFFFFF;font-weight:500;">Security Rule</span>
+          </div>
+          <span data-hf-id="hf-y5n7" style="font-size:9px;color:#ce93d8;text-transform:uppercase;letter-spacing:1px;margin-left:14px;">RULE</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Canvas (60% = 1152px) -->
+    <div data-hf-id="hf-xlnr" class="canvas" id="s6-canvas" style="width:1152px;height:100%;position:relative;overflow:hidden;">
+
+      <!-- Canvas dot grid -->
+      <svg data-hf-id="hf-o556" style="position:absolute;top:0;left:0;width:1152px;height:1080px;pointer-events:none;">
+        <defs data-hf-id="hf-vl9d">
+          <pattern data-hf-id="hf-66dl" id="g6-cvgrid" width="40" height="40" patternUnits="userSpaceOnUse">
+            <circle data-hf-id="hf-e2eu" cx="20" cy="20" r="0.5" fill="#FFFFFF" opacity="0.02" />
+          </pattern>
+        </defs>
+        <rect data-hf-id="hf-cb07" width="1152" height="1080" fill="url(#g6-cvgrid)" />
+      </svg>
+
+      <!-- Edges SVG -->
+      <svg data-hf-id="hf-d8gi" class="edges-svg" style="position:absolute;top:0;left:0;width:1152px;height:1080px;pointer-events:none;">
+        <line data-hf-id="hf-zapa" class="edge" id="s6-edge-as" x1="220" y1="140" x2="460" y2="140" stroke="#4fc3f7" stroke-width="2.5" stroke-dasharray="240" stroke-dashoffset="240" stroke-linecap="round" opacity="0.8" />
+        <line data-hf-id="hf-dg3r" class="edge" id="s6-edge-ac" x1="170" y1="190" x2="320" y2="330" stroke="#ffb74d" stroke-width="2" stroke-dasharray="8,6" stroke-dashoffset="210" stroke-linecap="round" opacity="0.8" />
+        <line data-hf-id="hf-da3r" class="edge" id="s6-edge-sr" x1="540" y1="190" x2="390" y2="490" stroke="#ce93d8" stroke-width="2" stroke-dasharray="340" stroke-dashoffset="340" stroke-linecap="round" opacity="0.8" />
+        <line data-hf-id="hf-u8u2" class="edge" id="s6-edge-cr" x1="390" y1="390" x2="350" y2="490" stroke="#ce93d8" stroke-width="2" stroke-dasharray="120" stroke-dashoffset="120" stroke-linecap="round" opacity="0.8" />
+      </svg>
+
+      <!-- Agent Node (circle) -->
+      <div data-hf-id="hf-igb1" class="node" id="s6-node-agent" style="position:absolute;left:130px;top:100px;width:80px;height:80px;border-radius:50%;border:2px solid #4fc3f7;background:rgba(79,195,247,0.08);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;box-shadow:0 0 20px rgba(79,195,247,0.1);">
+        <svg data-hf-id="hf-b8zx" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#4fc3f7" stroke-width="2"><circle data-hf-id="hf-jnj3" cx="12" cy="8" r="4" /><path data-hf-id="hf-rrrm" d="M4 20c0-4 4-7 8-7s8 3 8 7" /></svg>
+        <span data-hf-id="hf-eucz" style="font-size:9px;color:#4fc3f7;font-weight:500;text-align:center;">Architect</span>
+      </div>
+      <div data-hf-id="hf-lzdb" class="node-label" id="s6-label-agent" style="position:absolute;left:130px;top:185px;width:80px;text-align:center;font-size:10px;color:#4fc3f7;opacity:0.8;font-weight:500;">Architect Agent</div>
+
+      <!-- Skill Node (rounded rect) -->
+      <div data-hf-id="hf-ncf8" class="node" id="s6-node-skill" style="position:absolute;left:460px;top:110px;width:160px;height:60px;border-radius:10px;border:2px solid #81c784;background:rgba(129,199,132,0.08);display:flex;align-items:center;gap:10px;padding:0 16px;box-shadow:0 0 20px rgba(129,199,132,0.1);">
+        <svg data-hf-id="hf-pp4n" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#81c784" stroke-width="2"><path data-hf-id="hf-kfcs" d="M12 2L2 7l10 5 10-5-10-5z" /><path data-hf-id="hf-tdcq" d="M2 17l10 5 10-5" /><path data-hf-id="hf-xx9v" d="M2 12l10 5 10-5" /></svg>
+        <span data-hf-id="hf-jab0" style="font-size:12px;color:#81c784;font-weight:500;">Code Review</span>
+      </div>
+      <div data-hf-id="hf-edsp" class="node-label" id="s6-label-skill" style="position:absolute;left:460px;top:175px;width:160px;text-align:center;font-size:10px;color:#81c784;opacity:0.8;font-weight:500;">Code Review Skill</div>
+
+      <!-- Command Node (rounded rect) -->
+      <div data-hf-id="hf-mo1j" class="node" id="s6-node-cmd" style="position:absolute;left:310px;top:330px;width:160px;height:60px;border-radius:10px;border:2px solid #ffb74d;background:rgba(255,183,77,0.08);display:flex;align-items:center;gap:10px;padding:0 16px;box-shadow:0 0 20px rgba(255,183,77,0.1);">
+        <svg data-hf-id="hf-ml4h" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffb74d" stroke-width="2"><polyline data-hf-id="hf-c7ch" points="4 17 8 13 4 9" /><polyline data-hf-id="hf-q69f" points="12 19 20 19 20 17" /></svg>
+        <span data-hf-id="hf-qzgk" style="font-size:12px;color:#ffb74d;font-weight:500;">Deploy</span>
+      </div>
+      <div data-hf-id="hf-cxqq" class="node-label" id="s6-label-cmd" style="position:absolute;left:310px;top:395px;width:160px;text-align:center;font-size:10px;color:#ffb74d;opacity:0.8;font-weight:500;">Deploy Command</div>
+
+      <!-- Rule Node (diamond) -->
+      <div data-hf-id="hf-1xw3" class="node" id="s6-node-rule" style="position:absolute;left:310px;top:490px;width:80px;height:80px;clip-path:polygon(50% 0%,100% 50%,50% 100%,0% 50%);border:2px solid #ce93d8;background:rgba(206,147,216,0.08);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;">
+        <svg data-hf-id="hf-fy98" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ce93d8" stroke-width="2"><rect data-hf-id="hf-rlbj" x="3" y="11" width="18" height="11" rx="2" /><path data-hf-id="hf-r9hi" d="M7 11V7a5 5 0 0110 0v4" /></svg>
+        <span data-hf-id="hf-urfl" style="font-size:9px;color:#ce93d8;font-weight:500;text-align:center;">Security</span>
+      </div>
+      <div data-hf-id="hf-kvg2" class="node-label" id="s6-label-rule" style="position:absolute;left:310px;top:575px;width:80px;text-align:center;font-size:10px;color:#ce93d8;opacity:0.8;font-weight:500;">Security Rule</div>
+    </div>
+  </div>
+
+  <!-- Detail Panel (slides in from right at t=7.0) -->
+  <div data-hf-id="hf-jz9k" class="detail-panel" id="s6-detail" style="position:absolute;top:140px;right:-320px;width:280px;background:rgba(20,20,20,0.95);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:20px;backdrop-filter:blur(10px);display:flex;flex-direction:column;gap:14px;z-index:10;">
+    <div data-hf-id="hf-vo1r" style="font-size:11px;color:#666666;text-transform:uppercase;letter-spacing:1px;">Selected Agent</div>
+    <div data-hf-id="hf-xddg" style="display:flex;align-items:center;gap:8px;">
+      <div data-hf-id="hf-fjxv" style="width:10px;height:10px;border-radius:50%;background:#4fc3f7;"></div>
+      <span data-hf-id="hf-33ny" style="font-size:15px;color:#FFFFFF;font-weight:600;">Architect Agent</span>
+    </div>
+    <div data-hf-id="hf-md9p" style="font-size:12px;color:#999999;line-height:1.5;">Designs system architecture, selects patterns, and generates project scaffolding.</div>
+    <div data-hf-id="hf-zjem" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <div data-hf-id="hf-805g" style="display:flex;flex-direction:column;gap:2px;padding:10px;background:rgba(255,255,255,0.03);border-radius:6px;">
+        <span data-hf-id="hf-a28p" style="font-size:9px;color:#666666;text-transform:uppercase;">Skills</span>
+        <span data-hf-id="hf-08b8" style="font-size:14px;color:#4fc3f7;font-weight:600;">8</span>
+      </div>
+      <div data-hf-id="hf-e29o" style="display:flex;flex-direction:column;gap:2px;padding:10px;background:rgba(255,255,255,0.03);border-radius:6px;">
+        <span data-hf-id="hf-ftq1" style="font-size:9px;color:#666666;text-transform:uppercase;">Commands</span>
+        <span data-hf-id="hf-tyuw" style="font-size:14px;color:#ffb74d;font-weight:600;">4</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Status Bar (appears at t=8.5) -->
+  <div data-hf-id="hf-swq1" class="status-bar" id="s6-status" style="position:absolute;bottom:76px;left:50%;padding:8px 24px;background:rgba(0,0,0,0.6);border:1px solid rgba(255,255,255,0.06);border-radius:20px;display:flex;align-items:center;gap:16px;opacity:0;z-index:5;">
+    <div data-hf-id="hf-y9vp" style="display:flex;align-items:center;gap:6px;">
+      <span data-hf-id="hf-hq7g" style="font-size:11px;color:#4fc3f7;font-weight:600;">12</span>
+      <span data-hf-id="hf-ijr1" style="font-size:10px;color:#999999;">available</span>
+    </div>
+    <div data-hf-id="hf-pzib" style="width:1px;height:12px;background:rgba(255,255,255,0.1);"></div>
+    <div data-hf-id="hf-yo6q" style="display:flex;align-items:center;gap:6px;">
+      <span data-hf-id="hf-wlvu" style="font-size:11px;color:#81c784;font-weight:600;">3</span>
+      <span data-hf-id="hf-a17o" style="font-size:10px;color:#999999;">installed</span>
+    </div>
+    <div data-hf-id="hf-wzgj" style="width:1px;height:12px;background:rgba(255,255,255,0.1);"></div>
+    <div data-hf-id="hf-z2hr" style="display:flex;align-items:center;gap:6px;">
+      <span data-hf-id="hf-1d47" style="font-size:11px;color:#ffb74d;font-weight:600;">2</span>
+      <span data-hf-id="hf-7lxv" style="font-size:10px;color:#999999;">enabled</span>
+    </div>
+  </div>
+
+  <!-- Bottom rule -->
+  <div data-hf-id="hf-6czq" class="bottom-rule" id="s6-bottom-rule"></div>
+
+  <!-- Statuz logo -->
+  <div data-hf-id="hf-ex78" class="statuz-logo" id="s6-logo">
+    <svg data-hf-id="hf-u3yk" viewBox="0 0 256 256" width="36" height="36">
+      <line data-hf-id="hf-ta5v" x1="40" y1="184" x2="144" y2="168" stroke="currentColor" stroke-width="16" stroke-linecap="round" />
+      <line data-hf-id="hf-uzkn" x1="144" y1="168" x2="112" y2="72" stroke="currentColor" stroke-width="16" stroke-linecap="round" />
+      <line data-hf-id="hf-o14n" x1="112" y1="72" x2="216" y2="56" stroke="currentColor" stroke-width="16" stroke-linecap="round" />
+      <circle data-hf-id="hf-x91m" cx="128" cy="120" r="20" fill="currentColor" />
+    </svg>
+  </div>
+
+  <!-- Oasis Company -->
+  <div data-hf-id="hf-3mz6" class="oasis-text" id="s6-oasis">OASIS COMPANY</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script>
+(function() {
+  var tl = gsap.timeline({ paused: true });
+  window.__timelines = window.__timelines || {};
+  window.__timelines["scene6"] = tl;
+
+  // Elements
+  var ambient = document.getElementById("s6-ambient");
+  var ghost = document.getElementById("s6-ghost");
+  var label = document.getElementById("s6-label");
+  var subtitle = document.getElementById("s6-subtitle");
+  var logo = document.getElementById("s6-logo");
+  var oasis = document.getElementById("s6-oasis");
+  var bottomRule = document.getElementById("s6-bottom-rule");
+  var search = document.getElementById("s6-search");
+  var filter = document.getElementById("s6-filter");
+  var cardgrid = document.getElementById("s6-cardgrid");
+  var cards = [document.getElementById("s6-card0"), document.getElementById("s6-card1"), document.getElementById("s6-card2"), document.getElementById("s6-card3")];
+  var nodes = [document.getElementById("s6-node-agent"), document.getElementById("s6-node-skill"), document.getElementById("s6-node-cmd"), document.getElementById("s6-node-rule")];
+  var nodeLabels = [document.getElementById("s6-label-agent"), document.getElementById("s6-label-skill"), document.getElementById("s6-label-cmd"), document.getElementById("s6-label-rule")];
+  var edgeAS = document.getElementById("s6-edge-as");
+  var edgeAC = document.getElementById("s6-edge-ac");
+  var edgeSR = document.getElementById("s6-edge-sr");
+  var edgeCR = document.getElementById("s6-edge-cr");
+  var detail = document.getElementById("s6-detail");
+  var statusBar = document.getElementById("s6-status");
+  var agentNode = document.getElementById("s6-node-agent");
+
+  // Initial states
+  gsap.set(ghost, { xPercent: -50, yPercent: -50 });
+  gsap.set(label, { opacity: 0, y: -10 });
+  gsap.set(subtitle, { opacity: 0, y: -10 });
+  gsap.set(logo, { opacity: 0 });
+  gsap.set(oasis, { opacity: 0 });
+  gsap.set(bottomRule, { scaleX: 0 });
+  gsap.set(search, { opacity: 0, y: 15 });
+  gsap.set(filter, { opacity: 0, y: 15 });
+  gsap.set(cardgrid, { opacity: 0, y: 15 });
+  gsap.set(cards, { opacity: 0, y: 12 });
+  gsap.set(nodes, { opacity: 0, scale: 0 });
+  gsap.set(nodeLabels, { opacity: 0 });
+  gsap.set([edgeAS, edgeAC, edgeSR, edgeCR], { opacity: 0 });
+  gsap.set(detail, { x: 0, opacity: 0 });
+  gsap.set(statusBar, { opacity: 0, xPercent: -50 });
+
+  // ===== TIMELINE =====
+
+  // t=0.0: Ambient breathing + ghost drift
+  tl.to(ambient, { opacity: 0.12, duration: 3, ease: "sine.inOut", yoyo: true, repeat: 10 }, 0);
+  tl.to(ghost, { x: 8, y: -5, duration: 4, ease: "sine.inOut", yoyo: true, repeat: 5 }, 0);
+  tl.to(ghost, { scale: 1.02, duration: 5, ease: "sine.inOut", yoyo: true, repeat: 4 }, 0);
+
+  // t=0.3: Label + subtitle fade in
+  tl.to(label, { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }, 0.3);
+  tl.to(subtitle, { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }, 0.3);
+
+  // t=0.5: Logo + Oasis + bottom rule
+  tl.to(logo, { opacity: 1, duration: 0.4, ease: "power2.out" }, 0.5);
+  tl.to(logo, { scale: 1.06, duration: 2, ease: "sine.inOut", yoyo: true, repeat: 2 }, 0.7);
+  tl.to(oasis, { opacity: 1, duration: 0.4, ease: "power2.out" }, 0.5);
+  tl.to(bottomRule, { scaleX: 1, duration: 0.6, ease: "power2.out" }, 0.5);
+
+  // t=0.8-1.5: Sidebar elements animate in (staggered)
+  tl.to(search, { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }, 0.8);
+  tl.to(filter, { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }, 1.0);
+  tl.to(cardgrid, { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }, 1.2);
+  tl.to(cards[0], { opacity: 1, y: 0, duration: 0.3, ease: "power2.out" }, 1.3);
+  tl.to(cards[1], { opacity: 1, y: 0, duration: 0.3, ease: "power2.out" }, 1.4);
+  tl.to(cards[2], { opacity: 1, y: 0, duration: 0.3, ease: "power2.out" }, 1.5);
+  tl.to(cards[3], { opacity: 1, y: 0, duration: 0.3, ease: "power2.out" }, 1.6);
+
+  // t=2.0-3.0: Canvas nodes animate in (staggered, scale from 0)
+  tl.to(nodes[0], { opacity: 1, scale: 1, duration: 0.4, ease: "back.out(1.7)" }, 2.0);
+  tl.to(nodes[1], { opacity: 1, scale: 1, duration: 0.4, ease: "back.out(1.7)" }, 2.3);
+  tl.to(nodes[2], { opacity: 1, scale: 1, duration: 0.4, ease: "back.out(1.7)" }, 2.6);
+  tl.to(nodes[3], { opacity: 1, scale: 1, duration: 0.4, ease: "back.out(1.7)" }, 2.9);
+
+  // t=3.5-4.5: Edges draw in (stroke-dashoffset animation)
+  tl.to(edgeAS, { opacity: 0.8, strokeDashoffset: 0, duration: 0.5, ease: "power2.out" }, 3.5);
+  tl.to(edgeAC, { opacity: 0.8, strokeDashoffset: 0, duration: 0.5, ease: "power2.out" }, 3.8);
+  tl.to(edgeSR, { opacity: 0.8, strokeDashoffset: 0, duration: 0.5, ease: "power2.out" }, 4.1);
+  tl.to(edgeCR, { opacity: 0.8, strokeDashoffset: 0, duration: 0.5, ease: "power2.out" }, 4.4);
+
+  // t=5.0: Node labels pulse
+  tl.to(nodeLabels, { scale: 1.08, duration: 0.25, ease: "sine.inOut" }, 5.0);
+  tl.to(nodeLabels, { scale: 1, duration: 0.3, ease: "sine.inOut" }, 5.25);
+
+  // t=6.0: Highlight "Agent" node with glow
+  tl.to(agentNode, {
+    boxShadow: "0 0 30px rgba(79,195,247,0.4), 0 0 60px rgba(79,195,247,0.2)",
+    borderColor: "#4fc3f7",
+    duration: 0.4,
+    ease: "power2.out"
+  }, 6.0);
+
+  // t=7.0: Detail panel slides in from right
+  tl.to(detail, { x: -350, opacity: 1, duration: 0.5, ease: "power2.out" }, 7.0);
+
+  // t=8.5: Status bar appears
+  tl.to(statusBar, { opacity: 1, duration: 0.4, ease: "power2.out" }, 8.5);
+})();
+</script>
+</template>
