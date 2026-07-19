@@ -277,18 +277,10 @@ const DASHBOARD_CSS = `
 `;
 
 
-// ─── ViewPane ──────────────────────────────────────────────────
+import { AgentDefinitionWithState } from './agentdef/agentDefinitionTypes.js';
 
-/** Placeholder agent definition (will be replaced by real .statuzide/ loader) */
-interface AgentDefinition {
-	id: string;
-	name: string;
-	type: 'agent' | 'skill' | 'command' | 'rule';
-	description: string;
-	source: 'local' | 'ecc';
-	version: string;
-	enabled: boolean;
-}
+
+// ─── ViewPane ──────────────────────────────────────────────────
 
 class DashboardViewPane extends ViewPane {
 
@@ -387,31 +379,64 @@ class DashboardViewPane extends ViewPane {
 		// ── ECC Catalog section ──
 		this.renderAgentSection('ECC Catalog', 'ecc', [
 			{
-				id: 'ecc-code-reviewer',
-				name: 'Code Reviewer',
-				type: 'agent',
-				description: 'Automated code review agent with PR analysis',
-				source: 'ecc',
-				version: '2.0.0',
-				enabled: false,
+				definition: {
+					id: 'ecc:agent:code-reviewer',
+					name: 'Code Reviewer',
+					kind: 'agent',
+					description: 'Automated code review agent with PR analysis',
+					source: { type: 'ecc', componentId: 'agent:code-reviewer', eccVersion: '2.0.0' },
+					version: '2.0.0',
+					author: 'ECC Team',
+					icon: 'codicon-symbol-method',
+					category: 'Agent Engineering',
+					tags: ['code-review', 'pr-analysis', 'ecc'],
+					config: {},
+					createdAt: Date.now(),
+					updatedAt: Date.now(),
+				},
+				state: 'disabled',
+				lastUsed: 0,
+				usageCount: 0,
 			},
 			{
-				id: 'ecc-test-writer',
-				name: 'Test Writer',
-				type: 'skill',
-				description: 'Generates unit tests and integration tests',
-				source: 'ecc',
-				version: '2.0.0',
-				enabled: false,
+				definition: {
+					id: 'ecc:skill:test-writer',
+					name: 'Test Writer',
+					kind: 'skill',
+					description: 'Generates unit tests and integration tests',
+					source: { type: 'ecc', componentId: 'skill:test-writer', eccVersion: '2.0.0' },
+					version: '2.0.0',
+					author: 'ECC Team',
+					icon: 'codicon-beaker',
+					category: 'Agent Engineering',
+					tags: ['testing', 'tdd', 'ecc'],
+					config: {},
+					createdAt: Date.now(),
+					updatedAt: Date.now(),
+				},
+				state: 'disabled',
+				lastUsed: 0,
+				usageCount: 0,
 			},
 			{
-				id: 'ecc-refactor',
-				name: 'Refactor Assistant',
-				type: 'command',
-				description: 'Safe code refactoring with validation',
-				source: 'ecc',
-				version: '2.0.0',
-				enabled: false,
+				definition: {
+					id: 'ecc:command:refactor',
+					name: 'Refactor Assistant',
+					kind: 'command',
+					description: 'Safe code refactoring with validation',
+					source: { type: 'ecc', componentId: 'command:refactor', eccVersion: '2.0.0' },
+					version: '2.0.0',
+					author: 'ECC Team',
+					icon: 'codicon-wrench',
+					category: 'Agent Engineering',
+					tags: ['refactoring', 'code-quality', 'ecc'],
+					config: {},
+					createdAt: Date.now(),
+					updatedAt: Date.now(),
+				},
+				state: 'disabled',
+				lastUsed: 0,
+				usageCount: 0,
 			},
 		]);
 	}
@@ -441,7 +466,7 @@ class DashboardViewPane extends ViewPane {
 		this.scrollEl!.appendChild(banner);
 	}
 
-	private renderAgentSection(title: string, source: 'local' | 'ecc', agents: AgentDefinition[]): void {
+	private renderAgentSection(title: string, source: 'local' | 'ecc', agents: AgentDefinitionWithState[]): void {
 		const section = document.createElement('div');
 		section.className = 'agent-mgmt-section';
 
@@ -480,21 +505,22 @@ class DashboardViewPane extends ViewPane {
 		this.scrollEl!.appendChild(section);
 	}
 
-	private renderAgentCard(agent: AgentDefinition): HTMLElement {
+	private renderAgentCard(ds: AgentDefinitionWithState): HTMLElement {
+		const agent = ds.definition;
 		const card = document.createElement('div');
 		card.className = 'agent-mgmt-card';
 		card.addEventListener('click', () => this.showComingSoon(`Agent editor for "${agent.name}" will open here.`));
 
 		// Icon
 		const icon = document.createElement('div');
-		icon.className = `agent-mgmt-card-icon ${agent.type}`;
+		icon.className = `agent-mgmt-card-icon ${agent.kind}`;
 		const iconMap: Record<string, string> = {
 			agent: 'robot',
 			skill: 'zap',
 			command: 'terminal',
 			rule: 'law',
 		};
-		icon.innerHTML = `<span class="codicon codicon-${iconMap[agent.type] || 'symbol-misc'}"></span>`;
+		icon.innerHTML = `<span class="codicon codicon-${iconMap[agent.kind] || 'symbol-misc'}"></span>`;
 
 		// Body
 		const body = document.createElement('div');
@@ -510,7 +536,7 @@ class DashboardViewPane extends ViewPane {
 
 		const meta = document.createElement('div');
 		meta.className = 'agent-mgmt-card-meta';
-		meta.innerHTML = `<span>${agent.type}</span><span>v${agent.version}</span><span>${agent.source === 'ecc' ? 'ECC' : 'Local'}</span>`;
+		meta.innerHTML = `<span>${agent.kind}</span><span>v${agent.version}</span><span>${agent.source.type === 'ecc' ? 'ECC' : 'Local'}</span>`;
 
 		body.appendChild(name);
 		body.appendChild(desc);
@@ -520,10 +546,10 @@ class DashboardViewPane extends ViewPane {
 		const actions = document.createElement('div');
 		actions.className = 'agent-mgmt-card-actions';
 
-		if (agent.source === 'ecc') {
+		if (agent.source.type === 'ecc') {
 			const installBtn = document.createElement('button');
 			installBtn.className = 'agent-mgmt-card-action';
-			installBtn.textContent = 'Install';
+			installBtn.textContent = ds.state === 'enabled' ? 'Uninstall' : 'Install';
 			installBtn.addEventListener('click', (e) => {
 				e.stopPropagation();
 				this.showComingSoon(`Installing "${agent.name}" from ECC catalog...`);
