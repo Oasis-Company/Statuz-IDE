@@ -31,6 +31,10 @@ import { Action2, registerAction2 } from '../../../../platform/actions/common/ac
 import { ServicesAccessor } from '../../../../editor/browser/editorExtensions.js';
 import { IViewsService } from '../../../services/views/common/viewsService.js';
 import { FileAccess } from '../../../../base/common/network.js';
+import { IAgentManagementService } from './agentManagementService.js';
+import { IEditorService } from '../../../services/editor/common/editorService.js';
+import { HarnessEditorInput } from './harness/harnessEditorInput.js';
+import { AgentDefinition } from './agentdef/agentDefinitionTypes.js';
 
 
 // ─── CSS ───────────────────────────────────────────────────────
@@ -299,6 +303,8 @@ class DashboardViewPane extends ViewPane {
 		@IOpenerService openerService: IOpenerService,
 		@ITelemetryService telemetryService: ITelemetryService,
 		@IHoverService hoverService: IHoverService,
+		@IAgentManagementService private readonly agentMgmtService: IAgentManagementService,
+		@IEditorService private readonly editorService: IEditorService,
 	) {
 		super(options, keybindingService, contextMenuService, configurationService, contextKeyService, viewDescriptorService, instantiationService, openerService, themeService, hoverService)
 	}
@@ -350,12 +356,12 @@ class DashboardViewPane extends ViewPane {
 		const createBtn = document.createElement('button');
 		createBtn.className = 'agent-mgmt-btn primary';
 		createBtn.innerHTML = '<span class="codicon codicon-add"></span> New Agent';
-		createBtn.addEventListener('click', () => this.showComingSoon('Agent creation wizard will open here.'));
+		createBtn.addEventListener('click', () => this.showCreateAgentWizard());
 
 		const importBtn = document.createElement('button');
 		importBtn.className = 'agent-mgmt-btn';
 		importBtn.innerHTML = '<span class="codicon codicon-cloud-download"></span> Import from ECC';
-		importBtn.addEventListener('click', () => this.showComingSoon('ECC import browser will open here.'));
+		importBtn.addEventListener('click', () => this.showEccImportBrowser());
 
 		headerRight.appendChild(createBtn);
 		headerRight.appendChild(importBtn);
@@ -493,7 +499,11 @@ class DashboardViewPane extends ViewPane {
 			`;
 			const actionBtn = empty.querySelector('button')!;
 			actionBtn.addEventListener('click', () => {
-				this.showComingSoon(source === 'local' ? 'Agent creation wizard will open here.' : 'ECC catalog browser will open here.');
+				if (source === 'local') {
+					this.showCreateAgentWizard();
+				} else {
+					this.showEccImportBrowser();
+				}
 			});
 			section.appendChild(empty);
 		} else {
@@ -509,7 +519,7 @@ class DashboardViewPane extends ViewPane {
 		const agent = ds.definition;
 		const card = document.createElement('div');
 		card.className = 'agent-mgmt-card';
-		card.addEventListener('click', () => this.showComingSoon(`Agent editor for "${agent.name}" will open here.`));
+		card.addEventListener('click', () => this.openHarnessEditor(agent.id));
 
 		// Icon
 		const icon = document.createElement('div');
@@ -552,7 +562,7 @@ class DashboardViewPane extends ViewPane {
 			installBtn.textContent = ds.state === 'enabled' ? 'Uninstall' : 'Install';
 			installBtn.addEventListener('click', (e) => {
 				e.stopPropagation();
-				this.showComingSoon(`Installing "${agent.name}" from ECC catalog...`);
+				this.installEccAgent(agent);
 			});
 			actions.appendChild(installBtn);
 		} else {
@@ -561,7 +571,7 @@ class DashboardViewPane extends ViewPane {
 			editBtn.textContent = 'Edit';
 			editBtn.addEventListener('click', (e) => {
 				e.stopPropagation();
-				this.showComingSoon(`Opening harness editor for "${agent.name}"...`);
+				this.openHarnessEditor(agent.id);
 			});
 			actions.appendChild(editBtn);
 		}
@@ -573,11 +583,188 @@ class DashboardViewPane extends ViewPane {
 		return card;
 	}
 
-	private showComingSoon(message: string): void {
-		// For now, we show a subtle notification. In the future, this will trigger
-		// actual editor openings, catalog browsers, and creation wizards.
-		console.log('[Agent Management]', message);
+	private showCreateAgentWizard(): void {
+		// Create a modal overlay
+		const overlay = document.createElement('div');
+		overlay.className = 'agent-mgmt-wizard-overlay';
+		overlay.style.cssText = `
+			position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+			background: rgba(0,0,0,0.5); z-index: 9999;
+			display: flex; align-items: center; justify-content: center;
+		`;
+
+		const modal = document.createElement('div');
+		modal.className = 'agent-mgmt-wizard-modal';
+		modal.style.cssText = `
+			background: var(--vscode-editor-background);
+			border: 1px solid var(--vscode-widget-border);
+			border-radius: 8px; padding: 24px;
+			width: 480px; max-height: 80vh; overflow-y: auto;
+			color: var(--vscode-foreground);
+		`;
+
+		modal.innerHTML = `
+			<h2 style="margin: 0 0 16px; font-size: 18px;">Create New Agent</h2>
+			<div style="margin-bottom: 12px;">
+				<label style="display: block; margin-bottom: 4px; font-size: 12px; color: var(--vscode-descriptionForeground);">Name</label>
+				<input id="wizard-name" type="text" placeholder="My Agent" style="width: 100%; padding: 6px; background: var(--vscode-input-background); color: var(--vscode-input-foreground); border: 1px solid var(--vscode-input-border); border-radius: 4px;">
+			</div>
+			<div style="margin-bottom: 12px;">
+				<label style="display: block; margin-bottom: 4px; font-size: 12px; color: var(--vscode-descriptionForeground);">Kind</label>
+				<select id="wizard-kind" style="width: 100%; padding: 6px; background: var(--vscode-dropdown-background); color: var(--vscode-dropdown-foreground); border: 1px solid var(--vscode-dropdown-border); border-radius: 4px;">
+					<option value="agent">Agent</option>
+					<option value="skill">Skill</option>
+					<option value="command">Command</option>
+					<option value="rule">Rule</option>
+				</select>
+			</div>
+			<div style="margin-bottom: 12px;">
+				<label style="display: block; margin-bottom: 4px; font-size: 12px; color: var(--vscode-descriptionForeground);">Description</label>
+				<textarea id="wizard-desc" rows="2" placeholder="What does this agent do?" style="width: 100%; padding: 6px; background: var(--vscode-input-background); color: var(--vscode-input-foreground); border: 1px solid var(--vscode-input-border); border-radius: 4px; resize: vertical;"></textarea>
+			</div>
+			<div style="margin-bottom: 16px;">
+				<label style="display: block; margin-bottom: 4px; font-size: 12px; color: var(--vscode-descriptionForeground);">Configuration (JSON)</label>
+				<textarea id="wizard-config" rows="6" placeholder='{"role": "", "style": "", "domain": ""}' style="width: 100%; padding: 6px; background: var(--vscode-input-background); color: var(--vscode-input-foreground); border: 1px solid var(--vscode-input-border); border-radius: 4px; font-family: var(--vscode-editor-font-family); font-size: 12px; resize: vertical;">{
+  "role": "",
+  "style": "",
+  "domain": "",
+  "constraints": [],
+  "tools": []
+}</textarea>
+			</div>
+			<div style="display: flex; justify-content: flex-end; gap: 8px;">
+				<button id="wizard-cancel" style="padding: 6px 16px; background: var(--vscode-button-secondaryBackground); color: var(--vscode-button-secondaryForeground); border: 1px solid var(--vscode-button-secondaryBorder, transparent); border-radius: 4px; cursor: pointer;">Cancel</button>
+				<button id="wizard-create" style="padding: 6px 16px; background: var(--vscode-button-background); color: var(--vscode-button-foreground); border: 1px solid var(--vscode-button-border, transparent); border-radius: 4px; cursor: pointer;">Create Agent</button>
+			</div>
+		`;
+
+		overlay.appendChild(modal);
+		document.body.appendChild(overlay);
+
+		// Close on overlay click
+		overlay.addEventListener('click', (e) => {
+			if (e.target === overlay) {
+				document.body.removeChild(overlay);
+			}
+		});
+
+		// Cancel
+		const cancelBtn = modal.querySelector('#wizard-cancel') as HTMLButtonElement;
+		cancelBtn.addEventListener('click', () => document.body.removeChild(overlay));
+
+		// Create
+		const createBtn = modal.querySelector('#wizard-create') as HTMLButtonElement;
+		createBtn.addEventListener('click', async () => {
+			const nameInput = modal.querySelector('#wizard-name') as HTMLInputElement;
+			const kindSelect = modal.querySelector('#wizard-kind') as HTMLSelectElement;
+			const descTextarea = modal.querySelector('#wizard-desc') as HTMLTextAreaElement;
+			const configTextarea = modal.querySelector('#wizard-config') as HTMLTextAreaElement;
+
+			const name = nameInput.value.trim();
+			if (!name) {
+				alert('Name is required.');
+				return;
+			}
+
+			let config: Record<string, unknown> = {};
+			try {
+				config = JSON.parse(configTextarea.value);
+			} catch (e) {
+				alert('Invalid JSON in configuration.');
+				return;
+			}
+
+			const def: AgentDefinition = {
+				id: `local:${Date.now()}:${Math.random().toString(36).slice(2, 8)}`,
+				name,
+				kind: kindSelect.value,
+				description: descTextarea.value.trim(),
+				source: { type: 'local', path: `.statuzide/definitions/${name.toLowerCase().replace(/\s+/g, '-')}.yaml` },
+				version: '1.0.0',
+				author: 'User',
+				icon: 'codicon-robot',
+				category: 'Custom',
+				tags: [],
+				config,
+				createdAt: Date.now(),
+				updatedAt: Date.now(),
+			};
+
+			try {
+				await this.agentMgmtService.writeDefinition(def);
+				document.body.removeChild(overlay);
+				// Re-render the dashboard
+				this.renderBody(this.dashboardEl!.parentElement!);
+			} catch (err) {
+				console.error('[Dashboard] Failed to create agent:', err);
+				alert('Failed to create agent. See console for details.');
+			}
+		});
+
+		// Focus name input
+		setTimeout(() => {
+			const nameInput = modal.querySelector('#wizard-name') as HTMLInputElement;
+			nameInput?.focus();
+		}, 0);
 	}
+
+	private showEccImportBrowser(): void {
+		// For now, show ECC catalog as a modal list
+		const overlay = document.createElement('div');
+		overlay.className = 'agent-mgmt-wizard-overlay';
+		overlay.style.cssText = `
+			position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+			background: rgba(0,0,0,0.5); z-index: 9999;
+			display: flex; align-items: center; justify-content: center;
+		`;
+
+		const modal = document.createElement('div');
+		modal.style.cssText = `
+			background: var(--vscode-editor-background);
+			border: 1px solid var(--vscode-widget-border);
+			border-radius: 8px; padding: 24px;
+			width: 400px; color: var(--vscode-foreground);
+		`;
+
+		modal.innerHTML = `
+			<h2 style="margin: 0 0 16px; font-size: 18px;">ECC Catalog</h2>
+			<p style="color: var(--vscode-descriptionForeground); font-size: 13px;">Browse and import agents from the ECC catalog. This feature will be available in a future update.</p>
+			<div style="display: flex; justify-content: flex-end; margin-top: 16px;">
+				<button id="ecc-close" style="padding: 6px 16px; background: var(--vscode-button-background); color: var(--vscode-button-foreground); border: 1px solid var(--vscode-button-border, transparent); border-radius: 4px; cursor: pointer;">Close</button>
+			</div>
+		`;
+
+		overlay.appendChild(modal);
+		document.body.appendChild(overlay);
+
+		overlay.addEventListener('click', (e) => {
+			if (e.target === overlay) {
+				document.body.removeChild(overlay);
+			}
+		});
+
+		const closeBtn = modal.querySelector('#ecc-close') as HTMLButtonElement;
+		closeBtn.addEventListener('click', () => document.body.removeChild(overlay));
+	}
+
+	private openHarnessEditor(agentId: string): void {
+		const input = new HarnessEditorInput();
+		this.editorService.openEditor(input, { pinned: true });
+		console.log('[Dashboard] Opening harness editor for agent:', agentId);
+	}
+
+	private async installEccAgent(agent: AgentDefinition): Promise<void> {
+		try {
+			console.log('[Dashboard] Installing ECC agent:', agent.name);
+			await this.agentMgmtService.installItem(agent.id);
+			// Re-render to show updated state
+			this.renderBody(this.dashboardEl!.parentElement!);
+		} catch (err) {
+			console.error('[Dashboard] Failed to install agent:', err);
+			alert(`Failed to install "${agent.name}". See console for details.`);
+		}
+	}
+
 }
 
 
