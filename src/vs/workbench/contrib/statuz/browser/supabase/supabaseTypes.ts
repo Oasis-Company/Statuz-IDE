@@ -52,12 +52,3 @@ export interface ProjectBlock {
 	updated_at: string;
 }
 
-/* ─── Board Sync Data ────────────────────────────────────── */
-
-export interface BoardSyncData {
-	nodes: Array<{ id: string; type: string; position: { x: number; y: number } }>;
-	edges: Array<{ id: string; source: string; target: string; type: string }>;
-	viewport: { x: number; y: number; zoom: number };
-	lastModified: string; // ISO 8601 timestamp
-	version: number;
-}

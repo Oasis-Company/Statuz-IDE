@@ -68,23 +68,26 @@ class SupabaseAuthService extends Disposable implements ISupabaseAuthService {
 			// Cleanup handled by auth listener
 		}));
 		// Subscribe to Supabase auth state changes
-		const { data: { subscription } } = this.supabaseClient.getAuth().onAuthStateChange((_event, session) => {
-			this._currentSession = session;
-			this._currentUser = session?.user ?? null;
-			this._onDidChangeSession.fire(session);
+		const auth = this.supabaseClient.getAuth();
+		if (auth) {
+			const { data: { subscription } } = auth.onAuthStateChange((_event, session) => {
+				this._currentSession = session;
+				this._currentUser = session?.user ?? null;
+				this._onDidChangeSession.fire(session);
 
-			// Persist session to IStorageService
-			if (session) {
-				this.storageService.store(SUPABASE_STORAGE_KEY, JSON.stringify({
-					access_token: session.access_token,
-					refresh_token: session.refresh_token,
-					expires_at: Date.now() + (session.expires_in || 3600) * 1000,
-				}), StorageScope.APPLICATION, StorageTarget.MACHINE);
-			} else {
-				this.storageService.remove(SUPABASE_STORAGE_KEY, StorageScope.APPLICATION);
-			}
-		});
-		this._register(toDisposable(() => subscription.unsubscribe()));
+				// Persist session to IStorageService
+				if (session) {
+					this.storageService.store(SUPABASE_STORAGE_KEY, JSON.stringify({
+						access_token: session.access_token,
+						refresh_token: session.refresh_token,
+						expires_at: Date.now() + (session.expires_in || 3600) * 1000,
+					}), StorageScope.APPLICATION, StorageTarget.MACHINE);
+				} else {
+					this.storageService.remove(SUPABASE_STORAGE_KEY, StorageScope.APPLICATION);
+				}
+			});
+			this._register(toDisposable(() => subscription.unsubscribe()));
+		}
 	}
 
 	get isLoggedIn(): boolean {
@@ -99,9 +102,20 @@ class SupabaseAuthService extends Disposable implements ISupabaseAuthService {
 		return this._currentSession;
 	}
 
+	private _getAuth() {
+		const auth = this.supabaseClient.getAuth();
+		if (!auth) {
+			throw new Error('Supabase auth not available');
+		}
+		return auth;
+	}
+
 	async signIn(email: string, password: string): Promise<ApiResult<Session>> {
+		if (!this.supabaseClient.isAvailable()) {
+			return { data: null, error: { type: 'auth', message: 'Supabase client not available' } };
+		}
 		const result = await guardAsync(async () => {
-			const response = await this.supabaseClient.getAuth().signInWithPassword({ email, password });
+			const response = await this._getAuth().signInWithPassword({ email, password });
 			this.handleAuthResponse(response);
 			return response.data.session;
 		}, 'signIn');
@@ -109,8 +123,11 @@ class SupabaseAuthService extends Disposable implements ISupabaseAuthService {
 	}
 
 	async signUp(email: string, password: string): Promise<ApiResult<Session>> {
+		if (!this.supabaseClient.isAvailable()) {
+			return { data: null, error: { type: 'auth', message: 'Supabase client not available' } };
+		}
 		const result = await guardAsync(async () => {
-			const response = await this.supabaseClient.getAuth().signUp({ email, password });
+			const response = await this._getAuth().signUp({ email, password });
 			this.handleAuthResponse(response);
 			return response.data.session!;
 		}, 'signUp');
@@ -125,8 +142,15 @@ class SupabaseAuthService extends Disposable implements ISupabaseAuthService {
 	}
 
 	async signOut(): Promise<ApiResult<void>> {
+		if (!this.supabaseClient.isAvailable()) {
+			this._currentSession = null;
+			this._currentUser = null;
+			this.storageService.remove(SUPABASE_STORAGE_KEY, StorageScope.APPLICATION);
+			this._onDidChangeSession.fire(null);
+			return { data: undefined, error: null };
+		}
 		return guardAsync(async () => {
-			await this.supabaseClient.getAuth().signOut();
+			await this._getAuth().signOut();
 			this._currentSession = null;
 			this._currentUser = null;
 			this.storageService.remove(SUPABASE_STORAGE_KEY, StorageScope.APPLICATION);
@@ -135,6 +159,9 @@ class SupabaseAuthService extends Disposable implements ISupabaseAuthService {
 	}
 
 	async restoreSession(): Promise<ApiResult<Session | null>> {
+		if (!this.supabaseClient.isAvailable()) {
+			return { data: null, error: null };
+		}
 		return guardAsync(async () => {
 			// Try to restore from IStorageService
 			const stored = this.storageService.get(SUPABASE_STORAGE_KEY, StorageScope.APPLICATION);
@@ -142,7 +169,7 @@ class SupabaseAuthService extends Disposable implements ISupabaseAuthService {
 				try {
 					const parsed = JSON.parse(stored);
 					if (parsed.refresh_token) {
-						const { data, error } = await this.supabaseClient.getAuth().setSession({
+						const { data, error } = await this._getAuth().setSession({
 							access_token: parsed.access_token,
 							refresh_token: parsed.refresh_token,
 						});
@@ -160,7 +187,7 @@ class SupabaseAuthService extends Disposable implements ISupabaseAuthService {
 			}
 
 			// Try to get existing session from Supabase
-			const { data, error } = await this.supabaseClient.getAuth().getSession();
+			const { data, error } = await this._getAuth().getSession();
 			if (!error && data.session) {
 				this._currentSession = data.session;
 				this._currentUser = data.session.user;

@@ -41,12 +41,9 @@ import { BoardCompletenessPanel } from './board/boardCompletenessPanel.js';
 import { BoardStateManager } from './board/boardStateManager.js';
 import { BoardUndoRedo } from './board/boardUndoRedo.js';
 import { computeColumnLayout, computeDagreLayout } from './board/boardLayout.js';
-import type { FlowNodeLayout, FlowEdgeData, SandboxCard } from './board/boardTypes.js';
+import type { FlowEdgeData, SandboxCard } from './board/boardTypes.js';
 import type { BoardSnapshot } from './board/boardUndoRedo.js';
-import { ISupabaseAuthService } from './supabase/supabaseAuthService.js';
-import { IBoardDataService } from './board/boardDataService.js';
-import { SupabaseLoginDialog } from './supabase/supabaseLoginDialog.js';
-import type { BoardSyncData } from './supabase/supabaseTypes.js';
+
 
 /* ─── BoardViewPane ──────────────────────────────────────── */
 
@@ -60,9 +57,6 @@ class BoardViewPane extends ViewPane {
 	private undoRedo!: BoardUndoRedo;
 
 	private boardData: BoardCanvasData = { cards: [], constitution: null, decisions: [] };
-	private loginDialog: SupabaseLoginDialog | null = null;
-	private lastSavedData: string = '';
-	private saveTimer: ReturnType<typeof setTimeout> | null = null;
 
 	constructor(
 		options: IViewPaneOptions,
@@ -76,8 +70,6 @@ class BoardViewPane extends ViewPane {
 		@IOpenerService openerService: IOpenerService,
 		@ITelemetryService telemetryService: ITelemetryService,
 		@IHoverService hoverService: IHoverService,
-		@ISupabaseAuthService private readonly authService: ISupabaseAuthService,
-		@IBoardDataService private readonly boardDataService: IBoardDataService,
 	) {
 		super(options, keybindingService, contextMenuService, configurationService, contextKeyService, viewDescriptorService, instantiationService, openerService, themeService, hoverService);
 	}
@@ -161,40 +153,12 @@ class BoardViewPane extends ViewPane {
 	/* ─── Data Loading ─────────────────────────────────────── */
 
 	private async loadBoardData(): Promise<void> {
-		try {
-			// 1. Try Supabase first
-			if (this.authService.isLoggedIn) {
-				const result = await this.boardDataService.loadBoard('statuz-main');
-				if (result.data && result.data.nodes.length > 0) {
-					// Sync layouts/edges/viewport from Supabase to stateManager
-					this.stateManager.setLayouts(result.data.nodes.map(n => ({
-						id: n.id,
-						type: n.type as FlowNodeLayout['type'],
-						position: n.position,
-						size: 'medium' as const,
-					})));
-					this.stateManager.setEdges(result.data.edges.map(e => ({
-						id: e.id,
-						source: e.source,
-						target: e.target,
-						type: e.type as FlowEdgeData['type'],
-					})));
-					this.stateManager.setViewport(result.data.viewport);
-					this.canvas.render();
-					this.lastSavedData = JSON.stringify(result.data);
-					return;
-				}
-			}
-		} catch (err) {
-			console.warn('[Board] Supabase load failed, falling back to localStorage:', err);
-		}
-
-		// 2. Fallback to localStorage — BoardStateManager already loaded it
+		// Load from localStorage via BoardStateManager (already loaded in constructor)
 		const state = this.stateManager.getState();
 		if (state.nodeLayouts.length > 0) {
 			this.canvas.render();
 		}
-		// 3. Empty state — stay empty, user can create cards via toolbar
+		// Empty state — stay empty, user can create cards via toolbar
 	}
 
 	/* ─── Layout Management ────────────────────────────────── */
@@ -330,7 +294,6 @@ class BoardViewPane extends ViewPane {
 		this.canvas.updateData(this.boardData);
 		this.completenessPanel.update(this.boardData.cards, this.boardData.constitution);
 		this.canvas.render();
-		this.scheduleSave();
 	}
 
 	private handleAddDecision(): void {
@@ -351,7 +314,6 @@ class BoardViewPane extends ViewPane {
 		this.boardData.decisions = [...this.boardData.decisions, newDecision];
 		this.canvas.updateData(this.boardData);
 		this.canvas.render();
-		this.scheduleSave();
 	}
 
 	private handleRemoveNode(nodeId: string, nodeType: string): void {
@@ -367,7 +329,6 @@ class BoardViewPane extends ViewPane {
 		this.canvas.updateData(this.boardData);
 		this.completenessPanel.update(this.boardData.cards, this.boardData.constitution);
 		this.canvas.render();
-		this.scheduleSave();
 	}
 
 	private handleDuplicateNode(nodeId: string): void {
@@ -397,35 +358,6 @@ class BoardViewPane extends ViewPane {
 		this.canvas.render();
 	}
 
-	/* ─── Auto-save ────────────────────────────────────────── */
-
-	private scheduleSave(): void {
-		if (this.saveTimer) clearTimeout(this.saveTimer);
-		this.saveTimer = setTimeout(() => this.doSave(), 2000);
-	}
-
-	private async doSave(): Promise<void> {
-		const state = this.stateManager.getState();
-		const syncData: BoardSyncData = {
-			nodes: state.nodeLayouts.map(n => ({ id: n.id, type: n.type, position: n.position })),
-			edges: state.edges.map(e => ({ id: e.id, source: e.source, target: e.target, type: e.type })),
-			viewport: state.viewport,
-			lastModified: new Date().toISOString(),
-			version: 1,
-		};
-
-		const dataStr = JSON.stringify(syncData);
-		if (dataStr === this.lastSavedData) return; // No change
-		this.lastSavedData = dataStr;
-
-		if (this.authService.isLoggedIn) {
-			const result = await this.boardDataService.saveBoard('statuz-main', syncData);
-			if (result.error) {
-				console.warn('[Board] Save to Supabase failed:', result.error.message);
-			}
-		}
-	}
-
 	/* ─── Layout ───────────────────────────────────────────── */
 
 	protected override layoutBody(height: number, width: number): void {
@@ -435,11 +367,9 @@ class BoardViewPane extends ViewPane {
 	}
 
 	override dispose(): void {
-		if (this.saveTimer) clearTimeout(this.saveTimer);
 		this.canvas?.destroy();
 		this.boardToolbar?.destroy();
 		this.completenessPanel?.destroy();
-		this.loginDialog?.dispose();
 		super.dispose();
 	}
 }
