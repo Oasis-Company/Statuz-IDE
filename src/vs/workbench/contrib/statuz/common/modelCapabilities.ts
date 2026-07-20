@@ -233,7 +233,7 @@ type ProviderReasoningIOSettings = {
 	| { nameOfFieldInDelta?: undefined, needsManualParse?: true, };
 }
 
-type VoidStaticProviderInfo = { // doesn't change (not stateful)
+type StatuzStaticProviderInfo = { // doesn't change (not stateful)
 	providerReasoningIOSettings?: ProviderReasoningIOSettings; // input/output settings around thinking (allowed to be empty) - only applied if the model supports reasoning output
 	modelOptions: { [key: string]: StatuzStaticModelInfo };
 	modelOptionsFallback: (modelName: string, fallbackKnownValues?: Partial<StatuzStaticModelInfo>) => (StatuzStaticModelInfo & { modelName: string, recognizedModelName: string }) | null;
@@ -391,7 +391,7 @@ const openSourceModelOptions_assumingOAICompat = {
 
 
 // keep modelName, but use the fallback's defaults
-const extensiveModelOptionsFallback: VoidStaticProviderInfo['modelOptionsFallback'] = (modelName, fallbackKnownValues) => {
+const extensiveModelOptionsFallback: StatuzStaticProviderInfo['modelOptionsFallback'] = (modelName, fallbackKnownValues) => {
 
 	const lower = modelName.toLowerCase()
 
@@ -569,7 +569,7 @@ const anthropicModelOptions = {
 	}
 } as const satisfies { [s: string]: StatuzStaticModelInfo }
 
-const anthropicSettings: VoidStaticProviderInfo = {
+const anthropicSettings: StatuzStaticProviderInfo = {
 	providerReasoningIOSettings: {
 		input: {
 			includeInPayload: (reasoningInfo) => {
@@ -713,7 +713,7 @@ const openAICompatIncludeInPayloadReasoning = (reasoningInfo: SendableReasoningI
 
 }
 
-const openAISettings: VoidStaticProviderInfo = {
+const openAISettings: StatuzStaticProviderInfo = {
 	modelOptions: openAIModelOptions,
 	modelOptionsFallback: (modelName) => {
 		const lower = modelName.toLowerCase()
@@ -786,7 +786,7 @@ const xAIModelOptions = {
 	},
 } as const satisfies { [s: string]: StatuzStaticModelInfo }
 
-const xAISettings: VoidStaticProviderInfo = {
+const xAISettings: StatuzStaticProviderInfo = {
 	modelOptions: xAIModelOptions,
 	modelOptionsFallback: (modelName) => {
 		const lower = modelName.toLowerCase()
@@ -917,7 +917,7 @@ const geminiModelOptions = { // https://ai.google.dev/gemini-api/docs/pricing
 	},
 } as const satisfies { [s: string]: StatuzStaticModelInfo }
 
-const geminiSettings: VoidStaticProviderInfo = {
+const geminiSettings: StatuzStaticProviderInfo = {
 	modelOptions: geminiModelOptions,
 	modelOptionsFallback: (modelName) => { return null },
 }
@@ -943,7 +943,7 @@ const deepseekModelOptions = {
 } as const satisfies { [s: string]: StatuzStaticModelInfo }
 
 
-const deepseekSettings: VoidStaticProviderInfo = {
+const deepseekSettings: StatuzStaticProviderInfo = {
 	modelOptions: deepseekModelOptions,
 	modelOptionsFallback: (modelName) => { return null },
 	providerReasoningIOSettings: {
@@ -1032,7 +1032,7 @@ const mistralModelOptions = { // https://mistral.ai/products/la-plateforme#prici
 	},
 } as const satisfies { [s: string]: StatuzStaticModelInfo }
 
-const mistralSettings: VoidStaticProviderInfo = {
+const mistralSettings: StatuzStaticProviderInfo = {
 	modelOptions: mistralModelOptions,
 	modelOptionsFallback: (modelName) => { return null },
 	providerReasoningIOSettings: {
@@ -1080,7 +1080,7 @@ const groqModelOptions = { // https://console.groq.com/docs/models, https://groq
 		reasoningCapabilities: { supportsReasoning: true, canIOReasoning: true, canTurnOffReasoning: false, openSourceThinkTags: ['<think>', '</think>'] }, // we're using reasoning_format:parsed so really don't need to know openSourceThinkTags
 	},
 } as const satisfies { [s: string]: StatuzStaticModelInfo }
-const groqSettings: VoidStaticProviderInfo = {
+const groqSettings: StatuzStaticProviderInfo = {
 	modelOptions: groqModelOptions,
 	modelOptionsFallback: (modelName) => { return null },
 	providerReasoningIOSettings: {
@@ -1102,7 +1102,7 @@ const groqSettings: VoidStaticProviderInfo = {
 // ---------------- GOOGLE VERTEX ----------------
 const googleVertexModelOptions = {
 } as const satisfies Record<string, StatuzStaticModelInfo>
-const googleVertexSettings: VoidStaticProviderInfo = {
+const googleVertexSettings: StatuzStaticProviderInfo = {
 	modelOptions: googleVertexModelOptions,
 	modelOptionsFallback: (modelName) => { return null },
 	providerReasoningIOSettings: {
@@ -1113,7 +1113,7 @@ const googleVertexSettings: VoidStaticProviderInfo = {
 // ---------------- MICROSOFT AZURE ----------------
 const microsoftAzureModelOptions = {
 } as const satisfies Record<string, StatuzStaticModelInfo>
-const microsoftAzureSettings: VoidStaticProviderInfo = {
+const microsoftAzureSettings: StatuzStaticProviderInfo = {
 	modelOptions: microsoftAzureModelOptions,
 	modelOptionsFallback: (modelName) => { return null },
 	providerReasoningIOSettings: {
@@ -1125,7 +1125,7 @@ const microsoftAzureSettings: VoidStaticProviderInfo = {
 const awsBedrockModelOptions = {
 } as const satisfies Record<string, StatuzStaticModelInfo>
 
-const awsBedrockSettings: VoidStaticProviderInfo = {
+const awsBedrockSettings: StatuzStaticProviderInfo = {
 	modelOptions: awsBedrockModelOptions,
 	modelOptionsFallback: (modelName) => { return null },
 	providerReasoningIOSettings: {
@@ -1214,7 +1214,7 @@ const ollamaModelOptions = {
 export const ollamaRecommendedModels = ['qwen2.5-coder:1.5b', 'llama3.1', 'qwq', 'deepseek-r1', 'devstral:latest'] as const satisfies (keyof typeof ollamaModelOptions)[]
 
 
-const vLLMSettings: VoidStaticProviderInfo = {
+const vLLMSettings: StatuzStaticProviderInfo = {
 	modelOptionsFallback: (modelName) => extensiveModelOptionsFallback(modelName, { downloadable: { sizeGb: 'not-known' } }),
 	modelOptions: {},
 	providerReasoningIOSettings: {
@@ -1224,7 +1224,7 @@ const vLLMSettings: VoidStaticProviderInfo = {
 	},
 }
 
-const lmStudioSettings: VoidStaticProviderInfo = {
+const lmStudioSettings: StatuzStaticProviderInfo = {
 	modelOptionsFallback: (modelName) => extensiveModelOptionsFallback(modelName, { downloadable: { sizeGb: 'not-known' }, contextWindow: 4_096 }),
 	modelOptions: {},
 	providerReasoningIOSettings: {
@@ -1233,7 +1233,7 @@ const lmStudioSettings: VoidStaticProviderInfo = {
 	},
 }
 
-const ollamaSettings: VoidStaticProviderInfo = {
+const ollamaSettings: StatuzStaticProviderInfo = {
 	modelOptionsFallback: (modelName) => extensiveModelOptionsFallback(modelName, { downloadable: { sizeGb: 'not-known' } }),
 	modelOptions: ollamaModelOptions,
 	providerReasoningIOSettings: {
@@ -1243,7 +1243,7 @@ const ollamaSettings: VoidStaticProviderInfo = {
 	},
 }
 
-const openaiCompatible: VoidStaticProviderInfo = {
+const openaiCompatible: StatuzStaticProviderInfo = {
 	modelOptionsFallback: (modelName) => extensiveModelOptionsFallback(modelName),
 	modelOptions: {},
 	providerReasoningIOSettings: {
@@ -1253,7 +1253,7 @@ const openaiCompatible: VoidStaticProviderInfo = {
 	},
 }
 
-const liteLLMSettings: VoidStaticProviderInfo = { // https://docs.litellm.ai/docs/reasoning_content
+const liteLLMSettings: StatuzStaticProviderInfo = { // https://docs.litellm.ai/docs/reasoning_content
 	modelOptionsFallback: (modelName) => extensiveModelOptionsFallback(modelName, { downloadable: { sizeGb: 'not-known' } }),
 	modelOptions: {},
 	providerReasoningIOSettings: {
@@ -1409,7 +1409,7 @@ const openRouterModelOptions_assumingOpenAICompat = {
 	}
 } as const satisfies { [s: string]: StatuzStaticModelInfo }
 
-const openRouterSettings: VoidStaticProviderInfo = {
+const openRouterSettings: StatuzStaticProviderInfo = {
 	modelOptions: openRouterModelOptions_assumingOpenAICompat,
 	modelOptionsFallback: (modelName) => {
 		const res = extensiveModelOptionsFallback(modelName)
@@ -1451,7 +1451,7 @@ const openRouterSettings: VoidStaticProviderInfo = {
 
 // ---------------- model settings of everything above ----------------
 
-const modelSettingsOfProvider: { [providerName in ProviderName]: VoidStaticProviderInfo } = {
+const modelSettingsOfProvider: { [providerName in ProviderName]: StatuzStaticProviderInfo } = {
 	openAI: openAISettings,
 	anthropic: anthropicSettings,
 	xAI: xAISettings,

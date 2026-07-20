@@ -30,7 +30,7 @@ import { toDisposable } from '../../../../base/common/lifecycle.js';
 
 // refer to preferences.contribution.ts keybindings editor
 
-class VoidSettingsInput extends EditorInput {
+class StatuzSettingsInput extends EditorInput {
 
 	static readonly ID: string = 'workbench.input.statuz.settings';
 
@@ -38,14 +38,14 @@ class VoidSettingsInput extends EditorInput {
 		scheme: 'statuz',  // Custom scheme for our editor (try Schemas.https)
 		path: 'settings'
 	})
-	readonly resource = VoidSettingsInput.RESOURCE;
+	readonly resource = StatuzSettingsInput.RESOURCE;
 
 	constructor() {
 		super();
 	}
 
 	override get typeId(): string {
-		return VoidSettingsInput.ID;
+		return StatuzSettingsInput.ID;
 	}
 
 	override getName(): string {
@@ -59,7 +59,7 @@ class VoidSettingsInput extends EditorInput {
 }
 
 
-class VoidSettingsPane extends EditorPane {
+class StatuzSettingsPane extends EditorPane {
 	static readonly ID = 'workbench.test.myCustomPane';
 
 	// private _scrollbar: DomScrollableElement | undefined;
@@ -71,7 +71,7 @@ class VoidSettingsPane extends EditorPane {
 		@IStorageService storageService: IStorageService,
 		@IInstantiationService private readonly instantiationService: IInstantiationService
 	) {
-		super(VoidSettingsPane.ID, group, telemetryService, themeService, storageService);
+		super(StatuzSettingsPane.ID, group, telemetryService, themeService, storageService);
 	}
 
 	protected createEditor(parent: HTMLElement): void {
@@ -112,8 +112,8 @@ class VoidSettingsPane extends EditorPane {
 
 // register Settings pane
 Registry.as<IEditorPaneRegistry>(EditorExtensions.EditorPane).registerEditorPane(
-	EditorPaneDescriptor.create(VoidSettingsPane, VoidSettingsPane.ID, nls.localize('StatuzSettingsPane', "Statuz\'s Settings Pane")),
-	[new SyncDescriptor(VoidSettingsInput)]
+	EditorPaneDescriptor.create(StatuzSettingsPane, StatuzSettingsPane.ID, nls.localize('StatuzSettingsPane', "Statuz\'s Settings Pane")),
+	[new SyncDescriptor(StatuzSettingsInput)]
 );
 
 
@@ -146,7 +146,7 @@ registerAction2(class extends Action2 {
 		const instantiationService = accessor.get(IInstantiationService);
 
 		// if is open, close it
-		const openEditors = editorService.findEditors(VoidSettingsInput.RESOURCE); // should only have 0 or 1 elements...
+		const openEditors = editorService.findEditors(StatuzSettingsInput.RESOURCE); // should only have 0 or 1 elements...
 		if (openEditors.length !== 0) {
 			const openEditor = openEditors[0].editor
 			const isCurrentlyOpen = editorService.activeEditor?.resource?.fsPath === openEditor.resource?.fsPath
@@ -159,7 +159,7 @@ registerAction2(class extends Action2 {
 
 
 		// else open it
-		const input = instantiationService.createInstance(VoidSettingsInput);
+		const input = instantiationService.createInstance(StatuzSettingsInput);
 
 		await editorGroupService.activeGroup.openEditor(input);
 	}
@@ -182,13 +182,13 @@ registerAction2(class extends Action2 {
 		const instantiationService = accessor.get(IInstantiationService);
 
 		// close all instances if found
-		const openEditors = editorService.findEditors(VoidSettingsInput.RESOURCE);
+		const openEditors = editorService.findEditors(StatuzSettingsInput.RESOURCE);
 		if (openEditors.length > 0) {
 			await editorService.closeEditors(openEditors);
 		}
 
 		// then, open one single editor
-		const input = instantiationService.createInstance(VoidSettingsInput);
+		const input = instantiationService.createInstance(StatuzSettingsInput);
 		await editorService.openEditor(input);
 	}
 })

@@ -4,11 +4,11 @@
  *--------------------------------------------------------------------------------------*/
 import { URI } from '../../../../base/common/uri.js';
 
-export type VoidDirectoryItem = {
+export type StatuzDirectoryItem = {
 	uri: URI;
 	name: string;
 	isSymbolicLink: boolean;
-	children: VoidDirectoryItem[] | null;
+	children: StatuzDirectoryItem[] | null;
 	isDirectory: boolean;
 	isGitIgnoredDirectory: false | { numChildren: number }; // if directory is gitignored, we ignore children
 }

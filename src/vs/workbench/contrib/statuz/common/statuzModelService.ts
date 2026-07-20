@@ -6,7 +6,7 @@ import { registerSingleton, InstantiationType } from '../../../../platform/insta
 import { createDecorator } from '../../../../platform/instantiation/common/instantiation.js';
 import { ITextFileService } from '../../../services/textfile/common/textfiles.js';
 
-type VoidModelType = {
+type StatuzModelType = {
 	model: ITextModel | null;
 	editorModel: IResolvedTextEditorModel | null;
 };
@@ -14,9 +14,9 @@ type VoidModelType = {
 export interface IStatuzModelService {
 	readonly _serviceBrand: undefined;
 	initializeModel(uri: URI): Promise<void>;
-	getModel(uri: URI): VoidModelType;
-	getModelFromFsPath(fsPath: string): VoidModelType;
-	getModelSafe(uri: URI): Promise<VoidModelType>;
+	getModel(uri: URI): StatuzModelType;
+	getModelFromFsPath(fsPath: string): StatuzModelType;
+	getModelSafe(uri: URI): Promise<StatuzModelType>;
 	saveModel(uri: URI): Promise<void>;
 
 }
@@ -53,7 +53,7 @@ class StatuzModelService extends Disposable implements IStatuzModelService {
 		}
 	};
 
-	getModelFromFsPath = (fsPath: string): VoidModelType => {
+	getModelFromFsPath = (fsPath: string): StatuzModelType => {
 		const editorModelRef = this._modelRefOfURI[fsPath];
 		if (!editorModelRef) {
 			return { model: null, editorModel: null };
@@ -73,7 +73,7 @@ class StatuzModelService extends Disposable implements IStatuzModelService {
 	}
 
 
-	getModelSafe = async (uri: URI): Promise<VoidModelType> => {
+	getModelSafe = async (uri: URI): Promise<StatuzModelType> => {
 		if (!(uri.fsPath in this._modelRefOfURI)) await this.initializeModel(uri);
 		return this.getModel(uri);
 

@@ -491,7 +491,7 @@ export class StatuzCommandBarService extends Disposable implements IStatuzComman
 registerSingleton(IStatuzCommandBarService, StatuzCommandBarService, InstantiationType.Delayed); // delayed is needed here :(
 
 
-export type VoidCommandBarProps = {
+export type StatuzCommandBarProps = {
 	uri: URI | null;
 	editor: ICodeEditor;
 }
@@ -535,12 +535,12 @@ class AcceptRejectAllFloatingWidget extends Widget implements IOverlayWidget {
 
 		this.instantiationService.invokeFunction(accessor => {
 			const uri = editor.getModel()?.uri || null
-			const res = mountStatuzCommandBar(root, accessor, { uri, editor } satisfies VoidCommandBarProps)
+			const res = mountStatuzCommandBar(root, accessor, { uri, editor } satisfies StatuzCommandBarProps)
 			if (!res) return
 			this._register(toDisposable(() => res.dispose?.()))
 			this._register(editor.onWillChangeModel((model) => {
 				const uri = model.newModelUrl
-				res.rerender({ uri, editor } satisfies VoidCommandBarProps)
+				res.rerender({ uri, editor } satisfies StatuzCommandBarProps)
 			}))
 		})
 	}

@@ -14,13 +14,13 @@ import { IStatuzUpdateService } from '../common/statuzUpdateService.js';
 import { IWorkbenchContribution, registerWorkbenchContribution2, WorkbenchPhase } from '../../../common/contributions.js';
 import * as dom from '../../../../base/browser/dom.js';
 import { IUpdateService } from '../../../../platform/update/common/update.js';
-import { VoidCheckUpdateRespose } from '../common/statuzUpdateServiceTypes.js';
+import { StatuzCheckUpdateResponse } from '../common/statuzUpdateServiceTypes.js';
 import { IAction } from '../../../../base/common/actions.js';
 
 
 
 
-const notifyUpdate = (res: VoidCheckUpdateRespose & { message: string }, notifService: INotificationService, updateService: IUpdateService): INotificationHandle => {
+const notifyUpdate = (res: StatuzCheckUpdateResponse & { message: string }, notifService: INotificationService, updateService: IUpdateService): INotificationHandle => {
 	const message = res?.message || 'This is a very old version of Statuz IDE, please download the latest version! [Statuz IDE](https://github.com/Oasis-Company/Statuz-IDE/releases)!'
 
 	let actions: INotificationActions | undefined

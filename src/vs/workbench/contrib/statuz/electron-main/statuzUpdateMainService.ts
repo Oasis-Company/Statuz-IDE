@@ -8,7 +8,7 @@ import { IEnvironmentMainService } from '../../../../platform/environment/electr
 import { IProductService } from '../../../../platform/product/common/productService.js';
 import { IUpdateService, StateType } from '../../../../platform/update/common/update.js';
 import { IStatuzUpdateService } from '../common/statuzUpdateService.js';
-import { VoidCheckUpdateRespose } from '../common/statuzUpdateServiceTypes.js';
+import { StatuzCheckUpdateResponse } from '../common/statuzUpdateServiceTypes.js';
 
 
 
@@ -24,7 +24,7 @@ export class StatuzMainUpdateService extends Disposable implements IStatuzUpdate
 	}
 
 
-	async check(explicit: boolean): Promise<VoidCheckUpdateRespose> {
+	async check(explicit: boolean): Promise<StatuzCheckUpdateResponse> {
 
 		const isDevMode = !this._envMainService.isBuilt // found in abstractUpdateService.ts
 
@@ -93,7 +93,7 @@ export class StatuzMainUpdateService extends Disposable implements IStatuzUpdate
 
 
 
-	private async _manualCheckGHTagIfDisabled(explicit: boolean): Promise<VoidCheckUpdateRespose> {
+	private async _manualCheckGHTagIfDisabled(explicit: boolean): Promise<StatuzCheckUpdateResponse> {
 		try {
 			const response = await fetch('https://api.github.com/repos/Oasis-Company/Statuz-IDE/releases/latest');
 
