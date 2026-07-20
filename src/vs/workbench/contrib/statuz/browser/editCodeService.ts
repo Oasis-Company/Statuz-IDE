@@ -1133,25 +1133,25 @@ class EditCodeService extends Disposable implements IEditCodeService {
 
 
 	// the applyDonePromise this returns can reject, and should be caught with .catch
-	public startApplying(opts: StartApplyingOpts): [URI, Promise<void>] | null {
+	public async startApplying(opts: StartApplyingOpts): Promise<[URI, Promise<void>] | null> {
 		let res: [DiffZone, Promise<void>] | undefined = undefined
 
 		if (opts.from === 'QuickEdit') {
-			res = this._initializeWriteoverStream(opts) // rewrite
+			res = await this._initializeWriteoverStream(opts) // rewrite
 		}
 		else if (opts.from === 'ClickApply') {
 			if (this._settingsService.state.globalSettings.enableFastApply) {
 				const numCharsInFile = this._fileLengthOfGivenURI(opts.uri)
 				if (numCharsInFile === null) return null
 				if (numCharsInFile < 1000) { // slow apply for short files (especially important for empty files)
-					res = this._initializeWriteoverStream(opts)
+					res = await this._initializeWriteoverStream(opts)
 				}
 				else {
-					res = this._initializeSearchAndReplaceStream(opts) // fast apply
+					res = await this._initializeSearchAndReplaceStream(opts) // fast apply
 				}
 			}
 			else {
-				res = this._initializeWriteoverStream(opts) // rewrite
+				res = await this._initializeWriteoverStream(opts) // rewrite
 			}
 		}
 
@@ -1349,7 +1349,7 @@ class EditCodeService extends Disposable implements IEditCodeService {
 	}
 
 
-	private _initializeWriteoverStream(opts: StartApplyingOpts): [DiffZone, Promise<void>] | undefined {
+	private async _initializeWriteoverStream(opts: StartApplyingOpts): Promise<[DiffZone, Promise<void>] | undefined> {
 
 		const { from, } = opts
 		const featureName: FeatureName = opts.from === 'ClickApply' ? 'Apply' : 'Ctrl+K'
@@ -1392,7 +1392,7 @@ class EditCodeService extends Disposable implements IEditCodeService {
 		let messages: LLMChatMessage[]
 		let separateSystemMessage: string | undefined
 		if (from === 'ClickApply') {
-			const { messages: a, separateSystemMessage: b } = this._convertToLLMMessageService.prepareLLMSimpleMessages({
+			const { messages: a, separateSystemMessage: b } = await this._convertToLLMMessageService.prepareLLMSimpleMessages({
 				systemMessage: rewriteCode_systemMessage,
 				simpleMessages: [{ role: 'user', content: rewriteCode_userMessage({ originalCode, applyStr: opts.applyStr, language }), }],
 				featureName,
@@ -1411,7 +1411,7 @@ class EditCodeService extends Disposable implements IEditCodeService {
 			const { prefix, suffix } = voidPrefixAndSuffix({ fullFileStr: originalFileCode, startLine, endLine })
 			const userContent = ctrlKStream_userMessage({ selection: originalCode, instructions: instructions, prefix, suffix, fimTags: quickEditFIMTags, language })
 
-			const { messages: a, separateSystemMessage: b } = this._convertToLLMMessageService.prepareLLMSimpleMessages({
+			const { messages: a, separateSystemMessage: b } = await this._convertToLLMMessageService.prepareLLMSimpleMessages({
 				systemMessage: ctrlKStream_systemMessage({ quickEditFIMTags: quickEditFIMTags }),
 				simpleMessages: [{ role: 'user', content: userContent, }],
 				featureName,
@@ -1668,7 +1668,7 @@ class EditCodeService extends Disposable implements IEditCodeService {
 		)
 	}
 
-	private _initializeSearchAndReplaceStream(opts: StartApplyingOpts & { from: 'ClickApply' }): [DiffZone, Promise<void>] | undefined {
+	private async _initializeSearchAndReplaceStream(opts: StartApplyingOpts & { from: 'ClickApply' }): Promise<[DiffZone, Promise<void>] | undefined> {
 		const { from, applyStr, } = opts
 		const featureName: FeatureName = 'Apply'
 		const overridesOfModel = this._settingsService.state.overridesOfModel
@@ -1688,7 +1688,7 @@ class EditCodeService extends Disposable implements IEditCodeService {
 		const originalFileCode = model.getValue(EndOfLinePreference.LF)
 		const userMessageContent = searchReplaceGivenDescription_userMessage({ originalCode: originalFileCode, applyStr: applyStr })
 
-		const { messages, separateSystemMessage: separateSystemMessage } = this._convertToLLMMessageService.prepareLLMSimpleMessages({
+		const { messages, separateSystemMessage: separateSystemMessage } = await this._convertToLLMMessageService.prepareLLMSimpleMessages({
 			systemMessage: searchReplaceGivenDescription_systemMessage,
 			simpleMessages: [{ role: 'user', content: userMessageContent, }],
 			featureName,

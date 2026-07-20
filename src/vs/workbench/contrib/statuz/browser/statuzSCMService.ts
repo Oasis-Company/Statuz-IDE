@@ -95,7 +95,7 @@ class GenerateCommitMessageService extends Disposable implements IGenerateCommit
 				const prompt = gitCommitMessage_userMessage(stat, sampledDiffs, branch, log)
 
 				const simpleMessages = [{ role: 'user', content: prompt } as const]
-				const { messages, separateSystemMessage } = this.convertToLLMMessageService.prepareLLMSimpleMessages({
+				const { messages, separateSystemMessage } = await this.convertToLLMMessageService.prepareLLMSimpleMessages({
 					simpleMessages,
 					systemMessage: gitCommitMessage_systemMessage,
 					modelSelection: modelOptions.modelSelection,
