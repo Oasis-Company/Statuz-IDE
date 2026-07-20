@@ -342,7 +342,7 @@ const ApplyButtonsForEdit = ({
 
 		await editCodeService.callBeforeApplyOrEdit(uri)
 
-		const [newApplyingUri, applyDonePromise] = editCodeService.startApplying({
+		const [newApplyingUri, applyDonePromise] = await editCodeService.startApplying({
 			from: 'ClickApply',
 			applyStr: codeStr,
 			uri: uri,

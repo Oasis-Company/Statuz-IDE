@@ -264,24 +264,72 @@ const ChatModeDropdown = ({ className }: { className: string }) => {
 	const accessor = useAccessor()
 
 	const voidSettingsService = accessor.get('IStatuzSettingsService')
+	const agentMgmtService = accessor.get('IAgentManagementService')
 	const settingsState = useSettingsState()
 
 	const options: ChatMode[] = useMemo(() => ['normal', 'gather', 'agent'], [])
 
 	const onChangeOption = useCallback((newVal: ChatMode) => {
 		voidSettingsService.setGlobalSetting('chatMode', newVal)
-	}, [voidSettingsService])
+		// Clear active agent when switching away from agent mode
+		if (newVal !== 'agent') {
+			agentMgmtService.setActiveAgent(null);
+		}
+	}, [voidSettingsService, agentMgmtService])
 
-	return <StatuzCustomDropdownBox
-		className={className}
-		options={options}
-		selectedOption={settingsState.globalSettings.chatMode}
-		onChangeOption={onChangeOption}
-		getOptionDisplayName={(val) => nameOfChatMode[val]}
-		getOptionDropdownName={(val) => nameOfChatMode[val]}
-		getOptionDropdownDetail={(val) => detailOfChatMode[val]}
-		getOptionsEqual={(a, b) => a === b}
-	/>
+	// Agent selection state
+	const [agentStates, setAgentStates] = useState(() =>
+		agentMgmtService.getDefinitionStates().filter(s => s.state === 'enabled')
+	);
+	const [activeAgentId, setActiveAgentId] = useState(() => agentMgmtService.getActiveAgentId());
+
+	useEffect(() => {
+		const disposables = [
+			agentMgmtService.onDidChangeItems(() => {
+				setAgentStates(agentMgmtService.getDefinitionStates().filter(s => s.state === 'enabled'));
+			}),
+			agentMgmtService.onDidChangeActiveAgent((id) => {
+				setActiveAgentId(id);
+			}),
+		];
+		return () => disposables.forEach(d => d.dispose());
+	}, [agentMgmtService]);
+
+	const isAgentMode = settingsState.globalSettings.chatMode === 'agent';
+	const enabledAgents = agentStates.filter(s => s.definition.kind === 'agent');
+
+	return <>
+		<StatuzCustomDropdownBox
+			className={className}
+			options={options}
+			selectedOption={settingsState.globalSettings.chatMode}
+			onChangeOption={onChangeOption}
+			getOptionDisplayName={(val) => nameOfChatMode[val]}
+			getOptionDropdownName={(val) => nameOfChatMode[val]}
+			getOptionDropdownDetail={(val) => detailOfChatMode[val]}
+			getOptionsEqual={(a, b) => a === b}
+		/>
+		{isAgentMode && enabledAgents.length > 0 && (
+			<select
+				className='text-xs text-statuz-fg-3 bg-statuz-bg-1 border border-statuz-border-2 rounded py-0.5 px-1'
+				value={activeAgentId ?? ''}
+				onChange={(e) => {
+					const id = e.target.value || null;
+					agentMgmtService.setActiveAgent(id);
+				}}
+			>
+				<option value="">No agent selected</option>
+				{enabledAgents.map(a => (
+					<option key={a.definition.id} value={a.definition.id}>
+						{a.definition.name}
+					</option>
+				))}
+			</select>
+		)}
+		{isAgentMode && enabledAgents.length === 0 && (
+			<span className='text-xs text-statuz-fg-3 italic'>No agents available</span>
+		)}
+	</>
 
 }
 

@@ -72,7 +72,7 @@ export const QuickEditChat = ({
 		} as const
 
 		await editCodeService.callBeforeApplyOrEdit(opts)
-		const [newApplyingUri, applyDonePromise] = editCodeService.startApplying(opts) ?? []
+		const [newApplyingUri, applyDonePromise] = await editCodeService.startApplying(opts) ?? []
 		// catch any errors by interrupting the stream
 		applyDonePromise?.catch(e => { if (newApplyingUri) editCodeService.interruptCtrlKStreaming({ diffareaid }) })
 
