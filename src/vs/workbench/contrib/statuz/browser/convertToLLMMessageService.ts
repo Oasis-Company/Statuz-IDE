@@ -18,6 +18,8 @@ import { URI } from '../../../../base/common/uri.js';
 import { EndOfLinePreference } from '../../../../editor/common/model.js';
 import { ToolName } from '../common/toolsServiceTypes.js';
 import { IMCPService } from '../common/mcpService.js';
+import { IAgentManagementService } from './agentManagementService.js';
+import { IAgentConfigPromptAdapter } from './agentdef/agentConfigPromptAdapter.js';
 
 export const EMPTY_MESSAGE = '(empty message)'
 
@@ -271,7 +273,7 @@ const prepareOpenAIOrAnthropicMessages = ({
 	// A COMPLETE HACK: last message is system message for context purposes
 
 	const sysMsgParts: string[] = []
-	if (aiInstructions) sysMsgParts.push(`GUIDELINES (from the user's .voidrules file):\n${aiInstructions}`)
+	if (aiInstructions) sysMsgParts.push(`GUIDELINES (from the user's .statuzrules file):\n${aiInstructions}`)
 	if (systemMessage) sysMsgParts.push(systemMessage)
 	const combinedSystemMessage = sysMsgParts.join('\n\n')
 
@@ -521,9 +523,9 @@ const prepareMessages = (params: {
 
 export interface IConvertToLLMMessageService {
 	readonly _serviceBrand: undefined;
-	prepareLLMSimpleMessages: (opts: { simpleMessages: SimpleLLMMessage[], systemMessage: string, modelSelection: ModelSelection | null, featureName: FeatureName }) => { messages: LLMChatMessage[], separateSystemMessage: string | undefined }
+	prepareLLMSimpleMessages: (opts: { simpleMessages: SimpleLLMMessage[], systemMessage: string, modelSelection: ModelSelection | null, featureName: FeatureName }) => Promise<{ messages: LLMChatMessage[], separateSystemMessage: string | undefined }>
 	prepareLLMChatMessages: (opts: { chatMessages: ChatMessage[], chatMode: ChatMode, modelSelection: ModelSelection | null }) => Promise<{ messages: LLMChatMessage[], separateSystemMessage: string | undefined }>
-	prepareFIMMessage(opts: { messages: LLMFIMMessage, }): { prefix: string, suffix: string, stopTokens: string[] }
+	prepareFIMMessage(opts: { messages: LLMFIMMessage, }): Promise<{ prefix: string, suffix: string, stopTokens: string[] }>
 }
 
 export const IConvertToLLMMessageService = createDecorator<IConvertToLLMMessageService>('ConvertToLLMMessageService');
@@ -541,36 +543,59 @@ class ConvertToLLMMessageService extends Disposable implements IConvertToLLMMess
 		@IStatuzSettingsService private readonly voidSettingsService: IStatuzSettingsService,
 		@IStatuzModelService private readonly voidModelService: IStatuzModelService,
 		@IMCPService private readonly mcpService: IMCPService,
+		@IAgentManagementService private readonly agentMgmtService: IAgentManagementService,
+		@IAgentConfigPromptAdapter private readonly promptAdapter: IAgentConfigPromptAdapter,
 	) {
 		super()
 	}
 
-	// Read .voidrules files from workspace folders
-	private _getVoidRulesFileContents(): string {
+	// Read .statuzrules files from workspace folders
+	private _getStatuzRulesFileContents(): string {
 		try {
 			const workspaceFolders = this.workspaceContextService.getWorkspace().folders;
-			let voidRules = '';
+			let statuzRules = '';
 			for (const folder of workspaceFolders) {
-				const uri = URI.joinPath(folder.uri, '.voidrules')
+				const uri = URI.joinPath(folder.uri, '.statuzrules')
 				const { model } = this.voidModelService.getModel(uri)
 				if (!model) continue
-				voidRules += model.getValue(EndOfLinePreference.LF) + '\n\n';
+				statuzRules += model.getValue(EndOfLinePreference.LF) + '\n\n';
 			}
-			return voidRules.trim();
+			return statuzRules.trim();
 		}
 		catch (e) {
 			return ''
 		}
 	}
 
-	// Get combined AI instructions from settings and .voidrules files
-	private _getCombinedAIInstructions(): string {
+	// Get agent-specific prompt fragment from the currently active agent
+	private async _getActiveAgentPromptFragment(): Promise<string> {
+		const activeAgentId = this.agentMgmtService.getActiveAgentId();
+		if (!activeAgentId) {
+			return '';
+		}
+		try {
+			const definition = await this.agentMgmtService.getDefinition(activeAgentId);
+			if (!definition || !definition.config) {
+				return '';
+			}
+			const promptConfig = this.promptAdapter.extractPromptConfig(definition.config);
+			return this.promptAdapter.toPromptFragment(promptConfig);
+		} catch (e) {
+			console.error('[ConvertToLLMMessage] Failed to get agent prompt fragment:', e);
+			return '';
+		}
+	}
+
+	// Get combined AI instructions from settings, .statuzrules files, and active agent
+	private async _getCombinedAIInstructions(): Promise<string> {
+		const agentPromptFragment = await this._getActiveAgentPromptFragment();
 		const globalAIInstructions = this.voidSettingsService.state.globalSettings.aiInstructions;
-		const voidRulesFileContent = this._getVoidRulesFileContents();
+		const statuzRulesFileContent = this._getStatuzRulesFileContents();
 
 		const ans: string[] = []
+		if (agentPromptFragment) ans.push(agentPromptFragment)
 		if (globalAIInstructions) ans.push(globalAIInstructions)
-		if (voidRulesFileContent) ans.push(voidRulesFileContent)
+		if (statuzRulesFileContent) ans.push(statuzRulesFileContent)
 		return ans.join('\n\n')
 	}
 
@@ -634,7 +659,7 @@ class ConvertToLLMMessageService extends Disposable implements IConvertToLLMMess
 		return simpleLLMMessages
 	}
 
-	prepareLLMSimpleMessages: IConvertToLLMMessageService['prepareLLMSimpleMessages'] = ({ simpleMessages, systemMessage, modelSelection, featureName }) => {
+	prepareLLMSimpleMessages: IConvertToLLMMessageService['prepareLLMSimpleMessages'] = async ({ simpleMessages, systemMessage, modelSelection, featureName }) => {
 		if (modelSelection === null) return { messages: [], separateSystemMessage: undefined }
 
 		const { overridesOfModel } = this.voidSettingsService.state
@@ -649,7 +674,7 @@ class ConvertToLLMMessageService extends Disposable implements IConvertToLLMMess
 		const modelSelectionOptions = this.voidSettingsService.state.optionsOfModelSelection[featureName][modelSelection.providerName]?.[modelSelection.modelName]
 
 		// Get combined AI instructions
-		const aiInstructions = this._getCombinedAIInstructions();
+		const aiInstructions = await this._getCombinedAIInstructions();
 
 		const isReasoningEnabled = getIsReasoningEnabledState(featureName, providerName, modelName, modelSelectionOptions, overridesOfModel)
 		const reservedOutputTokenSpace = getReservedOutputTokenSpace(providerName, modelName, { isReasoningEnabled, overridesOfModel })
@@ -686,7 +711,7 @@ class ConvertToLLMMessageService extends Disposable implements IConvertToLLMMess
 		const modelSelectionOptions = this.voidSettingsService.state.optionsOfModelSelection['Chat'][modelSelection.providerName]?.[modelSelection.modelName]
 
 		// Get combined AI instructions
-		const aiInstructions = this._getCombinedAIInstructions();
+		const aiInstructions = await this._getCombinedAIInstructions();
 		const isReasoningEnabled = getIsReasoningEnabledState('Chat', providerName, modelName, modelSelectionOptions, overridesOfModel)
 		const reservedOutputTokenSpace = getReservedOutputTokenSpace(providerName, modelName, { isReasoningEnabled, overridesOfModel })
 		const llmMessages = this._chatMessagesToSimpleMessages(chatMessages)
@@ -708,9 +733,9 @@ class ConvertToLLMMessageService extends Disposable implements IConvertToLLMMess
 
 	// --- FIM ---
 
-	prepareFIMMessage: IConvertToLLMMessageService['prepareFIMMessage'] = ({ messages }) => {
+	prepareFIMMessage: IConvertToLLMMessageService['prepareFIMMessage'] = async ({ messages }) => {
 		// Get combined AI instructions with the provided aiInstructions as the base
-		const combinedInstructions = this._getCombinedAIInstructions();
+		const combinedInstructions = await this._getCombinedAIInstructions();
 
 		let prefix = `\
 ${!combinedInstructions ? '' : `\
