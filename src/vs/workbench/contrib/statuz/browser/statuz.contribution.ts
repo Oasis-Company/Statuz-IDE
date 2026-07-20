@@ -122,6 +122,11 @@ import './supabase/supabaseAuthContribution.js'
 import { IAgentDefinitionStorage, AgentDefinitionStorage } from './agentdef/agentDefinitionStorage.js';
 registerSingleton(IAgentDefinitionStorage, AgentDefinitionStorage, 0);
 
+// ---------- Agent Config Prompt Adapter ----------
+
+import { IAgentConfigPromptAdapter, AgentConfigPromptAdapter } from './agentdef/agentConfigPromptAdapter.js';
+registerSingleton(IAgentConfigPromptAdapter, AgentConfigPromptAdapter, 0);
+
 // ---------- Statuz Core services ----------
 
 import { IStatuzService, StatuzService } from './statuz/statuzService.js';

@@ -11,7 +11,7 @@ export interface HarnessDetailActions {
 	onInstall: (id: string) => Promise<void>;
 	onUninstall: (id: string) => Promise<void>;
 	onToggle: (id: string, state: 'enabled' | 'disabled') => void;
-	onConfigSave: (id: string, config: Record<string, any>) => void;
+	onConfigSave: (id: string, config: Record<string, any>) => Promise<void>;
 }
 
 export class HarnessDetailPanel extends Disposable {
@@ -131,14 +131,27 @@ export class HarnessDetailPanel extends Disposable {
 		const textarea = append(configEditor, $('textarea.harness-detail-config-textarea')) as HTMLTextAreaElement;
 		textarea.value = JSON.stringify(item.config, null, 2);
 		const configActions = append(configEditor, $('.harness-detail-config-actions'));
-		const saveBtn = append(configActions, $('button.harness-detail-btn.primary'));
+		const saveBtn = append(configActions, $('button.harness-detail-btn.primary')) as HTMLButtonElement;
 		saveBtn.textContent = 'Save Config';
-		this._register(addDisposableListener(saveBtn, 'click', () => {
+		this._register(addDisposableListener(saveBtn, 'click', async () => {
 			try {
 				const parsed = JSON.parse(textarea.value);
-				actions.onConfigSave(item.id, parsed);
+				saveBtn.textContent = 'Saving...';
+				saveBtn.disabled = true;
+				await actions.onConfigSave(item.id, parsed);
+				saveBtn.textContent = '✓ Saved';
+				setTimeout(() => {
+					saveBtn.textContent = 'Save Config';
+					saveBtn.disabled = false;
+				}, 1500);
 			} catch (e) {
-				// Invalid JSON — ignore
+				if (e instanceof SyntaxError) {
+					saveBtn.textContent = '✗ Invalid JSON';
+				} else {
+					saveBtn.textContent = '✗ Error';
+				}
+				saveBtn.disabled = false;
+				setTimeout(() => { saveBtn.textContent = 'Save Config'; }, 2000);
 			}
 		}));
 	}

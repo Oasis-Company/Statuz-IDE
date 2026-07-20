@@ -332,8 +332,13 @@ export class HarnessEditor extends EditorPane {
 		}
 	}
 
-	private handleConfigSave(id: string, config: Record<string, any>): void {
-		this.agentMgmtService.updateConfig(id, config);
+	private async handleConfigSave(id: string, config: Record<string, any>): Promise<void> {
+		try {
+			await this.agentMgmtService.updateConfig(id, config);
+			console.log(`[HarnessEditor] Config saved for ${id}`);
+		} catch (err) {
+			console.error(`[HarnessEditor] Failed to save config for ${id}:`, err);
+		}
 	}
 
 	// ─── Dispose ────────────────────────────────────────────

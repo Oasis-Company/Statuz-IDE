@@ -35,7 +35,19 @@ export interface IAgentManagementService {
 	/** Set runtime state for a definition */
 	setDefinitionState(id: string, state: AgentRuntimeState): void;
 	/** Update config for a definition */
-	updateDefinitionConfig(id: string, config: Record<string, unknown>): void;
+	updateDefinitionConfig(id: string, config: Record<string, unknown>): Promise<void>;
+	/** Create a new definition (write to YAML storage) */
+	writeDefinition(definition: import('./agentdef/agentDefinitionTypes.js').AgentDefinition): Promise<void>;
+	/** Get a single definition's raw data (for prompt injection) */
+	getDefinition(id: string): Promise<import('./agentdef/agentDefinitionTypes.js').AgentDefinition | undefined>;
+
+	// ── Active Agent Management ─────────────────────────────
+	/** Set the currently active agent for Chat */
+	setActiveAgent(id: string | null): void;
+	/** Get the currently active agent ID */
+	getActiveAgentId(): string | null;
+	/** Fired when the active agent changes */
+	readonly onDidChangeActiveAgent: Event<string | null>;
 
 	// ── Deprecated API (backward-compatible) ──────────────────
 	/** @deprecated Use getDefinitionStates() instead */
@@ -57,6 +69,11 @@ export class AgentManagementService implements IAgentManagementService {
 
 	private readonly _onDidChangeItems = new Emitter<void>();
 	readonly onDidChangeItems: Event<void> = this._onDidChangeItems.event;
+
+	// ── Active Agent Management ─────────────────────────────
+	private activeAgentId: string | null = null;
+	private readonly _onDidChangeActiveAgent = new Emitter<string | null>();
+	readonly onDidChangeActiveAgent: Event<string | null> = this._onDidChangeActiveAgent.event;
 
 	/** Runtime state overrides: definitionId → { state, lastUsed, usageCount } */
 	private runtimeStates: Map<string, { state: AgentRuntimeState; lastUsed: number; usageCount: number }> = new Map();
@@ -207,10 +224,39 @@ export class AgentManagementService implements IAgentManagementService {
 		this._onDidChangeItems.fire();
 	}
 
-	updateDefinitionConfig(id: string, config: Record<string, unknown>): void {
-		// Config is stored in the definition YAML file via IAgentDefinitionStorage
-		// For now, we only track runtime state
+	async writeDefinition(definition: import('./agentdef/agentDefinitionTypes.js').AgentDefinition): Promise<void> {
+		await this.definitionStorage.writeDefinition(definition);
 		this._onDidChangeItems.fire();
+	}
+
+	async updateDefinitionConfig(id: string, config: Record<string, unknown>): Promise<void> {
+		const existingDef = await this.definitionStorage.readDefinition(id);
+		if (!existingDef) {
+			console.error(`[AgentMgmt] updateDefinitionConfig: definition not found for id="${id}"`);
+			return;
+		}
+		// Construct new definition object (config is readonly, must replace entire object)
+		const updatedDef = {
+			...existingDef,
+			config,
+			updatedAt: Date.now(),
+		};
+		await this.definitionStorage.writeDefinition(updatedDef);
+		this._onDidChangeItems.fire();
+	}
+
+	async getDefinition(id: string): Promise<import('./agentdef/agentDefinitionTypes.js').AgentDefinition | undefined> {
+		const result = await this.definitionStorage.readDefinition(id);
+		return result ?? undefined;
+	}
+
+	setActiveAgent(id: string | null): void {
+		this.activeAgentId = id;
+		this._onDidChangeActiveAgent.fire(id);
+	}
+
+	getActiveAgentId(): string | null {
+		return this.activeAgentId;
 	}
 
 	// ─── Deprecated API (backward-compatible) ──────────────────
@@ -260,8 +306,8 @@ export class AgentManagementService implements IAgentManagementService {
 		this.setDefinitionState(id, state as AgentRuntimeState);
 	}
 
-	updateConfig(id: string, config: Record<string, any>): void {
-		this.updateDefinitionConfig(id, config);
+	updateConfig(id: string, config: Record<string, any>): Promise<void> {
+		return this.updateDefinitionConfig(id, config);
 	}
 
 	async installItem(id: string): Promise<void> {
