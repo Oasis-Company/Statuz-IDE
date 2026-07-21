@@ -6,6 +6,10 @@
 import { append, $, clearNode, addDisposableListener } from '../../../../../base/browser/dom.js';
 import { Disposable } from '../../../../../base/common/lifecycle.js';
 import { IAgentSkillItem } from '../agentManagement.types.js';
+import { AgentBehaviorPreview } from './agentBehaviorPreview.js';
+import { AgentVersionGallery } from './agentVersionGallery.js';
+import { AgentExportService } from './agentExportService.js';
+import { IAgentManagementService } from '../agentManagementService.js';
 
 export interface HarnessDetailActions {
 	onInstall: (id: string) => Promise<void>;
@@ -19,8 +23,9 @@ export class HarnessDetailPanel extends Disposable {
 	private readonly container: HTMLElement;
 	private actionButtons: HTMLElement | null = null;
 	private statusMessage: HTMLElement | null = null;
+	private behaviorPreview: AgentBehaviorPreview | null = null;
 
-	constructor(parent: HTMLElement) {
+	constructor(parent: HTMLElement, @IAgentManagementService private readonly agentMgmtService?: IAgentManagementService) {
 		super();
 		this.container = parent;
 		this.container.className = 'harness-detail-panel';
@@ -121,6 +126,41 @@ export class HarnessDetailPanel extends Disposable {
 			toggleBtn.textContent = item.state === 'disabled' ? 'Enable' : 'Disable';
 			this._register(addDisposableListener(toggleBtn, 'click', () => {
 				actions.onToggle(item.id, item.state === 'disabled' ? 'enabled' : 'disabled');
+			}));
+		}
+
+		// Behavior Preview
+		if (item.config && Object.keys(item.config).length > 0) {
+			const previewSection = append(content, $('.harness-detail-section'));
+			append(previewSection, $('.harness-detail-section-title')).textContent = 'Behavior Preview';
+			const previewContainer = append(previewSection, $('.harness-detail-behavior-preview'));
+			this.behaviorPreview = new AgentBehaviorPreview(previewContainer);
+			this.behaviorPreview.show(item.config);
+		}
+
+		// Version History
+		if (this.agentMgmtService) {
+			const versionSection = append(content, $('.harness-detail-section'));
+			append(versionSection, $('.harness-detail-section-title')).textContent = 'Version History';
+			const versionContainer = append(versionSection, $('.harness-detail-version-gallery'));
+			this._register(new AgentVersionGallery(versionContainer, item.id, this.agentMgmtService, async (snapshotId) => {
+				await this.agentMgmtService!.rollbackConfig(item.id, snapshotId);
+				// Refresh config display
+				actions.onConfigSave(item.id, item.config);
+			}));
+		}
+
+		// Export button
+		if (this.agentMgmtService) {
+			const exportBtn = append(this.actionButtons, $('button.harness-detail-btn.secondary')) as HTMLButtonElement;
+			exportBtn.textContent = 'Export .agent.yaml';
+			this._register(addDisposableListener(exportBtn, 'click', async () => {
+				const exportService = new AgentExportService(this.agentMgmtService!);
+				try {
+					await exportService.exportAsYaml(item.id);
+				} catch (e) {
+					console.error('[HarnessDetailPanel] Export failed:', e);
+				}
 			}));
 		}
 

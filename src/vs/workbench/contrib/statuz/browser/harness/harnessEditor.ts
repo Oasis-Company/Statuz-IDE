@@ -45,14 +45,19 @@ import { IOpenerService } from '../../../../../platform/opener/common/opener.js'
 import { IHoverService } from '../../../../../platform/hover/browser/hover.js';
 
 import { HarnessEditorInput } from './harnessEditorInput.js';
-import { HarnessNavBar } from './harnessNavBar.js';
+import { HarnessNavBar, HarnessTab } from './harnessNavBar.js';
 import { HarnessStatusBar } from './harnessStatusBar.js';
 import { HarnessSidebar } from './harnessSidebar.js';
 import { HarnessCardGrid } from './harnessCardGrid.js';
 import { HarnessDetailPanel } from './harnessDetailPanel.js';
 import { IAgentManagementService } from '../agentManagementService.js';
-import { IAgentSkillItem, IAgentSkillFilter } from '../agentManagement.types.js';
+import { IAgentSkillItem, IAgentSkillFilter, AgentTemplate } from '../agentManagement.types.js';
 import { AgentCanvas } from './agentCanvas.js';
+import { AgentTemplateStore } from './agentTemplateStore.js';
+import { AgentSandbox } from './agentSandbox.js';
+import { AgentPerformanceDashboard } from './agentPerformanceDashboard.js';
+import { AgentDefinition } from '../agentdef/agentDefinitionTypes.js';
+import { clearNode } from '../../../../../base/browser/dom.js';
 
 /* ─── Data ───────────────────────────────────────────────── */
 
@@ -76,11 +81,13 @@ export class HarnessEditor extends EditorPane {
 	private agentCanvasContainer!: HTMLElement;
 	private agentCanvas!: AgentCanvas;
 
-	private currentTab: 'catalog' | 'installed' | 'harness' | 'config' = 'catalog';
+	private currentTab: HarnessTab = 'catalog';
 	private currentFilter: IAgentSkillFilter = {
 		query: '', types: [], state: 'all',
 		sortBy: 'name', sortAsc: true,
 	};
+	private templateStore!: AgentTemplateStore;
+	private sandbox: AgentSandbox | null = null;
 
 	constructor(
 		group: IEditorGroup,
@@ -138,6 +145,7 @@ export class HarnessEditor extends EditorPane {
 		this.sidebar = new HarnessSidebar(this.sidebarContainer, (filter) => this.onFilterChange(filter));
 		this.cardGrid = new HarnessCardGrid(this.cardGridContainer, (item) => this.onCardSelect(item));
 		this.detailPanel = new HarnessDetailPanel(this.detailPanelContainer);
+		this.templateStore = new AgentTemplateStore();
 
 		// Initialize AgentCanvas
 		this.agentCanvas = new AgentCanvas(this.agentCanvasContainer, {
@@ -188,7 +196,7 @@ export class HarnessEditor extends EditorPane {
 
 	// ─── Tab Switching ──────────────────────────────────────
 
-	private onTabSwitch(tab: 'catalog' | 'installed' | 'harness' | 'config'): void {
+	private onTabSwitch(tab: HarnessTab): void {
 		this.currentTab = tab;
 		this.renderCurrentTab();
 	}
@@ -201,8 +209,23 @@ export class HarnessEditor extends EditorPane {
 			case 'installed':
 				this.renderInstalledView();
 				break;
+			case 'templates':
+				this.renderTemplatesView();
+				break;
+			case 'design':
+				this.renderDesignView();
+				break;
 			case 'harness':
 				this.renderHarnessDashboard();
+				break;
+			case 'sandbox':
+				this.renderSandboxView();
+				break;
+			case 'analytics':
+				this.renderAnalyticsView();
+				break;
+			case 'pipeline':
+				this.renderPipelineView();
 				break;
 			case 'config':
 				this.renderConfigView();
@@ -279,6 +302,212 @@ export class HarnessEditor extends EditorPane {
 		const items = this.agentMgmtService.getItems();
 		const enabled = items.filter(i => i.state === 'enabled').length;
 		this.statusBar.update(items.length, enabled, enabled);
+	}
+
+	// ─── Templates View ──────────────────────────────────────
+
+	private renderTemplatesView(): void {
+		this.agentCanvasContainer.style.display = 'none';
+		this.cardGridContainer.style.display = '';
+		this.sidebarContainer.style.display = 'none';
+		this.detailPanelContainer.style.display = 'none';
+
+		const templates = this.templateStore.getAllTemplates();
+		this.renderTemplateCards(templates);
+	}
+
+	private renderTemplateCards(templates: AgentTemplate[]): void {
+		const container = this.cardGridContainer;
+		clearNode(container);
+
+		const grouped = this.templateStore.getTemplatesByCategory();
+		const grid = append(container, $('.harness-template-grid'));
+
+		for (const [category, items] of grouped.entries()) {
+			append(grid, $('.harness-category-header')).textContent = category;
+
+			const cardsRow = append(grid, $('.harness-category-grid'));
+			for (const tpl of items) {
+				const card = append(cardsRow, $('.harness-template-card'));
+				card.addEventListener('click', () => this.createAgentFromTemplate(tpl));
+
+				const icon = append(card, $('span.codicon'));
+				icon.className = `codicon ${tpl.icon}`;
+
+				const name = append(card, $('.harness-template-card-name'));
+				name.textContent = tpl.name;
+
+				const desc = append(card, $('.harness-template-card-desc'));
+				desc.textContent = tpl.description;
+
+				const tags = append(card, $('.harness-template-card-tags'));
+				tpl.tags.slice(0, 3).forEach(tag => {
+					append(tags, $('.harness-template-card-tag')).textContent = tag;
+				});
+			}
+		}
+	}
+
+	private async createAgentFromTemplate(template: AgentTemplate): Promise<void> {
+		const agentId = `local:${template.id.replace('tmpl-', '')}-${Date.now().toString(36)}`;
+		const definition: AgentDefinition = {
+			id: agentId,
+			name: `${template.name} (from template)`,
+			kind: template.kind,
+			description: template.defaults.description,
+			version: template.defaults.version,
+			author: template.defaults.author,
+			source: { type: 'local', path: `.statuzide/definitions/${agentId}.yaml` },
+			icon: template.icon,
+			category: template.category,
+			tags: [...template.tags],
+			config: template.defaults.config,
+			createdAt: Date.now(),
+			updatedAt: Date.now(),
+		};
+
+		try {
+			await this.agentMgmtService.writeDefinition(definition);
+			this.currentTab = 'design';
+			this.renderCurrentTab();
+			const item = this.agentMgmtService.getItem(agentId);
+			if (item) {
+				this.onCardSelect(item);
+			}
+		} catch (err) {
+			console.error('[HarnessEditor] Failed to create agent from template:', err);
+		}
+	}
+
+	// ─── Design View ─────────────────────────────────────────
+
+	private renderDesignView(): void {
+		this.agentCanvasContainer.style.display = 'none';
+		this.cardGridContainer.style.display = '';
+		this.sidebarContainer.style.display = 'none';
+		this.detailPanelContainer.style.display = '';
+
+		const items = this.agentMgmtService.getItems();
+		this.cardGrid.render(items, this.currentFilter);
+	}
+
+	// ─── Sandbox View ────────────────────────────────────────
+
+	private renderSandboxView(): void {
+		this.agentCanvasContainer.style.display = 'none';
+		this.cardGridContainer.style.display = '';
+		this.sidebarContainer.style.display = '';
+		this.detailPanelContainer.style.display = 'none';
+
+		clearNode(this.cardGridContainer);
+		clearNode(this.sidebarContainer);
+
+		// Show agent selector in sidebar
+		this.sidebar.renderForSandbox((agentId) => {
+			this.openSandbox(agentId);
+		});
+
+		// Show placeholder
+		const placeholder = append(this.cardGridContainer, $('.agent-sandbox-placeholder'));
+		append(placeholder, $('span.codicon.codicon-beaker'));
+		append(placeholder, $('h3')).textContent = 'Agent Sandbox';
+		append(placeholder, $('p')).textContent = 'Select an agent from the sidebar to test it in the sandbox.';
+	}
+
+	private openSandbox(agentId: string): void {
+		clearNode(this.cardGridContainer);
+		if (this.sandbox) {
+			this.sandbox.dispose();
+		}
+		this.sandbox = this._register(new AgentSandbox(
+			this.cardGridContainer,
+			agentId,
+			this.agentMgmtService,
+		));
+	}
+
+	// ─── Analytics View ──────────────────────────────────────
+
+	private renderAnalyticsView(): void {
+		this.agentCanvasContainer.style.display = 'none';
+		this.cardGridContainer.style.display = '';
+		this.sidebarContainer.style.display = 'none';
+		this.detailPanelContainer.style.display = 'none';
+
+		clearNode(this.cardGridContainer);
+		new AgentPerformanceDashboard(this.cardGridContainer, this.agentMgmtService);
+	}
+
+	// ─── Pipeline View ───────────────────────────────────────
+
+	private renderPipelineView(): void {
+		this.sidebarContainer.style.display = '';
+		this.detailPanelContainer.style.display = 'none';
+		this.cardGridContainer.style.display = 'none';
+		this.agentCanvasContainer.style.display = '';
+
+		clearNode(this.sidebarContainer);
+
+		// Agent palette for drag-and-drop
+		const palette = append(this.sidebarContainer, $('.pipeline-palette'));
+		append(palette, $('.pipeline-palette-title')).textContent = 'Agent Palette';
+
+		const items = this.agentMgmtService.getItems().filter(i => i.state === 'enabled');
+		const list = append(palette, $('.pipeline-palette-list'));
+
+		for (const item of items) {
+			const entry = append(list, $('.pipeline-palette-entry'));
+			entry.draggable = true;
+			entry.dataset.agentId = item.id;
+			entry.addEventListener('dragstart', (e) => {
+				e.dataTransfer?.setData('text/plain', item.id);
+				e.dataTransfer!.effectAllowed = 'copy';
+			});
+
+			const icon = append(entry, $('span.codicon'));
+			icon.className = `codicon ${item.iconCodicon}`;
+			append(entry, $('span')).textContent = item.name;
+		}
+
+		// Flow control nodes
+		const flowTitle = append(palette, $('.pipeline-palette-title'));
+		flowTitle.textContent = 'Flow Control';
+		flowTitle.style.marginTop = '12px';
+
+		const flowNodes = append(palette, $('.pipeline-palette-list'));
+		const flowTypes: { type: string; label: string; icon: string }[] = [
+			{ type: 'condition', label: 'Condition', icon: 'codicon-symbol-boolean' },
+			{ type: 'parallel', label: 'Parallel', icon: 'codicon-split-horizontal' },
+			{ type: 'aggregator', label: 'Aggregator', icon: 'codicon-merge' },
+			{ type: 'trigger', label: 'Trigger', icon: 'codicon-zap' },
+			{ type: 'output', label: 'Output', icon: 'codicon-output' },
+		];
+
+		for (const fn of flowTypes) {
+			const entry = append(flowNodes, $('.pipeline-palette-entry'));
+			entry.draggable = true;
+			entry.dataset.nodeType = fn.type;
+			entry.addEventListener('dragstart', (e) => {
+				e.dataTransfer?.setData('application/pipeline-node', fn.type);
+				e.dataTransfer!.effectAllowed = 'copy';
+			});
+
+			const icon = append(entry, $('span.codicon'));
+			icon.className = `codicon ${fn.icon}`;
+			append(entry, $('span')).textContent = fn.label;
+		}
+
+		// Render agent canvas in pipeline mode
+		this.agentCanvas.enablePipelineMode({
+			id: 'pipeline-default',
+			name: 'New Pipeline',
+			description: '',
+			nodes: [],
+			edges: [],
+			createdAt: Date.now(),
+			updatedAt: Date.now(),
+			enabled: true,
+		});
 	}
 
 	// ─── Filter & Select ────────────────────────────────────

@@ -17,7 +17,7 @@ import { extractEccComponentId } from './agentdef/eccAdapter.js';
 import { IStorageService, StorageScope, StorageTarget } from '../../../../platform/storage/common/storage.js';
 
 // ─── Deprecated imports (for backward-compatible API) ──────────
-import { IAgentSkillItem, IAgentSkillFilter, ItemState } from './agentManagement.types.js';
+import { IAgentSkillItem, IAgentSkillFilter, ItemState, ConfigSnapshot, AgentUsageRecord, AgentUsageStats } from './agentManagement.types.js';
 
 export const IAgentManagementService = createDecorator<IAgentManagementService>('agentManagementService');
 
@@ -48,6 +48,24 @@ export interface IAgentManagementService {
 	getActiveAgentId(): string | null;
 	/** Fired when the active agent changes */
 	readonly onDidChangeActiveAgent: Event<string | null>;
+
+	// ── Config Snapshots ──────────────────────────────────────
+	/** Create a snapshot of an agent's current config */
+	snapshotConfig(agentId: string, label?: string): Promise<void>;
+	/** Get all snapshots for an agent, ordered by timestamp desc */
+	getConfigHistory(agentId: string): Promise<import('./agentManagement.types.js').ConfigSnapshot[]>;
+	/** Rollback an agent's config to a specific snapshot */
+	rollbackConfig(agentId: string, snapshotId: string): Promise<void>;
+	/** Export an agent definition as a YAML string */
+	exportDefinition(agentId: string): Promise<string>;
+
+	// ── Usage Tracking ────────────────────────────────────────
+	/** Record a usage event for an agent */
+	recordUsage(agentId: string, record: import('./agentManagement.types.js').AgentUsageRecord): void;
+	/** Get usage stats for a specific agent */
+	getUsageStats(agentId: string): import('./agentManagement.types.js').AgentUsageStats;
+	/** Get usage stats for all agents */
+	getAllUsageStats(): import('./agentManagement.types.js').AgentUsageStats[];
 
 	// ── Deprecated API (backward-compatible) ──────────────────
 	/** @deprecated Use getDefinitionStates() instead */
@@ -257,6 +275,121 @@ export class AgentManagementService implements IAgentManagementService {
 
 	getActiveAgentId(): string | null {
 		return this.activeAgentId;
+	}
+
+	// ─── Config Snapshots ──────────────────────────────────────
+
+	private readonly SNAPSHOT_KEY_PREFIX = 'statuz.agent.snapshots.';
+
+	private getSnapshotKey(agentId: string): string {
+		return this.SNAPSHOT_KEY_PREFIX + agentId;
+	}
+
+	async snapshotConfig(agentId: string, label?: string): Promise<void> {
+		const def = await this.definitionStorage.readDefinition(agentId);
+		if (!def) { return; }
+		const snapshotId = `snap-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+		const snapshot: ConfigSnapshot = {
+			id: snapshotId,
+			agentId,
+			config: JSON.parse(JSON.stringify(def.config)),
+			label: label || `Snapshot ${new Date().toLocaleString()}`,
+			timestamp: Date.now(),
+		};
+		const key = this.getSnapshotKey(agentId);
+		const raw = this.storageService.get(key, StorageScope.PROFILE);
+		const snapshots: ConfigSnapshot[] = raw ? JSON.parse(raw) : [];
+		snapshots.unshift(snapshot);
+		if (snapshots.length > 50) { snapshots.length = 50; }
+		this.storageService.store(key, JSON.stringify(snapshots), StorageScope.PROFILE, StorageTarget.MACHINE);
+	}
+
+	async getConfigHistory(agentId: string): Promise<ConfigSnapshot[]> {
+		const key = this.getSnapshotKey(agentId);
+		const raw = this.storageService.get(key, StorageScope.PROFILE);
+		if (!raw) { return []; }
+		try { return JSON.parse(raw) as ConfigSnapshot[]; } catch { return []; }
+	}
+
+	async rollbackConfig(agentId: string, snapshotId: string): Promise<void> {
+		const snapshots = await this.getConfigHistory(agentId);
+		const target = snapshots.find(s => s.id === snapshotId);
+		if (!target) { return; }
+		await this.updateDefinitionConfig(agentId, target.config);
+	}
+
+	async exportDefinition(agentId: string): Promise<string> {
+		const def = await this.definitionStorage.readDefinition(agentId);
+		if (!def) { throw new Error(`Definition not found: ${agentId}`); }
+		const lines: string[] = [
+			`# Statuz Agent Definition`,
+			`# Exported: ${new Date().toISOString()}`,
+			``,
+			`id: "${def.id}"`,
+			`name: "${def.name}"`,
+			`kind: "${def.kind}"`,
+			`description: "${def.description}"`,
+			`version: "${def.version}"`,
+			`author: "${def.author}"`,
+			`icon: "${def.icon}"`,
+			`category: "${def.category}"`,
+			`tags:`,
+			...def.tags.map(t => `  - "${t}"`),
+			`config:`,
+		];
+		for (const [k, v] of Object.entries(def.config)) {
+			if (typeof v === 'string') {
+				lines.push(`  ${k}: "${v}"`);
+			} else if (Array.isArray(v)) {
+				lines.push(`  ${k}:`);
+				v.forEach(item => lines.push(`    - "${item}"`));
+			} else {
+				lines.push(`  ${k}: ${JSON.stringify(v)}`);
+			}
+		}
+		return lines.join('\n');
+	}
+
+	// ─── Usage Tracking ────────────────────────────────────────
+
+	private readonly USAGE_KEY = 'statuz.agent.usageRecords';
+
+	recordUsage(agentId: string, record: AgentUsageRecord): void {
+		const key = this.USAGE_KEY;
+		const raw = this.storageService.get(key, StorageScope.PROFILE);
+		const records: AgentUsageRecord[] = raw ? JSON.parse(raw) : [];
+		records.push(record);
+		if (records.length > 1000) { records.splice(0, records.length - 1000); }
+		this.storageService.store(key, JSON.stringify(records), StorageScope.PROFILE, StorageTarget.MACHINE);
+	}
+
+	getUsageStats(agentId: string): AgentUsageStats {
+		const key = this.USAGE_KEY;
+		const raw = this.storageService.get(key, StorageScope.PROFILE);
+		const allRecords: AgentUsageRecord[] = raw ? JSON.parse(raw) : [];
+		const records = allRecords.filter(r => r.agentId === agentId);
+		if (records.length === 0) {
+			return { agentId, totalCalls: 0, totalTokensIn: 0, totalTokensOut: 0, avgLatencyMs: 0, successRate: 0, lastUsed: 0, recentRecords: [] };
+		}
+		const successCount = records.filter(r => r.success).length;
+		return {
+			agentId,
+			totalCalls: records.length,
+			totalTokensIn: records.reduce((s, r) => s + r.tokensIn, 0),
+			totalTokensOut: records.reduce((s, r) => s + r.tokensOut, 0),
+			avgLatencyMs: Math.round(records.reduce((s, r) => s + r.latencyMs, 0) / records.length),
+			successRate: records.length > 0 ? successCount / records.length : 0,
+			lastUsed: records.length > 0 ? records[records.length - 1].timestamp : 0,
+			recentRecords: records.slice(-10).reverse(),
+		};
+	}
+
+	getAllUsageStats(): AgentUsageStats[] {
+		const key = this.USAGE_KEY;
+		const raw = this.storageService.get(key, StorageScope.PROFILE);
+		const allRecords: AgentUsageRecord[] = raw ? JSON.parse(raw) : [];
+		const agentIds = new Set(allRecords.map(r => r.agentId));
+		return Array.from(agentIds).map(id => this.getUsageStats(id));
 	}
 
 	// ─── Deprecated API (backward-compatible) ──────────────────

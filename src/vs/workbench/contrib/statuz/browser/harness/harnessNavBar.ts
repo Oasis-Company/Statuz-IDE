@@ -6,7 +6,7 @@
 import { append, $, addDisposableListener } from '../../../../../base/browser/dom.js';
 import { Disposable } from '../../../../../base/common/lifecycle.js';
 
-export type HarnessTab = 'catalog' | 'installed' | 'harness' | 'config';
+export type HarnessTab = 'catalog' | 'installed' | 'harness' | 'config' | 'templates' | 'design' | 'sandbox' | 'analytics' | 'pipeline';
 
 export class HarnessNavBar extends Disposable {
 
@@ -33,7 +33,12 @@ export class HarnessNavBar extends Disposable {
 		const tabs: { id: HarnessTab; label: string }[] = [
 			{ id: 'catalog', label: 'Catalog' },
 			{ id: 'installed', label: 'Installed' },
+			{ id: 'templates', label: 'Templates' },
+			{ id: 'design', label: 'Design' },
 			{ id: 'harness', label: 'Harness' },
+			{ id: 'sandbox', label: 'Sandbox' },
+			{ id: 'analytics', label: 'Analytics' },
+			{ id: 'pipeline', label: 'Pipeline' },
 			{ id: 'config', label: 'Config' },
 		];
 

@@ -6,11 +6,13 @@
 import { append, $, clearNode, addDisposableListener } from '../../../../../base/browser/dom.js';
 import { Disposable } from '../../../../../base/common/lifecycle.js';
 import { IAgentSkillFilter, AgentSkillType, ItemState } from '../agentManagement.types.js';
+import { IAgentManagementService } from '../agentManagementService.js';
 
 export class HarnessSidebar extends Disposable {
 
 	private readonly container: HTMLElement;
 	private readonly onFilterChange: (filter: IAgentSkillFilter) => void;
+	private agentMgmtService?: IAgentManagementService;
 
 	private searchInput!: HTMLInputElement;
 	private searchClearBtn!: HTMLElement;
@@ -30,9 +32,11 @@ export class HarnessSidebar extends Disposable {
 	constructor(
 		parent: HTMLElement,
 		onFilterChange: (filter: IAgentSkillFilter) => void,
+		@IAgentManagementService agentMgmtService?: IAgentManagementService,
 	) {
 		super();
 		this.onFilterChange = onFilterChange;
+		this.agentMgmtService = agentMgmtService;
 		this.container = parent;
 		this.createLayout();
 	}
@@ -184,6 +188,26 @@ export class HarnessSidebar extends Disposable {
 
 	private emitFilter(): void {
 		this.onFilterChange({ ...this.currentFilter });
+	}
+
+	renderForSandbox(onSelectAgent: (agentId: string) => void): void {
+		clearNode(this.container);
+		this.container.className = 'harness-sidebar';
+
+		const title = append(this.container, $('.harness-sidebar-section-title'));
+		title.textContent = 'Select Agent';
+
+		const items = this.agentMgmtService ? this.agentMgmtService.getItems().filter(i => i.state === 'enabled') : [];
+		const list = append(this.container, $('.harness-sidebar-agent-list'));
+
+		for (const item of items) {
+			const entry = append(list, $('.harness-sidebar-agent-entry'));
+			entry.addEventListener('click', () => onSelectAgent(item.id));
+
+			const icon = append(entry, $('span.codicon'));
+			icon.className = `codicon ${item.iconCodicon}`;
+			append(entry, $('span')).textContent = item.name;
+		}
 	}
 
 	override dispose(): void {

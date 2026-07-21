@@ -87,3 +87,75 @@ export interface IAgentSkillTemplateData {
  * @deprecated No longer used. List height is handled by the rendering component.
  */
 export const AGENT_MGMT_LIST_ELEMENT_HEIGHT = 72;
+
+// ─── Config Snapshot (for version history) ──────────────────
+
+export interface ConfigSnapshot {
+	/** Unique snapshot ID (timestamp-based) */
+	readonly id: string;
+	/** Reference to AgentDefinition.id */
+	readonly agentId: string;
+	/** Full config at snapshot time */
+	readonly config: Record<string, unknown>;
+	/** Human-readable label (auto-generated or user-provided) */
+	readonly label: string;
+	/** Unix ms timestamp */
+	readonly timestamp: number;
+}
+
+// ─── Agent Template (for quick creation) ─────────────────────
+
+export interface AgentTemplate {
+	/** Unique template ID */
+	readonly id: string;
+	/** Display name */
+	readonly name: string;
+	/** Short description shown in template card */
+	readonly description: string;
+	/** Category for grouping */
+	readonly category: string;
+	/** Tags for search */
+	readonly tags: readonly string[];
+	/** Icon codicon class */
+	readonly icon: string;
+	/** Default kind */
+	readonly kind: string;
+	/** Pre-filled AgentDefinition fields (partial) */
+	readonly defaults: {
+		description: string;
+		config: Record<string, unknown>;
+		author: string;
+		version: string;
+	};
+}
+
+// ─── Usage Stats (for performance dashboard) ────────────────
+
+export interface AgentUsageRecord {
+	/** Agent ID */
+	readonly agentId: string;
+	/** Unix ms timestamp */
+	readonly timestamp: number;
+	/** Prompt sent to LLM (truncated to 500 chars) */
+	readonly promptPreview: string;
+	/** Response received from LLM (truncated to 500 chars) */
+	readonly responsePreview: string;
+	/** Token usage */
+	readonly tokensIn: number;
+	readonly tokensOut: number;
+	/** Latency in ms */
+	readonly latencyMs: number;
+	/** Whether the response was successful */
+	readonly success: boolean;
+}
+
+export interface AgentUsageStats {
+	readonly agentId: string;
+	readonly totalCalls: number;
+	readonly totalTokensIn: number;
+	readonly totalTokensOut: number;
+	readonly avgLatencyMs: number;
+	readonly successRate: number;
+	readonly lastUsed: number;
+	readonly recentRecords: readonly AgentUsageRecord[];
+}

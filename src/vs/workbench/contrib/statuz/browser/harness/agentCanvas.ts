@@ -7,6 +7,7 @@ import { IAgentSkillItem } from '../agentManagement.types.js';
 import { AgentNodeLayout, getNodeDimensions, renderAgentNode } from './agentCanvasNodes.js';
 import { AgentEdgeData, AgentEdgeType, renderEdgePath, ConnectState, createConnectState, renderTempEdge, findNodeAtPosition, getNodePorts } from './agentCanvasEdges.js';
 import { AgentCanvasToolbar, ToolbarState } from './agentCanvasToolbar.js';
+import { PipelineDefinition, PipelineNode, PipelineEdge } from './agentPipelineTypes.js';
 
 // ─── Snapshot for Undo/Redo ──────────────────────────────────
 
@@ -1013,6 +1014,28 @@ export class AgentCanvas {
 
 	focus(): void {
 		this.svg.focus();
+	}
+
+	enablePipelineMode(pipeline: PipelineDefinition): void {
+		// Convert pipeline data to canvas format
+		this.nodeLayouts = pipeline.nodes.map((n: PipelineNode) => ({
+			id: n.id,
+			type: n.nodeType,
+			position: { ...n.position },
+		}));
+		this.edges = pipeline.edges.map((e: PipelineEdge) => ({
+			id: e.id,
+			source: e.source,
+			target: e.target,
+			type: e.edgeType as AgentEdgeType,
+		}));
+		this.render();
+	}
+
+	disablePipelineMode(): void {
+		this.nodeLayouts = [];
+		this.edges = [];
+		this.render();
 	}
 
 	destroy(): void {
