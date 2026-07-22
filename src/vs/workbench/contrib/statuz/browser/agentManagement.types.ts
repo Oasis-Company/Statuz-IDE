@@ -147,7 +147,49 @@ export interface AgentUsageRecord {
 	readonly latencyMs: number;
 	/** Whether the response was successful */
 	readonly success: boolean;
+	// ── Phase 2 fields ──
+	/** Time to first token in ms */
+	readonly ttftMs?: number;
+	/** Error category for classification */
+	readonly errorCategory?: 'network' | 'timeout' | 'rate_limit' | 'content_filter' | 'off_topic' | 'unknown' | 'quota' | 'not_found' | 'permission';
+	/** Model identifier used */
+	readonly modelId?: string;
+	/** Whether streaming was used */
+	readonly streaming?: boolean;
+	/** Number of tool calls made */
+	readonly toolCalls?: number;
+	/** Associated RunSession ID */
+	readonly sessionId?: string;
 }
+
+// ─── Run Session (multi-turn conversation lifecycle) ─────────
+
+export interface AgentRunSession {
+	/** Unique session ID */
+	readonly id: string;
+	/** Agent ID */
+	readonly agentId: string;
+	/** Unix ms start time */
+	readonly startTime: number;
+	/** Unix ms end time */
+	readonly endTime?: number;
+	/** Conversation messages */
+	readonly messages: { role: string; content: string; timestamp: number }[];
+	/** Session metrics */
+	readonly metrics: {
+		ttftMs?: number;
+		totalLatencyMs?: number;
+		totalTokensIn: number;
+		totalTokensOut: number;
+		toolCallCount: number;
+	};
+	/** Session status */
+	readonly status: 'running' | 'completed' | 'error' | 'cancelled';
+	/** Error details if status is 'error' */
+	readonly error?: { category: string; message: string };
+}
+
+// ─── Usage Stats (extended) ──────────────────────────────────
 
 export interface AgentUsageStats {
 	readonly agentId: string;
@@ -158,4 +200,25 @@ export interface AgentUsageStats {
 	readonly successRate: number;
 	readonly lastUsed: number;
 	readonly recentRecords: readonly AgentUsageRecord[];
+	// ── Phase 2 fields ──
+	/** 50th percentile latency */
+	readonly p50LatencyMs?: number;
+	/** 95th percentile latency */
+	readonly p95LatencyMs?: number;
+	/** 99th percentile latency */
+	readonly p99LatencyMs?: number;
+	/** Total error count */
+	readonly totalErrors?: number;
+	/** Error breakdown by category */
+	readonly errorBreakdown?: Record<string, number>;
+	/** Total tool call count */
+	readonly totalToolCalls?: number;
+	/** Model usage distribution */
+	readonly modelDistribution?: Record<string, number>;
+	/** Token usage trend over time */
+	readonly tokenTrend?: { timestamp: number; tokensIn: number; tokensOut: number }[];
+	/** Summary status for the agent */
+	readonly status?: 'healthy' | 'degraded' | 'error' | 'inactive';
+	/** Human-readable summary of agent performance */
+	readonly summary?: string;
 }

@@ -15,6 +15,7 @@ import {
 } from './agentdef/agentDefinitionTypes.js';
 import { extractEccComponentId } from './agentdef/eccAdapter.js';
 import { IStorageService, StorageScope, StorageTarget } from '../../../../platform/storage/common/storage.js';
+import { AppendOnlyLog } from './harness/agentAppendOnlyLog.js';
 
 // ─── Deprecated imports (for backward-compatible API) ──────────
 import { IAgentSkillItem, IAgentSkillFilter, ItemState, ConfigSnapshot, AgentUsageRecord, AgentUsageStats } from './agentManagement.types.js';
@@ -66,6 +67,10 @@ export interface IAgentManagementService {
 	getUsageStats(agentId: string): import('./agentManagement.types.js').AgentUsageStats;
 	/** Get usage stats for all agents */
 	getAllUsageStats(): import('./agentManagement.types.js').AgentUsageStats[];
+	/** Clear usage data, optionally scoped to a specific agent */
+	clearUsageData(agentId?: string): void;
+	/** Fired when a usage record is successfully persisted */
+	readonly onDidRecordUsage: Event<import('./agentManagement.types.js').AgentUsageRecord>;
 
 	// ── Deprecated API (backward-compatible) ──────────────────
 	/** @deprecated Use getDefinitionStates() instead */
@@ -82,6 +87,15 @@ export interface IAgentManagementService {
 	refresh(): void;
 }
 
+function calculateQuantile(sorted: number[], q: number): number | undefined {
+    if (sorted.length === 0) return undefined;
+    const pos = (sorted.length - 1) * q;
+    const lower = Math.floor(pos);
+    const upper = Math.ceil(pos);
+    if (lower === upper) return sorted[lower];
+    return sorted[lower] * (upper - pos) + sorted[upper] * (pos - lower);
+}
+
 export class AgentManagementService implements IAgentManagementService {
 	readonly _serviceBrand: undefined;
 
@@ -92,6 +106,10 @@ export class AgentManagementService implements IAgentManagementService {
 	private activeAgentId: string | null = null;
 	private readonly _onDidChangeActiveAgent = new Emitter<string | null>();
 	readonly onDidChangeActiveAgent: Event<string | null> = this._onDidChangeActiveAgent.event;
+
+	// ── Usage Tracking Events ───────────────────────────────
+	private readonly _onDidRecordUsage = new Emitter<AgentUsageRecord>();
+	readonly onDidRecordUsage: Event<AgentUsageRecord> = this._onDidRecordUsage.event;
 
 	/** Runtime state overrides: definitionId → { state, lastUsed, usageCount } */
 	private runtimeStates: Map<string, { state: AgentRuntimeState; lastUsed: number; usageCount: number }> = new Map();
@@ -353,25 +371,43 @@ export class AgentManagementService implements IAgentManagementService {
 	// ─── Usage Tracking ────────────────────────────────────────
 
 	private readonly USAGE_KEY = 'statuz.agent.usageRecords';
+	private readonly usageLog = new AppendOnlyLog<AgentUsageRecord>(
+		this.USAGE_KEY,
+		this.storageService,
+		5000, // maxEntries
+	);
 
 	recordUsage(agentId: string, record: AgentUsageRecord): void {
-		const key = this.USAGE_KEY;
-		const raw = this.storageService.get(key, StorageScope.PROFILE);
-		const records: AgentUsageRecord[] = raw ? JSON.parse(raw) : [];
-		records.push(record);
-		if (records.length > 1000) { records.splice(0, records.length - 1000); }
-		this.storageService.store(key, JSON.stringify(records), StorageScope.PROFILE, StorageTarget.MACHINE);
+		// Immutable append via AppendOnlyLog (agentic-os pattern)
+		// On overflow: AppendOnlyLog keeps the most recent 5000 entries automatically
+		this.usageLog.append(record);
+		// Layer 12 (agent-architecture-audit): fire event AFTER storage write succeeds
+		this._onDidRecordUsage.fire(record);
 	}
 
 	getUsageStats(agentId: string): AgentUsageStats {
-		const key = this.USAGE_KEY;
-		const raw = this.storageService.get(key, StorageScope.PROFILE);
-		const allRecords: AgentUsageRecord[] = raw ? JSON.parse(raw) : [];
+		const allRecords = this.usageLog.replay();
 		const records = allRecords.filter(r => r.agentId === agentId);
 		if (records.length === 0) {
-			return { agentId, totalCalls: 0, totalTokensIn: 0, totalTokensOut: 0, avgLatencyMs: 0, successRate: 0, lastUsed: 0, recentRecords: [] };
+			return {
+				agentId,
+				totalCalls: 0,
+				totalTokensIn: 0,
+				totalTokensOut: 0,
+				avgLatencyMs: 0,
+				successRate: 0,
+				lastUsed: 0,
+				recentRecords: [],
+				status: 'inactive',
+				summary: 'No usage data recorded for this agent.',
+			};
 		}
 		const successCount = records.filter(r => r.success).length;
+		const latencies = records.map(r => r.latencyMs).sort((a, b) => a - b);
+		const errorBreakdown = this.buildErrorBreakdown(records);
+		const modelDistribution = this.buildModelDistribution(records);
+		const tokenTrend = this.buildTokenTrend(records);
+
 		return {
 			agentId,
 			totalCalls: records.length,
@@ -381,15 +417,112 @@ export class AgentManagementService implements IAgentManagementService {
 			successRate: records.length > 0 ? successCount / records.length : 0,
 			lastUsed: records.length > 0 ? records[records.length - 1].timestamp : 0,
 			recentRecords: records.slice(-10).reverse(),
+			p50LatencyMs: calculateQuantile(latencies, 0.50),
+			p95LatencyMs: calculateQuantile(latencies, 0.95),
+			p99LatencyMs: calculateQuantile(latencies, 0.99),
+			totalErrors: records.length - successCount,
+			errorBreakdown: Object.keys(errorBreakdown).length > 0 ? errorBreakdown : undefined,
+			totalToolCalls: records.reduce((s, r) => s + (r.toolCalls ?? 0), 0),
+			modelDistribution: Object.keys(modelDistribution).length > 0 ? modelDistribution : undefined,
+			tokenTrend: tokenTrend.length > 0 ? tokenTrend : undefined,
+			status: this.computeStatus(records, successCount),
+			summary: this.computeSummary(records, successCount, latencies),
 		};
 	}
 
 	getAllUsageStats(): AgentUsageStats[] {
-		const key = this.USAGE_KEY;
-		const raw = this.storageService.get(key, StorageScope.PROFILE);
-		const allRecords: AgentUsageRecord[] = raw ? JSON.parse(raw) : [];
+		const allRecords = this.usageLog.replay();
 		const agentIds = new Set(allRecords.map(r => r.agentId));
 		return Array.from(agentIds).map(id => this.getUsageStats(id));
+	}
+
+	clearUsageData(agentId?: string): void {
+		if (agentId) {
+			// Remove only records for the specified agent
+			const allRecords = this.usageLog.replay();
+			const filtered = allRecords.filter(r => r.agentId !== agentId);
+			this.usageLog.clear();
+			for (const record of filtered) {
+				this.usageLog.append(record);
+			}
+		} else {
+			// Clear all usage data
+			this.usageLog.clear();
+		}
+	}
+
+	// ─── Private helpers for usage stats ──────────────────────
+
+	private buildErrorBreakdown(records: AgentUsageRecord[]): Record<string, number> {
+		const breakdown: Record<string, number> = {};
+		for (const r of records) {
+			if (!r.success) {
+				const category = r.errorCategory ?? 'unknown';
+				breakdown[category] = (breakdown[category] || 0) + 1;
+			}
+		}
+		return breakdown;
+	}
+
+	private buildModelDistribution(records: AgentUsageRecord[]): Record<string, number> {
+		const distribution: Record<string, number> = {};
+		for (const r of records) {
+			const model = r.modelId ?? 'unknown';
+			distribution[model] = (distribution[model] || 0) + 1;
+		}
+		return distribution;
+	}
+
+	private buildTokenTrend(records: AgentUsageRecord[]): { timestamp: number; tokensIn: number; tokensOut: number }[] {
+		// Sample at most 50 data points for trend visualization
+		const sampleSize = Math.min(records.length, 50);
+		if (sampleSize === 0) {
+			return [];
+		}
+		const step = Math.max(1, Math.floor(records.length / sampleSize));
+		const trend: { timestamp: number; tokensIn: number; tokensOut: number }[] = [];
+		for (let i = 0; i < records.length; i += step) {
+			trend.push({
+				timestamp: records[i].timestamp,
+				tokensIn: records[i].tokensIn,
+				tokensOut: records[i].tokensOut,
+			});
+		}
+		// Ensure the last record is always included
+		const lastRecord = records[records.length - 1];
+		if (trend.length > 0 && trend[trend.length - 1].timestamp !== lastRecord.timestamp) {
+			trend.push({
+				timestamp: lastRecord.timestamp,
+				tokensIn: lastRecord.tokensIn,
+				tokensOut: lastRecord.tokensOut,
+			});
+		}
+		return trend;
+	}
+
+	private computeStatus(records: AgentUsageRecord[], successCount: number): 'healthy' | 'degraded' | 'error' | 'inactive' {
+		if (records.length === 0) {
+			return 'inactive';
+		}
+		const successRate = successCount / records.length;
+		if (successRate < 0.5) {
+			return 'error';
+		}
+		if (successRate < 0.9) {
+			return 'degraded';
+		}
+		return 'healthy';
+	}
+
+	private computeSummary(records: AgentUsageRecord[], successCount: number, sortedLatencies: number[]): string {
+		if (records.length === 0) {
+			return 'No usage data.';
+		}
+		const successRate = ((successCount / records.length) * 100).toFixed(1);
+		const p50 = calculateQuantile(sortedLatencies, 0.50);
+		const p95 = calculateQuantile(sortedLatencies, 0.95);
+		const totalTokens = records.reduce((s, r) => s + r.tokensIn + r.tokensOut, 0);
+		return `${records.length} calls, ${successRate}% success, P50=${p50 ?? 'N/A'}ms, P95=${p95 ?? 'N/A'}ms, ${totalTokens.toLocaleString()} total tokens.`;
 	}
 
 	// ─── Deprecated API (backward-compatible) ──────────────────

@@ -51,11 +51,15 @@ import { HarnessSidebar } from './harnessSidebar.js';
 import { HarnessCardGrid } from './harnessCardGrid.js';
 import { HarnessDetailPanel } from './harnessDetailPanel.js';
 import { IAgentManagementService } from '../agentManagementService.js';
+import { IAgentLLMService } from './agentLLMService.js';
 import { IAgentSkillItem, IAgentSkillFilter, AgentTemplate } from '../agentManagement.types.js';
 import { AgentCanvas } from './agentCanvas.js';
 import { AgentTemplateStore } from './agentTemplateStore.js';
 import { AgentSandbox } from './agentSandbox.js';
 import { AgentPerformanceDashboard } from './agentPerformanceDashboard.js';
+import { AgentRegressionRunner } from './agentRegressionRunner.js';
+import { AgentToolCallSimulator } from './agentToolCallSimulator.js';
+import { AgentTestSuite, AgentTestCase, AgentTestResult } from './agentRegressionTypes.js';
 import { AgentDefinition } from '../agentdef/agentDefinitionTypes.js';
 import { clearNode } from '../../../../../base/browser/dom.js';
 
@@ -88,16 +92,26 @@ export class HarnessEditor extends EditorPane {
 	};
 	private templateStore!: AgentTemplateStore;
 	private sandbox: AgentSandbox | null = null;
+	private regressionRunner!: AgentRegressionRunner;
+	private toolSimulator!: AgentToolCallSimulator;
+	private regressionSuites: AgentTestSuite[] = [];
+	private regressionResults: Map<string, AgentTestResult[]> = new Map();
+	private selectedRegressionSuiteId: string | null = null;
 
 	constructor(
 		group: IEditorGroup,
 		@ITelemetryService telemetryService: ITelemetryService,
 		@IThemeService themeService: IThemeService,
-		@IStorageService storageService: IStorageService,
+		@IStorageService private readonly storageService: IStorageService,
 		@IInstantiationService instantiationService: IInstantiationService,
 		@IAgentManagementService private readonly agentMgmtService: IAgentManagementService,
+		@IAgentLLMService private readonly llmService: IAgentLLMService,
 	) {
 		super(HarnessEditor.ID, group, telemetryService, themeService, storageService);
+		// Reserved for Task 3: openSandbox() passes llmService to AgentSandbox constructor
+		if (!this.llmService) {
+			// DI injection verified at runtime
+		}
 	}
 
 	override getId(): string {
@@ -230,6 +244,9 @@ export class HarnessEditor extends EditorPane {
 			case 'config':
 				this.renderConfigView();
 				break;
+			case 'regression':
+				this.renderRegressionView();
+				break;
 		}
 	}
 
@@ -302,6 +319,461 @@ export class HarnessEditor extends EditorPane {
 		const items = this.agentMgmtService.getItems();
 		const enabled = items.filter(i => i.state === 'enabled').length;
 		this.statusBar.update(items.length, enabled, enabled);
+	}
+
+	// ─── Regression View ──────────────────────────────────────
+
+	private renderRegressionView(): void {
+		this.agentCanvasContainer.style.display = 'none';
+		this.cardGridContainer.style.display = '';
+		this.sidebarContainer.style.display = '';
+		this.detailPanelContainer.style.display = '';
+
+		clearNode(this.cardGridContainer);
+		clearNode(this.sidebarContainer);
+		clearNode(this.detailPanelContainer);
+
+		// Initialize regression runner on first use
+		if (!this.regressionRunner) {
+			this.toolSimulator = new AgentToolCallSimulator();
+			this.regressionRunner = new AgentRegressionRunner(
+				this.llmService,
+				this.agentMgmtService,
+				this.toolSimulator,
+				this.storageService,
+			);
+		}
+
+		// Load suites from storage
+		this.regressionSuites = this.regressionRunner.loadSuites();
+		this.regressionResults.clear();
+		for (const suite of this.regressionSuites) {
+			const results = this.regressionRunner.loadResults(suite.id);
+			this.regressionResults.set(suite.id, results);
+		}
+
+		// Render left panel: suite list
+		this.renderRegressionSuiteList();
+
+		// Render right panel: suite editor + results
+		this.renderRegressionMainPanel();
+	}
+
+	private renderRegressionSuiteList(): void {
+		const sidebar = this.sidebarContainer;
+
+		// Title
+		const title = append(sidebar, $('.harness-sidebar-section-title'));
+		title.textContent = 'Test Suites';
+
+		// Create new suite button
+		const createBtn = append(sidebar, $('button.harness-detail-btn.primary'));
+		createBtn.textContent = '+ New Suite';
+		createBtn.style.marginBottom = '8px';
+		createBtn.style.width = '100%';
+		createBtn.addEventListener('click', () => this.createNewRegressionSuite());
+
+		// Suite list
+		const list = append(sidebar, $('.agent-regression-suite-list'));
+
+		if (this.regressionSuites.length === 0) {
+			const emptyHint = append(list, $('.agent-regression-empty-hint'));
+			emptyHint.textContent = 'No suites yet. Click "+ New Suite" to create one.';
+			emptyHint.style.fontSize = '11px';
+			emptyHint.style.color = 'var(--vscode-descriptionForeground)';
+			emptyHint.style.padding = '8px';
+			return;
+		}
+
+		for (const suite of this.regressionSuites) {
+			const entry = append(list, $('.agent-regression-suite-entry'));
+			if (suite.id === this.selectedRegressionSuiteId) {
+				entry.classList.add('selected');
+			}
+
+			const nameSpan = append(entry, $('.agent-regression-suite-name'));
+			nameSpan.textContent = suite.name;
+
+			const metaSpan = append(entry, $('.agent-regression-suite-meta'));
+			metaSpan.textContent = `${suite.cases.length} case(s)`;
+
+			entry.addEventListener('click', () => {
+				this.selectedRegressionSuiteId = suite.id;
+				this.renderRegressionSuiteList();
+				this.renderRegressionMainPanel();
+			});
+
+			// Delete button
+			const deleteBtn = append(entry, $('span.codicon.codicon-trash'));
+			deleteBtn.style.cursor = 'pointer';
+			deleteBtn.style.marginLeft = 'auto';
+			deleteBtn.addEventListener('click', (e) => {
+				e.stopPropagation();
+				this.regressionRunner.deleteSuite(suite.id);
+				if (this.selectedRegressionSuiteId === suite.id) {
+					this.selectedRegressionSuiteId = null;
+				}
+				this.regressionSuites = this.regressionRunner.loadSuites();
+				this.renderRegressionSuiteList();
+				this.renderRegressionMainPanel();
+			});
+		}
+	}
+
+	private renderRegressionMainPanel(): void {
+		clearNode(this.cardGridContainer);
+		clearNode(this.detailPanelContainer);
+
+		const selectedSuite = this.regressionSuites.find(s => s.id === this.selectedRegressionSuiteId);
+
+		if (!selectedSuite) {
+			// Empty state
+			const emptyState = append(this.cardGridContainer, $('.harness-empty-state'));
+			append(emptyState, $('span.codicon.codicon-testing-run-icon'));
+			const emptyTitle = append(emptyState, $('h3'));
+			emptyTitle.textContent = 'No Test Suites';
+			emptyTitle.style.margin = '0';
+			const emptyDesc = append(emptyState, $('p'));
+			emptyDesc.textContent = 'No test suites yet. Create a regression test suite to validate your agents.';
+			emptyDesc.style.margin = '0';
+			emptyDesc.style.color = 'var(--vscode-descriptionForeground)';
+			return;
+		}
+
+		// Main panel: suite form + results
+		const mainPanel = append(this.cardGridContainer, $('.agent-regression-main'));
+		mainPanel.style.display = 'flex';
+		mainPanel.style.flexDirection = 'column';
+		mainPanel.style.gap = '16px';
+		mainPanel.style.padding = '16px';
+		mainPanel.style.overflowY = 'auto';
+		mainPanel.style.height = '100%';
+
+		// Suite header
+		const header = append(mainPanel, $('.agent-regression-header'));
+		header.style.display = 'flex';
+		header.style.alignItems = 'center';
+		header.style.gap = '12px';
+
+		const suiteNameInput = append(header, $('input.harness-sidebar-search-input')) as HTMLInputElement;
+		suiteNameInput.type = 'text';
+		suiteNameInput.value = selectedSuite.name;
+		suiteNameInput.style.flex = '1';
+		suiteNameInput.style.maxWidth = '300px';
+		suiteNameInput.placeholder = 'Suite Name';
+		suiteNameInput.addEventListener('change', () => {
+			const updatedSuite: AgentTestSuite = {
+				...selectedSuite,
+				name: suiteNameInput.value,
+			};
+			this.regressionRunner.saveSuite(updatedSuite);
+			this.regressionSuites = this.regressionRunner.loadSuites();
+		});
+
+		// Agent selector
+		const agentSelect = append(header, $('select.harness-sidebar-select')) as HTMLSelectElement;
+		agentSelect.style.maxWidth = '200px';
+		const agents = this.agentMgmtService.getItems().filter(i => i.state === 'enabled');
+		const defaultOption = append(agentSelect, $('option')) as HTMLOptionElement;
+		defaultOption.value = '';
+		defaultOption.textContent = '-- Select Agent --';
+		for (const agent of agents) {
+			const opt = append(agentSelect, $('option')) as HTMLOptionElement;
+			opt.value = agent.id;
+			opt.textContent = agent.name;
+			if (agent.id === selectedSuite.agentId) {
+				opt.selected = true;
+			}
+		}
+		agentSelect.addEventListener('change', () => {
+			const updatedSuite: AgentTestSuite = {
+				...selectedSuite,
+				agentId: agentSelect.value,
+			};
+			this.regressionRunner.saveSuite(updatedSuite);
+			this.regressionSuites = this.regressionRunner.loadSuites();
+		});
+
+		// Run All button
+		const runAllBtn = append(header, $('button.agent-sandbox-run-btn')) as HTMLButtonElement;
+		runAllBtn.textContent = 'Run All';
+		runAllBtn.style.padding = '6px 16px';
+		runAllBtn.style.fontSize = '12px';
+		runAllBtn.addEventListener('click', async () => {
+			runAllBtn.disabled = true;
+			runAllBtn.textContent = 'Running...';
+			try {
+				const results = await this.regressionRunner.runSuite(selectedSuite);
+				this.regressionResults.set(selectedSuite.id, results);
+				this.renderRegressionMainPanel();
+			} catch (err) {
+				console.error('[HarnessEditor] Regression run failed:', err);
+			} finally {
+				runAllBtn.disabled = false;
+				runAllBtn.textContent = 'Run All';
+			}
+		});
+
+		// Add test case button
+		const addCaseBtn = append(header, $('button.harness-detail-btn.secondary'));
+		addCaseBtn.textContent = '+ Add Case';
+		addCaseBtn.style.fontSize = '12px';
+		addCaseBtn.addEventListener('click', () => this.addTestCaseToSuite(selectedSuite));
+
+		// Test cases list
+		const casesSection = append(mainPanel, $('.agent-regression-cases'));
+		casesSection.style.display = 'flex';
+		casesSection.style.flexDirection = 'column';
+		casesSection.style.gap = '8px';
+
+		const casesTitle = append(casesSection, $('.harness-detail-section-title'));
+		casesTitle.textContent = `Test Cases (${selectedSuite.cases.length})`;
+
+		for (const testCase of selectedSuite.cases) {
+			const caseRow = append(casesSection, $('.agent-regression-case-row'));
+			caseRow.style.display = 'flex';
+			caseRow.style.alignItems = 'center';
+			caseRow.style.gap = '8px';
+			caseRow.style.padding = '8px 12px';
+			caseRow.style.border = '1px solid var(--vscode-sideBarSectionHeader-border)';
+			caseRow.style.borderRadius = '4px';
+
+			// Case ID
+			const caseId = append(caseRow, $('.agent-regression-case-id'));
+			caseId.textContent = testCase.id;
+			caseId.style.fontSize = '11px';
+			caseId.style.fontFamily = 'var(--vscode-editor-font-family)';
+			caseId.style.minWidth = '80px';
+
+			// Prompt preview
+			const promptPreview = append(caseRow, $('.agent-regression-case-prompt'));
+			promptPreview.textContent = testCase.prompt.slice(0, 60) + (testCase.prompt.length > 60 ? '...' : '');
+			promptPreview.style.fontSize = '12px';
+			promptPreview.style.flex = '1';
+			promptPreview.style.overflow = 'hidden';
+			promptPreview.style.textOverflow = 'ellipsis';
+			promptPreview.style.whiteSpace = 'nowrap';
+
+			// Edit prompt input
+			promptPreview.addEventListener('dblclick', () => {
+				const input = document.createElement('input') as HTMLInputElement;
+				input.type = 'text';
+				input.value = testCase.prompt;
+				input.style.flex = '1';
+				input.style.fontSize = '12px';
+				input.style.padding = '4px';
+				input.style.border = '1px solid var(--vscode-input-border)';
+				input.style.borderRadius = '3px';
+				input.style.backgroundColor = 'var(--vscode-input-background)';
+				input.style.color = 'var(--vscode-input-foreground)';
+				promptPreview.replaceWith(input);
+				input.focus();
+				input.addEventListener('blur', () => {
+					this.updateTestCasePrompt(selectedSuite, testCase.id, input.value);
+				});
+				input.addEventListener('keydown', (e) => {
+					if (e.key === 'Enter') {
+						this.updateTestCasePrompt(selectedSuite, testCase.id, input.value);
+					}
+				});
+			});
+
+			// Keywords info
+			if (testCase.expectedKeywords && testCase.expectedKeywords.length > 0) {
+				const kwBadge = append(caseRow, $('.agent-regression-case-badge'));
+				kwBadge.textContent = `${testCase.expectedKeywords.length} kw`;
+				kwBadge.style.fontSize = '10px';
+				kwBadge.style.padding = '1px 6px';
+				kwBadge.style.borderRadius = '3px';
+				kwBadge.style.backgroundColor = 'var(--vscode-badge-background)';
+				kwBadge.style.color = 'var(--vscode-badge-foreground)';
+			}
+
+			// Delete case button
+			const deleteCaseBtn = append(caseRow, $('span.codicon.codicon-close'));
+			deleteCaseBtn.style.cursor = 'pointer';
+			deleteCaseBtn.style.fontSize = '12px';
+			deleteCaseBtn.addEventListener('click', () => {
+				this.removeTestCaseFromSuite(selectedSuite, testCase.id);
+			});
+		}
+
+		// Results grid
+		const suiteResults = this.regressionResults.get(selectedSuite.id);
+		if (suiteResults && suiteResults.length > 0) {
+			const resultsSection = append(mainPanel, $('.agent-regression-results'));
+			resultsSection.style.display = 'flex';
+			resultsSection.style.flexDirection = 'column';
+			resultsSection.style.gap = '8px';
+
+			const resultsTitle = append(resultsSection, $('.harness-detail-section-title'));
+			resultsTitle.textContent = 'Results';
+
+			const resultGrid = append(resultsSection, $('.agent-regression-result-grid'));
+
+			for (const result of suiteResults) {
+				const resultRow = append(resultGrid, $('.agent-regression-result-row'));
+				resultRow.classList.add(result.passed ? 'passed' : 'failed');
+
+				// Status indicator
+				const statusIcon = append(resultRow, $('span.codicon'));
+				statusIcon.className = result.passed ? 'codicon codicon-pass' : 'codicon codicon-error';
+				statusIcon.style.fontSize = '14px';
+
+				// Case ID
+				const resCaseId = append(resultRow, $('.agent-regression-result-case-id'));
+				resCaseId.textContent = result.caseId;
+				resCaseId.style.fontSize = '11px';
+				resCaseId.style.fontFamily = 'var(--vscode-editor-font-family)';
+
+				// Status text
+				const statusText = append(resultRow, $('.agent-regression-result-status'));
+				statusText.textContent = result.passed ? 'PASS' : 'FAIL';
+				statusText.style.fontSize = '11px';
+				statusText.style.fontWeight = '600';
+
+				// Latency
+				const latencyText = append(resultRow, $('.agent-regression-result-latency'));
+				latencyText.textContent = `${result.metrics.latencyMs}ms`;
+				latencyText.style.fontSize = '11px';
+
+				// Failure reason
+				if (!result.passed && result.failureReason) {
+					const failureText = append(resultRow, $('.agent-regression-result-failure'));
+					failureText.textContent = result.failureReason;
+					failureText.style.fontSize = '11px';
+					failureText.style.color = 'var(--vscode-errorForeground)';
+				}
+
+				// Expand button for diff
+				if (!result.passed && result.introspection) {
+					const expandBtn = append(resultRow, $('span.codicon.codicon-chevron-right'));
+					expandBtn.style.cursor = 'pointer';
+					expandBtn.style.fontSize = '12px';
+					let expanded = false;
+
+					const diffContainer = append(resultsSection, $('.agent-regression-diff'));
+					diffContainer.style.display = 'none';
+
+					expandBtn.addEventListener('click', () => {
+						expanded = !expanded;
+						expandBtn.className = expanded ? 'codicon codicon-chevron-down' : 'codicon codicon-chevron-right';
+						if (expanded) {
+							diffContainer.style.display = 'block';
+							this.renderDiffContent(diffContainer, result);
+						} else {
+							diffContainer.style.display = 'none';
+							clearNode(diffContainer);
+						}
+					});
+				}
+			}
+		}
+	}
+
+	private renderDiffContent(container: HTMLElement, result: AgentTestResult): void {
+		clearNode(container);
+
+		if (!result.introspection) {
+			return;
+		}
+
+		const report = result.introspection;
+
+		// Diff header
+		const diffHeader = append(container, $('.agent-regression-diff-header'));
+		diffHeader.style.display = 'flex';
+		diffHeader.style.flexDirection = 'column';
+		diffHeader.style.gap = '4px';
+		diffHeader.style.padding = '8px 12px';
+		diffHeader.style.borderBottom = '1px solid var(--vscode-sideBarSectionHeader-border)';
+
+		const diffTitle = append(diffHeader, $('span'));
+		diffTitle.textContent = 'Introspection Report';
+		diffTitle.style.fontWeight = '600';
+		diffTitle.style.fontSize = '12px';
+
+		const rootCause = append(diffHeader, $('span'));
+		rootCause.textContent = `Root Cause: ${report.rootCause}`;
+		rootCause.style.fontSize = '11px';
+		rootCause.style.color = 'var(--vscode-descriptionForeground)';
+
+		const suggestion = append(diffHeader, $('span'));
+		suggestion.textContent = `Suggestion: ${report.suggestion}`;
+		suggestion.style.fontSize = '11px';
+		suggestion.style.color = 'var(--vscode-textLink-foreground)';
+
+		// Diff content
+		const diffContent = append(container, $('.agent-regression-diff-content'));
+		diffContent.style.padding = '8px 12px';
+		diffContent.style.fontFamily = 'var(--vscode-editor-font-family)';
+		diffContent.style.fontSize = '11px';
+		diffContent.style.whiteSpace = 'pre-wrap';
+		diffContent.style.lineHeight = '1.5';
+		diffContent.textContent = report.diff;
+	}
+
+	// ─── Regression Suite Helpers ───────────────────────────────
+
+	private createNewRegressionSuite(): void {
+		const id = `suite-${Date.now().toString(36)}`;
+		const suite: AgentTestSuite = {
+			id,
+			name: 'New Test Suite',
+			agentId: '',
+			cases: [],
+			createdAt: Date.now(),
+		};
+		this.regressionRunner.saveSuite(suite);
+		this.regressionSuites = this.regressionRunner.loadSuites();
+		this.selectedRegressionSuiteId = id;
+		this.renderRegressionSuiteList();
+		this.renderRegressionMainPanel();
+	}
+
+	private addTestCaseToSuite(suite: AgentTestSuite): void {
+		const caseId = `case-${Date.now().toString(36)}`;
+		const newCase: AgentTestCase = {
+			id: caseId,
+			prompt: 'Enter your test prompt here...',
+		};
+		const updatedSuite: AgentTestSuite = {
+			...suite,
+			cases: [...suite.cases, newCase],
+		};
+		this.regressionRunner.saveSuite(updatedSuite);
+		this.regressionSuites = this.regressionRunner.loadSuites();
+		this.selectedRegressionSuiteId = updatedSuite.id;
+		this.renderRegressionSuiteList();
+		this.renderRegressionMainPanel();
+	}
+
+	private removeTestCaseFromSuite(suite: AgentTestSuite, caseId: string): void {
+		const updatedSuite: AgentTestSuite = {
+			...suite,
+			cases: suite.cases.filter(c => c.id !== caseId),
+		};
+		this.regressionRunner.saveSuite(updatedSuite);
+		this.regressionSuites = this.regressionRunner.loadSuites();
+		this.renderRegressionSuiteList();
+		this.renderRegressionMainPanel();
+	}
+
+	private updateTestCasePrompt(suite: AgentTestSuite, caseId: string, newPrompt: string): void {
+		const updatedCases = suite.cases.map(c => {
+			if (c.id === caseId) {
+				return { ...c, prompt: newPrompt };
+			}
+			return c;
+		});
+		const updatedSuite: AgentTestSuite = {
+			...suite,
+			cases: updatedCases,
+		};
+		this.regressionRunner.saveSuite(updatedSuite);
+		this.regressionSuites = this.regressionRunner.loadSuites();
+		this.renderRegressionSuiteList();
+		this.renderRegressionMainPanel();
 	}
 
 	// ─── Templates View ──────────────────────────────────────
@@ -423,6 +895,7 @@ export class HarnessEditor extends EditorPane {
 			this.cardGridContainer,
 			agentId,
 			this.agentMgmtService,
+			this.llmService,
 		));
 	}
 
@@ -579,6 +1052,7 @@ export class HarnessEditor extends EditorPane {
 		this.detailPanel?.dispose();
 		this.statusBar?.dispose();
 		this.agentCanvas?.destroy();
+		this.sandbox?.dispose();
 		super.dispose();
 	}
 }

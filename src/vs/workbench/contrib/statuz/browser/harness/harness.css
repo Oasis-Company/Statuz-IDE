@@ -1568,6 +1568,196 @@
 	font-size: 12px;
 }
 
+/* ─── Sandbox Conversation (Task 8: multi-turn chat bubbles) ─── */
+
+.agent-sandbox-conversation {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	padding: 8px 0;
+	max-height: 320px;
+	overflow-y: auto;
+	border-top: 1px solid var(--vscode-sideBarSectionHeader-border);
+}
+
+.agent-sandbox-trim-notice {
+	font-size: 11px;
+	color: var(--vscode-descriptionForeground);
+	text-align: center;
+	padding: 4px 8px;
+	background-color: var(--vscode-editorInfo-background);
+	color: var(--vscode-editorInfo-foreground);
+	border: 1px solid var(--vscode-editorInfo-border, transparent);
+	border-radius: 4px;
+	margin-bottom: 4px;
+	font-style: italic;
+}
+
+.agent-sandbox-message {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	padding: 8px 12px;
+	border-radius: 8px;
+	max-width: 80%;
+	word-break: break-word;
+}
+
+.agent-sandbox-message.User {
+	align-self: flex-end;
+	background-color: var(--vscode-button-background);
+	color: var(--vscode-button-foreground);
+}
+
+.agent-sandbox-message.Assistant {
+	align-self: flex-start;
+	background-color: var(--vscode-textCodeBlock-background);
+	color: var(--vscode-editor-foreground);
+	border: 1px solid var(--vscode-sideBarSectionHeader-border);
+}
+
+.agent-sandbox-message.System {
+	align-self: center;
+	background-color: transparent;
+	color: var(--vscode-descriptionForeground);
+	font-style: italic;
+	max-width: 90%;
+	text-align: center;
+	border: 1px dashed var(--vscode-sideBarSectionHeader-border);
+}
+
+.agent-sandbox-message-header {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.agent-sandbox-message-role {
+	font-size: 10px;
+	font-weight: 600;
+	text-transform: uppercase;
+	opacity: 0.7;
+}
+
+.agent-sandbox-message-time {
+	font-size: 10px;
+	opacity: 0.5;
+	margin-left: auto;
+}
+
+.agent-sandbox-message-content {
+	font-size: 13px;
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+/* ─── Clear History Button ────────────────────────────────── */
+
+.agent-sandbox-clear-btn {
+	padding: 6px 14px;
+	border: 1px solid var(--vscode-sideBarSectionHeader-border);
+	border-radius: 4px;
+	background: transparent;
+	color: var(--vscode-editor-foreground);
+	font-size: 12px;
+	cursor: pointer;
+	transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.agent-sandbox-clear-btn:hover {
+	border-color: var(--vscode-errorForeground);
+	background-color: var(--vscode-inputValidation-errorBackground);
+}
+
+.agent-sandbox-clear-btn:disabled {
+	opacity: 0.5;
+	cursor: not-allowed;
+}
+
+/* ─── Clear History Notification ──────────────────────────── */
+
+.agent-sandbox-clear-notification {
+	position: fixed;
+	bottom: 24px;
+	left: 50%;
+	transform: translateX(-50%);
+	padding: 8px 20px;
+	border-radius: 6px;
+	background-color: var(--vscode-editorInfo-background);
+	color: var(--vscode-editorInfo-foreground);
+	border: 1px solid var(--vscode-editorInfo-border, transparent);
+	font-size: 12px;
+	font-weight: 500;
+	z-index: 100;
+	animation: agent-sandbox-notification-fade 2s ease forwards;
+}
+
+@keyframes agent-sandbox-notification-fade {
+	0% { opacity: 0; transform: translateX(-50%) translateY(10px); }
+	10% { opacity: 1; transform: translateX(-50%) translateY(0); }
+	80% { opacity: 1; transform: translateX(-50%) translateY(0); }
+	100% { opacity: 0; transform: translateX(-50%) translateY(-10px); }
+}
+
+/* ─── Tool Call Card ──────────────────────────────────────── */
+
+.agent-sandbox-tool-call {
+	border: 1px solid var(--vscode-sideBarSectionHeader-border);
+	border-radius: 6px;
+	margin-bottom: 8px;
+	overflow: hidden;
+	font-size: 12px;
+	background-color: var(--vscode-editor-background);
+}
+
+.agent-sandbox-tool-call.success {
+	border-left: 3px solid #28a745;
+}
+
+.agent-sandbox-tool-call.error {
+	border-left: 3px solid #dc3545;
+}
+
+.agent-sandbox-tool-call-header {
+	padding: 6px 10px;
+	background-color: var(--vscode-sideBar-background);
+	font-weight: 600;
+	font-size: 12px;
+	color: var(--vscode-foreground);
+	border-bottom: 1px solid var(--vscode-sideBarSectionHeader-border);
+}
+
+.agent-sandbox-tool-call-section {
+	padding: 6px 10px;
+	border-bottom: 1px solid var(--vscode-sideBarSectionHeader-border);
+}
+
+.agent-sandbox-tool-call-section:last-child {
+	border-bottom: none;
+}
+
+.agent-sandbox-tool-call-label {
+	font-size: 10px;
+	text-transform: uppercase;
+	color: var(--vscode-descriptionForeground);
+	margin-bottom: 4px;
+	display: block;
+}
+
+.agent-sandbox-tool-call-pre {
+	margin: 0;
+	font-family: var(--vscode-editor-font-family);
+	font-size: 11px;
+	white-space: pre-wrap;
+	word-break: break-word;
+	color: var(--vscode-foreground);
+	background-color: var(--vscode-textCodeBlock-background);
+	padding: 6px;
+	border-radius: 3px;
+	max-height: 150px;
+	overflow-y: auto;
+}
+
 /* ─── Performance Dashboard ───────────────────────────────── */
 
 .agent-performance-dashboard {
@@ -1576,26 +1766,56 @@
 	height: 100%;
 }
 
-.agent-perf-header {
+/* ── Header ───────────────────────────────────────────────── */
+
+.agent-performance-header {
 	display: flex;
 	align-items: center;
-	gap: 6px;
-	font-size: 14px;
-	font-weight: 600;
-	color: var(--vscode-foreground);
+	gap: 8px;
 	margin-bottom: 16px;
 }
 
-.agent-perf-empty {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	gap: 8px;
-	padding: 40px;
-	color: var(--vscode-descriptionForeground);
+.agent-performance-icon {
+	font-size: 18px;
+	color: var(--vscode-textLink-foreground);
 }
 
-.agent-perf-summary {
+.agent-performance-title {
+	font-size: 16px;
+	font-weight: 600;
+	color: var(--vscode-foreground);
+	margin: 0;
+	flex: 1;
+}
+
+/* ── Export CSV Button ────────────────────────────────────── */
+
+.agent-perf-export-btn {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	padding: 4px 10px;
+	border: 1px solid var(--vscode-button-border, transparent);
+	border-radius: 4px;
+	background-color: var(--vscode-button-secondaryBackground);
+	color: var(--vscode-button-secondaryForeground);
+	cursor: pointer;
+	font-size: 11px;
+	font-family: var(--vscode-font-family);
+	transition: background-color 0.15s ease;
+}
+
+.agent-perf-export-btn:hover {
+	background-color: var(--vscode-button-secondaryHoverBackground);
+}
+
+.agent-perf-export-btn .codicon {
+	font-size: 12px;
+}
+
+/* ── Summary Cards ────────────────────────────────────────── */
+
+.agent-performance-summary {
 	display: grid;
 	grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
 	gap: 12px;
@@ -1612,99 +1832,392 @@
 	gap: 4px;
 }
 
-.agent-perf-summary-card .codicon {
+.agent-perf-summary-icon {
 	font-size: 20px;
 	color: var(--vscode-textLink-foreground);
 	margin-bottom: 4px;
 }
 
-.agent-perf-summary-card-value {
+.agent-perf-summary-value {
 	font-size: 24px;
 	font-weight: 700;
 	color: var(--vscode-foreground);
 }
 
-.agent-perf-summary-card-label {
+.agent-perf-summary-label {
 	font-size: 11px;
 	color: var(--vscode-descriptionForeground);
 	text-transform: uppercase;
 }
 
-.agent-perf-breakdown {
-	display: flex;
-	flex-direction: column;
-	gap: 12px;
+/* ── Section ──────────────────────────────────────────────── */
+
+.agent-perf-section {
+	margin-bottom: 20px;
 }
 
-.agent-perf-breakdown-title {
+.agent-perf-section-title {
 	font-size: 13px;
 	font-weight: 600;
 	color: var(--vscode-foreground);
+	margin: 0 0 12px 0;
+	padding-bottom: 6px;
+	border-bottom: 1px solid var(--vscode-sideBarSectionHeader-border);
 }
 
-.agent-perf-breakdown-item {
-	background: var(--vscode-editor-background);
+/* ── Step 7.2: Quantile Cards ─────────────────────────────── */
+
+.agent-perf-quantile-grid {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 12px;
+}
+
+.agent-perf-quantile-card {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 6px;
+	padding: 16px;
 	border: 1px solid var(--vscode-panel-border);
-	border-radius: 6px;
-	padding: 12px;
+	border-radius: 8px;
+	background: var(--vscode-editor-background);
+}
+
+.agent-perf-quantile-dot {
+	width: 12px;
+	height: 12px;
+	border-radius: 50%;
+	flex-shrink: 0;
+}
+
+.agent-perf-quantile-label {
+	font-size: 12px;
+	font-weight: 600;
+	color: var(--vscode-descriptionForeground);
+	text-transform: uppercase;
+}
+
+.agent-perf-quantile-value {
+	font-size: 22px;
+	font-weight: 700;
+}
+
+/* ── Step 7.3: Error Breakdown Bars ───────────────────────── */
+
+.agent-perf-error-bars {
 	display: flex;
 	flex-direction: column;
 	gap: 8px;
 }
 
-.agent-perf-breakdown-info {
+.agent-perf-error-row {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	padding: 6px 0;
+}
+
+.agent-perf-error-info {
 	display: flex;
 	flex-direction: column;
-	gap: 2px;
+	gap: 1px;
+	min-width: 140px;
+	flex-shrink: 0;
 }
 
-.agent-perf-breakdown-name {
-	font-size: 13px;
-	font-weight: 600;
+.agent-perf-error-label {
+	font-size: 12px;
+	font-weight: 500;
 	color: var(--vscode-foreground);
+	text-transform: capitalize;
 }
 
-.agent-perf-breakdown-meta {
+.agent-perf-error-count {
 	font-size: 11px;
 	color: var(--vscode-descriptionForeground);
 }
 
-.agent-perf-bar-container {
+.agent-perf-error-bar-track {
+	flex: 1;
 	height: 20px;
 	background: var(--vscode-input-background);
-	border-radius: 10px;
+	border-radius: 4px;
 	overflow: hidden;
 }
 
-.agent-perf-bar {
+.agent-perf-error-bar {
 	height: 100%;
-	border-radius: 10px;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	font-size: 10px;
-	font-weight: 600;
-	color: white;
-	min-width: 40px;
-	transition: width 0.3s ease;
+	border-radius: 4px;
+	min-width: 2px;
+	transition: width 0.4s ease;
 }
 
-.agent-perf-breakdown-recent {
+/* ── Step 7.4: Token Trend Chart ──────────────────────────── */
+
+.agent-perf-canvas-container {
+	position: relative;
+}
+
+.agent-perf-trend-canvas {
+	display: block;
+	border: 1px solid var(--vscode-panel-border);
+	border-radius: 6px;
+	background: var(--vscode-editor-background);
+	width: 100%;
+	max-width: 600px;
+	height: 200px;
+}
+
+/* CSS fallback for Canvas */
+.agent-perf-trend-fallback {
+	border: 1px solid var(--vscode-panel-border);
+	border-radius: 6px;
+	background: var(--vscode-editor-background);
+	padding: 12px;
+}
+
+.agent-perf-trend-fallback-note {
+	font-size: 11px;
+	color: var(--vscode-descriptionForeground);
+	margin-bottom: 12px;
+	font-style: italic;
+}
+
+.agent-perf-trend-bars {
+	display: flex;
+	align-items: flex-end;
+	gap: 2px;
+	height: 160px;
+	padding: 0 12px;
+}
+
+.agent-perf-trend-bar-group {
+	flex: 1;
 	display: flex;
 	flex-direction: column;
-	gap: 2px;
-	margin-top: 4px;
+	justify-content: flex-end;
+	gap: 1px;
+	height: 100%;
+	min-width: 4px;
 }
 
-.agent-perf-breakdown-recent-label {
-	font-size: 10px;
+.agent-perf-trend-bar {
+	width: 100%;
+	border-radius: 1px 1px 0 0;
+	min-height: 1px;
+}
+
+.agent-perf-trend-bar-in {
+	background-color: #4fc3f7;
+}
+
+.agent-perf-trend-bar-out {
+	background-color: #81c784;
+}
+
+.agent-perf-trend-legend {
+	display: flex;
+	gap: 16px;
+	margin-top: 8px;
+}
+
+.agent-perf-trend-legend-item {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	font-size: 11px;
 	color: var(--vscode-descriptionForeground);
+}
+
+.agent-perf-trend-legend-swatch {
+	display: inline-block;
+	width: 10px;
+	height: 10px;
+	border-radius: 2px;
+}
+
+/* ── Per-Agent Table ──────────────────────────────────────── */
+
+.agent-perf-table {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: 12px;
+}
+
+.agent-perf-table th {
+	text-align: left;
+	padding: 6px 10px;
+	border-bottom: 1px solid var(--vscode-sideBarSectionHeader-border);
+	font-weight: 600;
+	color: var(--vscode-descriptionForeground);
+	font-size: 11px;
+	text-transform: uppercase;
+	white-space: nowrap;
+}
+
+.agent-perf-table td {
+	padding: 6px 10px;
+	border-bottom: 1px solid var(--vscode-sideBarSectionHeader-border);
+	color: var(--vscode-foreground);
+}
+
+.agent-perf-table tbody tr:hover {
+	background-color: var(--vscode-list-hoverBackground);
+}
+
+/* ── Status Badges ────────────────────────────────────────── */
+
+.agent-perf-status-badge {
+	font-size: 10px;
+	padding: 2px 8px;
+	border-radius: 10px;
+	font-weight: 600;
 	text-transform: uppercase;
 }
 
-.agent-perf-breakdown-call {
-	font-size: 11px;
-	font-family: var(--vscode-editor-font-family);
+.agent-perf-status-healthy {
+	background-color: var(--vscode-testing-iconPassed);
+	color: var(--vscode-editor-background);
+}
+
+.agent-perf-status-degraded {
+	background-color: var(--vscode-testing-iconQueued);
+	color: var(--vscode-editor-background);
+}
+
+.agent-perf-status-error {
+	background-color: var(--vscode-testing-iconFailed);
+	color: var(--vscode-editor-background);
+}
+
+.agent-perf-status-inactive {
+	background-color: var(--vscode-testing-iconUnset);
+	color: var(--vscode-editor-background);
+}
+
+/* ── Recent Run Summary (agentic-os auto-reflection) ──────── */
+
+.agent-perf-run-summary {
+	font-size: 12px;
+	color: var(--vscode-foreground);
+	line-height: 1.5;
+}
+
+.agent-perf-run-summary-ok {
+	color: var(--vscode-testing-iconPassed);
+	padding: 8px 12px;
+	border: 1px solid var(--vscode-testing-iconPassed);
+	border-radius: 4px;
+	background: color-mix(in srgb, var(--vscode-testing-iconPassed) 10%, transparent);
+}
+
+.agent-perf-run-suggestions {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+
+.agent-perf-run-suggestions li {
+	padding: 8px 12px;
+	border: 1px solid var(--vscode-panel-border);
+	border-radius: 4px;
+	background: var(--vscode-editor-background);
+	font-size: 12px;
+	color: var(--vscode-foreground);
+}
+
+.agent-perf-run-suggestions li::before {
+	content: '> ';
+	color: var(--vscode-textLink-foreground);
+	font-weight: 600;
+}
+
+/* ── Step 7.6: Empty State ────────────────────────────────── */
+
+.agent-perf-empty {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	height: 100%;
+	gap: 8px;
+	padding: 60px 40px;
+	color: var(--vscode-descriptionForeground);
+	text-align: center;
+}
+
+.agent-perf-empty .codicon {
+	font-size: 48px;
+	opacity: 0.3;
+}
+
+.agent-perf-empty-title {
+	font-size: 16px;
+	font-weight: 600;
+	color: var(--vscode-foreground);
+	margin: 0;
+}
+
+.agent-perf-empty-hint {
+	font-size: 13px;
+	color: var(--vscode-descriptionForeground);
+	margin: 0;
+}
+
+.agent-perf-empty-suggestion {
+	font-size: 12px;
+	color: var(--vscode-descriptionForeground);
+	margin: 0;
+	display: flex;
+	align-items: center;
+	gap: 4px;
+}
+
+.agent-perf-empty-suggestion .codicon {
+	font-size: 14px;
+	opacity: 0.6;
+}
+
+/* ── Error State ──────────────────────────────────────────── */
+
+.agent-perf-error {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 8px;
+	padding: 40px;
+	color: var(--vscode-errorForeground);
+	text-align: center;
+}
+
+.agent-perf-error .codicon {
+	font-size: 32px;
+}
+
+.agent-perf-error p {
+	margin: 0;
+	font-size: 13px;
+}
+
+.agent-perf-retry-btn {
+	padding: 6px 16px;
+	border: 1px solid var(--vscode-button-border, transparent);
+	border-radius: 4px;
+	background-color: var(--vscode-button-background);
+	color: var(--vscode-button-foreground);
+	cursor: pointer;
+	font-size: 12px;
+	font-family: var(--vscode-font-family);
+	margin-top: 4px;
+	transition: background-color 0.15s ease;
+}
+
+.agent-perf-retry-btn:hover {
+	background-color: var(--vscode-button-hoverBackground);
 }
 
 /* ─── Pipeline Palette ────────────────────────────────────── */
@@ -1781,5 +2294,242 @@
 .harness-sidebar-agent-entry .codicon {
 	font-size: 14px;
 	color: var(--vscode-textLink-foreground);
+}
+
+/* ─── Regression View ─────────────────────────────────────── */
+
+.agent-regression-container {
+	display: flex;
+	flex: 1;
+	overflow: hidden;
+}
+
+/* ─── Suite List (Sidebar) ────────────────────────────────── */
+
+.agent-regression-suite-list {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	overflow-y: auto;
+	flex: 1;
+}
+
+.agent-regression-suite-entry {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 6px 10px;
+	border-radius: 4px;
+	cursor: pointer;
+	font-size: 12px;
+	color: var(--vscode-sideBar-foreground);
+	border: 1px solid transparent;
+	transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.agent-regression-suite-entry:hover {
+	background-color: var(--vscode-list-hoverBackground);
+	border-color: var(--vscode-sideBarSectionHeader-border);
+}
+
+.agent-regression-suite-entry.selected {
+	background-color: var(--vscode-list-activeSelectionBackground);
+	color: var(--vscode-list-activeSelectionForeground);
+	border-color: var(--vscode-list-activeSelectionBackground);
+}
+
+.agent-regression-suite-name {
+	flex: 1;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	font-weight: 500;
+}
+
+.agent-regression-suite-meta {
+	font-size: 10px;
+	color: var(--vscode-descriptionForeground);
+	flex-shrink: 0;
+}
+
+.agent-regression-suite-entry.selected .agent-regression-suite-meta {
+	color: inherit;
+	opacity: 0.7;
+}
+
+/* ─── Main Panel ──────────────────────────────────────────── */
+
+.agent-regression-main {
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+	padding: 16px;
+	overflow-y: auto;
+	height: 100%;
+	flex: 1;
+}
+
+.agent-regression-header {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	flex-wrap: wrap;
+}
+
+/* ─── Case Row ────────────────────────────────────────────── */
+
+.agent-regression-case-row {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 8px 12px;
+	border: 1px solid var(--vscode-sideBarSectionHeader-border);
+	border-radius: 4px;
+	background-color: var(--vscode-editor-background);
+	transition: border-color 0.15s ease;
+}
+
+.agent-regression-case-row:hover {
+	border-color: var(--vscode-list-activeSelectionBackground);
+}
+
+.agent-regression-case-id {
+	font-size: 11px;
+	font-family: var(--vscode-editor-font-family);
+	min-width: 80px;
+	color: var(--vscode-descriptionForeground);
+}
+
+.agent-regression-case-prompt {
+	font-size: 12px;
+	flex: 1;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	color: var(--vscode-editor-foreground);
+}
+
+.agent-regression-case-badge {
+	font-size: 10px;
+	padding: 1px 6px;
+	border-radius: 3px;
+	background-color: var(--vscode-badge-background);
+	color: var(--vscode-badge-foreground);
+	flex-shrink: 0;
+}
+
+/* ─── Result Grid ─────────────────────────────────────────── */
+
+.agent-regression-result-grid {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	border: 1px solid var(--vscode-sideBarSectionHeader-border);
+	border-radius: 6px;
+	overflow: hidden;
+}
+
+.agent-regression-result-row {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 6px 12px;
+	font-size: 12px;
+	border-bottom: 1px solid var(--vscode-sideBarSectionHeader-border);
+}
+
+.agent-regression-result-row:last-child {
+	border-bottom: none;
+}
+
+.agent-regression-result-row.passed {
+	background-color: rgba(40, 167, 69, 0.08);
+}
+
+.agent-regression-result-row.failed {
+	background-color: rgba(220, 53, 69, 0.08);
+}
+
+.agent-regression-result-row.passed .codicon {
+	color: var(--vscode-testing-iconPassed);
+}
+
+.agent-regression-result-row.failed .codicon {
+	color: var(--vscode-testing-iconFailed);
+}
+
+.agent-regression-result-case-id {
+	font-size: 11px;
+	font-family: var(--vscode-editor-font-family);
+	color: var(--vscode-descriptionForeground);
+	min-width: 80px;
+}
+
+.agent-regression-result-status {
+	font-size: 11px;
+	font-weight: 600;
+	text-transform: uppercase;
+}
+
+.agent-regression-result-row.passed .agent-regression-result-status {
+	color: var(--vscode-testing-iconPassed);
+}
+
+.agent-regression-result-row.failed .agent-regression-result-status {
+	color: var(--vscode-testing-iconFailed);
+}
+
+.agent-regression-result-latency {
+	font-size: 11px;
+	color: var(--vscode-descriptionForeground);
+	margin-left: auto;
+}
+
+.agent-regression-result-failure {
+	font-size: 11px;
+	color: var(--vscode-errorForeground);
+	flex: 1;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+/* ─── Diff Display ────────────────────────────────────────── */
+
+.agent-regression-diff {
+	margin-top: 4px;
+	border: 1px solid var(--vscode-sideBarSectionHeader-border);
+	border-radius: 4px;
+	overflow: hidden;
+	background-color: var(--vscode-editor-background);
+}
+
+.agent-regression-diff-header {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	padding: 8px 12px;
+	border-bottom: 1px solid var(--vscode-sideBarSectionHeader-border);
+	background-color: var(--vscode-sideBar-background);
+}
+
+.agent-regression-diff-content {
+	padding: 8px 12px;
+	font-family: var(--vscode-editor-font-family);
+	font-size: 11px;
+	white-space: pre-wrap;
+	line-height: 1.5;
+	color: var(--vscode-editor-foreground);
+	max-height: 300px;
+	overflow-y: auto;
+}
+
+/* ─── Empty State ─────────────────────────────────────────── */
+
+.agent-regression-empty-hint {
+	font-size: 11px;
+	color: var(--vscode-descriptionForeground);
+	padding: 8px;
+	text-align: center;
 }
 

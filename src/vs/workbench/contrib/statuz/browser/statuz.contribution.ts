@@ -25,6 +25,10 @@ import { registerSingleton } from '../../../../platform/instantiation/common/ext
 import { IAgentManagementService, AgentManagementService } from './agentManagementService.js';
 registerSingleton(IAgentManagementService, AgentManagementService, 0);
 
+// register AgentLLMService singleton
+import { IAgentLLMService, AgentLLMService } from './harness/agentLLMService.js';
+registerSingleton(IAgentLLMService, AgentLLMService, 0);
+
 // register ECC services
 import { IEccCatalogService, EccCatalogService } from './ecc/eccCatalogService.js';
 import { IEccInstallService, EccInstallService } from './ecc/eccInstallService.js';

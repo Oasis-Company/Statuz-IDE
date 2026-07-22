@@ -6,7 +6,7 @@
 import { append, $, addDisposableListener } from '../../../../../base/browser/dom.js';
 import { Disposable } from '../../../../../base/common/lifecycle.js';
 
-export type HarnessTab = 'catalog' | 'installed' | 'harness' | 'config' | 'templates' | 'design' | 'sandbox' | 'analytics' | 'pipeline';
+export type HarnessTab = 'catalog' | 'installed' | 'harness' | 'config' | 'templates' | 'design' | 'sandbox' | 'analytics' | 'pipeline' | 'regression';
 
 export class HarnessNavBar extends Disposable {
 
@@ -39,6 +39,7 @@ export class HarnessNavBar extends Disposable {
 			{ id: 'sandbox', label: 'Sandbox' },
 			{ id: 'analytics', label: 'Analytics' },
 			{ id: 'pipeline', label: 'Pipeline' },
+			{ id: 'regression', label: 'Regression' },
 			{ id: 'config', label: 'Config' },
 		];
 
