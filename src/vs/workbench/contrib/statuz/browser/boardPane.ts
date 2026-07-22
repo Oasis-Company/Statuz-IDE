@@ -34,15 +34,13 @@ import { Action2, registerAction2 } from '../../../../platform/actions/common/ac
 import { ServicesAccessor } from '../../../../editor/browser/editorExtensions.js';
 import { IViewsService } from '../../../services/views/common/viewsService.js';
 
-import { BoardCanvas } from './board/boardCanvas.js';
-import type { BoardCanvasData } from './board/boardCanvas.js';
-import { BoardToolbar } from './board/boardToolbar.js';
+import { ArchitectureDiagramEngine } from './diagram/architectureDiagramEngine.js';
+import { DiagramStateManager } from './diagram/diagramStateManager.js';
+import { DiagramUndoRedo } from './diagram/diagramUndoRedo.js';
+import { DiagramToolbar } from './diagram/diagramToolbar.js';
+import { boardDiagramDefinition } from './diagram/boardDiagramDefinition.js';
 import { BoardCompletenessPanel } from './board/boardCompletenessPanel.js';
-import { BoardStateManager } from './board/boardStateManager.js';
-import { BoardUndoRedo } from './board/boardUndoRedo.js';
-import { computeColumnLayout, computeDagreLayout } from './board/boardLayout.js';
-import type { FlowEdgeData, SandboxCard } from './board/boardTypes.js';
-import type { BoardSnapshot } from './board/boardUndoRedo.js';
+import type { SandboxCard } from './board/boardTypes.js';
 
 
 /* ─── BoardViewPane ──────────────────────────────────────── */
@@ -50,13 +48,13 @@ import type { BoardSnapshot } from './board/boardUndoRedo.js';
 class BoardViewPane extends ViewPane {
 
 	private container!: HTMLElement;
-	private canvas!: BoardCanvas;
-	private boardToolbar!: BoardToolbar;
+	private engine!: ArchitectureDiagramEngine;
+	private diagramToolbar!: DiagramToolbar;
 	private completenessPanel!: BoardCompletenessPanel;
-	private stateManager!: BoardStateManager;
-	private undoRedo!: BoardUndoRedo;
+	private diagramStateManager!: DiagramStateManager;
+	private diagramUndoRedo!: DiagramUndoRedo;
 
-	private boardData: BoardCanvasData = { cards: [], constitution: null, decisions: [] };
+	private cards: SandboxCard[] = [];
 
 	constructor(
 		options: IViewPaneOptions,
@@ -82,205 +80,121 @@ class BoardViewPane extends ViewPane {
 		this.container.style.cssText = 'display:flex;flex-direction:column;height:100%;overflow:hidden;position:relative;';
 		parent.appendChild(this.container);
 
-		// State management
-		const projectId = 'statuz-main';
-		this.stateManager = new BoardStateManager(projectId);
-		this.undoRedo = new BoardUndoRedo();
-
-		// Initialize empty board data
-		this.boardData = { cards: [], constitution: null, decisions: [] };
-
-		// Load persisted layouts from state manager (already loaded from localStorage)
-		this.ensureLayouts();
+		// State management using unified diagram modules
+		this.diagramStateManager = new DiagramStateManager(boardDiagramDefinition);
+		this.diagramUndoRedo = new DiagramUndoRedo();
 
 		// Track undo/redo state changes for toolbar
-		this.undoRedo.onStateChange(() => {
+		this.diagramUndoRedo.setOnStateChange(() => {
 			// Toolbar updates its own button states via the same callback
 		});
 
 		// Toolbar
-		this.boardToolbar = new BoardToolbar(this.container, this.undoRedo, {
-			onZoomIn: () => this.adjustZoom(-0.25),
-			onZoomOut: () => this.adjustZoom(0.25),
-			onFitView: () => this.fitView(),
-			onUndo: () => this.handleUndo(),
-			onRedo: () => this.handleRedo(),
-			onLayoutChange: (layout) => this.handleLayoutChange(layout),
-			onAddCard: (type) => this.handleAddCard(type),
-			onAddDecision: () => this.handleAddDecision(),
-		});
+		const toolbarContainer = document.createElement('div');
+		toolbarContainer.style.cssText = 'display:flex;align-items:center;gap:4px;padding:4px 8px;border-bottom:1px solid var(--vscode-panel-border);';
+		this.container.appendChild(toolbarContainer);
+
+		// Unified toolbar provides undo/redo/zoom/fit/layout
+		// We create the engine first, then the toolbar needs it
+		// Actually, we need to create the toolbar after the engine — but we need the canvas container
+		// Let's: create toolbar container → create canvas container → create engine → create toolbar in toolbar container
 
 		// Canvas container
 		const canvasContainer = document.createElement('div');
 		canvasContainer.style.cssText = 'flex:1;position:relative;overflow:hidden;';
 		this.container.appendChild(canvasContainer);
 
-		// Canvas — use empty data, no longer calls createSampleData()
-		this.canvas = new BoardCanvas(
+		// Engine — using unified ArchitectureDiagramEngine with board definition
+		this.engine = new ArchitectureDiagramEngine(
 			canvasContainer,
-			this.stateManager,
-			this.undoRedo,
-			this.boardData,
+			boardDiagramDefinition,
+			this.diagramStateManager,
+			this.diagramUndoRedo,
 			this.contextMenuService,
-			{
-				onNodeDoubleClick: (id, type) => this.handleNodeDoubleClick(id, type),
-				onAddEdge: (source, target, type) => this.handleAddEdge(source, target, type),
-				onRemoveEdge: (edgeId) => this.handleRemoveEdge(edgeId),
-				onRemoveNode: (nodeId, nodeType) => this.handleRemoveNode(nodeId, nodeType),
-				onDuplicateNode: (nodeId) => this.handleDuplicateNode(nodeId),
-				onEditNode: (nodeId, nodeType) => this.handleNodeDoubleClick(nodeId, nodeType),
-				onAddCard: (type) => this.handleAddCard(type),
-				onAddDecision: () => this.handleAddDecision(),
-				onLayoutChange: (layout) => this.handleLayoutChange(layout),
-				onFitView: () => this.fitView(),
-			},
 		);
+
+		// Toolbar (insert at top)
+		this.diagramToolbar = new DiagramToolbar(
+			toolbarContainer,
+			this.engine,
+			this.diagramUndoRedo,
+			boardDiagramDefinition,
+		);
+
+		// Add custom Board-specific toolbar buttons
+		this.addBoardToolbarButtons(toolbarContainer);
 
 		// Completeness panel
 		this.completenessPanel = new BoardCompletenessPanel(canvasContainer, {
 			onCreateCard: (type) => this.handleAddCard(type),
 			onEditConstitution: () => {
-				// TODO: open constitution editor
 				console.log('[Board] Edit constitution');
 			},
 		});
-		this.completenessPanel.update(this.boardData.cards, this.boardData.constitution);
+		this.completenessPanel.update(this.cards, null);
 
 		// Async load data
 		this.loadBoardData().catch(err => console.warn('[Board] Data load failed:', err));
 	}
 
+	/* ─── Custom Board Toolbar Buttons ─────────────────────── */
+
+	private addBoardToolbarButtons(parent: HTMLElement): void {
+		// Separator
+		const sep = document.createElement('span');
+		sep.style.cssText = 'width:1px;height:20px;background:var(--vscode-panel-border);margin:0 6px;';
+		parent.appendChild(sep);
+
+		// Add Card button
+		const addCardBtn = document.createElement('button');
+		addCardBtn.textContent = '+ Card';
+		addCardBtn.title = 'Add Card';
+		addCardBtn.style.cssText = `
+			background: transparent; border: 1px solid transparent;
+			color: var(--vscode-foreground); cursor: pointer;
+			padding: 2px 8px; border-radius: 3px; font-size: 12px;
+		`;
+		addCardBtn.addEventListener('click', () => this.handleAddCard('concept'));
+		addCardBtn.addEventListener('mouseenter', () => { addCardBtn.style.background = 'var(--vscode-toolbar-hoverBackground)'; });
+		addCardBtn.addEventListener('mouseleave', () => { addCardBtn.style.background = 'transparent'; });
+		parent.appendChild(addCardBtn);
+
+		// Add Decision button
+		const addDecisionBtn = document.createElement('button');
+		addDecisionBtn.textContent = '+ Decision';
+		addDecisionBtn.title = 'Add Decision';
+		addDecisionBtn.style.cssText = `
+			background: transparent; border: 1px solid transparent;
+			color: var(--vscode-foreground); cursor: pointer;
+			padding: 2px 8px; border-radius: 3px; font-size: 12px;
+		`;
+		addDecisionBtn.addEventListener('click', () => this.handleAddDecision());
+		addDecisionBtn.addEventListener('mouseenter', () => { addDecisionBtn.style.background = 'var(--vscode-toolbar-hoverBackground)'; });
+		addDecisionBtn.addEventListener('mouseleave', () => { addDecisionBtn.style.background = 'transparent'; });
+		parent.appendChild(addDecisionBtn);
+	}
+
 	/* ─── Data Loading ─────────────────────────────────────── */
 
 	private async loadBoardData(): Promise<void> {
-		// Load from localStorage via BoardStateManager (already loaded in constructor)
-		const state = this.stateManager.getState();
-		if (state.nodeLayouts.length > 0) {
-			this.canvas.render();
-		}
-		// Empty state — stay empty, user can create cards via toolbar
-	}
-
-	/* ─── Layout Management ────────────────────────────────── */
-
-	private ensureLayouts(): void {
-		// Simplified: BoardStateManager constructor already loaded from localStorage.
-		// No sample data auto-creation. User creates cards via toolbar/context menu.
-	}
-
-	/* ─── Zoom ─────────────────────────────────────────────── */
-
-	private adjustZoom(delta: number): void {
-		const state = this.stateManager.getState();
-		const currentZoom = state.viewport.zoom || 1;
-		const newZoom = Math.max(0.2, Math.min(5, currentZoom * (1 + delta)));
-		this.stateManager.setViewport({
-			x: state.viewport.x,
-			y: state.viewport.y,
-			zoom: newZoom,
-		});
-		this.boardToolbar.updateZoomLabel(newZoom);
-		this.canvas.render();
-	}
-
-	private fitView(): void {
-		this.stateManager.setViewport({ x: 0, y: 0, zoom: 1 });
-		this.boardToolbar.updateZoomLabel(1);
-		this.canvas.render();
-	}
-
-	/* ─── Undo/Redo ────────────────────────────────────────── */
-
-	private handleUndo(): void {
-		const currentSnapshot: BoardSnapshot = this.createCurrentSnapshot();
-		const restored = this.undoRedo.undo(currentSnapshot);
-		if (restored) {
-			this.restoreSnapshot(restored);
+		const state = this.diagramStateManager.getState();
+		if (state.layouts.length > 0) {
+			this.engine.render();
 		}
 	}
 
-	private handleRedo(): void {
-		const currentSnapshot: BoardSnapshot = this.createCurrentSnapshot();
-		const restored = this.undoRedo.redo(currentSnapshot);
-		if (restored) {
-			this.restoreSnapshot(restored);
-		}
-	}
-
-	private createCurrentSnapshot(): BoardSnapshot {
-		const state = this.stateManager.getState();
-		return {
-			nodeLayouts: state.nodeLayouts,
-			edges: state.edges,
-			viewport: state.viewport,
-		};
-	}
-
-	private restoreSnapshot(snapshot: BoardSnapshot): void {
-		// Replace all layouts
-		const currentState = this.stateManager.getState();
-
-		// Remove old layouts
-		for (const layout of currentState.nodeLayouts) {
-			this.stateManager.removeNodeLayout(layout.id);
-		}
-		// Add restored layouts
-		for (const layout of snapshot.nodeLayouts) {
-			this.stateManager.addNodeLayout(layout.id, layout.type, layout.position);
-		}
-
-		// Remove old edges
-		for (const edge of currentState.edges) {
-			this.stateManager.removeEdge(edge.id);
-		}
-		// Add restored edges
-		for (const edge of snapshot.edges) {
-			this.stateManager.addEdge(edge.source, edge.target, edge.type);
-		}
-
-		// Restore viewport
-		this.stateManager.setViewport(snapshot.viewport);
-		this.boardToolbar.updateZoomLabel(snapshot.viewport.zoom || 1);
-
-		this.canvas.render();
-	}
-
-	/* ─── Layout Change ────────────────────────────────────── */
-
-	private handleLayoutChange(layout: 'column' | 'dagre' | 'manual'): void {
-		const state = this.stateManager.getState();
-		if (state.nodeLayouts.length === 0) return; // No data — nothing to layout
-
-		if (layout === 'column') {
-			const layouts = computeColumnLayout(this.boardData.cards, this.boardData.decisions);
-			this.stateManager.setLayouts(layouts);
-			this.canvas.render();
-		} else if (layout === 'dagre') {
-			const layouts = computeDagreLayout(state.nodeLayouts, state.edges);
-			this.stateManager.setLayouts(layouts);
-			this.canvas.render();
-		}
-		// 'manual' — no automatic changes
-	}
-
-	/* ─── Node Operations ──────────────────────────────────── */
-
-	private handleNodeDoubleClick(nodeId: string, _nodeType: string): void {
-		console.log('[Board] Node double-clicked:', nodeId, _nodeType);
-		// TODO: open detail editor
-	}
+	/* ─── Custom Toolbar Actions ────────────────────────────── */
 
 	private handleAddCard(type: string): void {
 		const newId = `card-${type}-${Date.now().toString(36)}`;
-		const state = this.stateManager.getState();
-		const lastLayout = state.nodeLayouts[state.nodeLayouts.length - 1];
+		const state = this.diagramStateManager.getState();
+		const lastLayout = state.layouts[state.layouts.length - 1];
 		const pos = lastLayout
 			? { x: lastLayout.position.x, y: lastLayout.position.y + 130 }
 			: { x: 100, y: 100 };
 
-		this.stateManager.addNodeLayout(newId, 'card', pos);
+		this.diagramStateManager.addNodeLayout(newId, 'card', pos);
 
-		// Add card content to boardData
 		const newCard: SandboxCard = {
 			id: newId,
 			type: type as SandboxCard['type'],
@@ -290,72 +204,18 @@ class BoardViewPane extends ViewPane {
 			createdAt: new Date().toISOString(),
 			updatedAt: new Date().toISOString(),
 		};
-		this.boardData.cards = [...this.boardData.cards, newCard];
-		this.canvas.updateData(this.boardData);
-		this.completenessPanel.update(this.boardData.cards, this.boardData.constitution);
-		this.canvas.render();
+		this.cards = [...this.cards, newCard];
+		this.completenessPanel.update(this.cards, null);
+		this.engine.render();
 	}
 
 	private handleAddDecision(): void {
 		const newId = `decision-${Date.now().toString(36)}`;
-		const state = this.stateManager.getState();
-		const pos = { x: 500, y: 100 + state.nodeLayouts.length * 130 };
+		const state = this.diagramStateManager.getState();
+		const pos = { x: 500, y: 100 + state.layouts.length * 130 };
 
-		this.stateManager.addNodeLayout(newId, 'decision', pos);
-
-		// Add decision content to boardData
-		const newDecision = {
-			id: newId,
-			type: 'creation',
-			description: 'New decision',
-			commitment: 'Draft',
-			time: new Date().toISOString(),
-		};
-		this.boardData.decisions = [...this.boardData.decisions, newDecision];
-		this.canvas.updateData(this.boardData);
-		this.canvas.render();
-	}
-
-	private handleRemoveNode(nodeId: string, nodeType: string): void {
-		this.stateManager.removeNodeLayout(nodeId);
-
-		// Also remove from boardData
-		if (nodeType === 'card') {
-			this.boardData.cards = this.boardData.cards.filter(c => c.id !== nodeId);
-		} else if (nodeType === 'decision') {
-			this.boardData.decisions = this.boardData.decisions.filter(d => d.id !== nodeId);
-		}
-
-		this.canvas.updateData(this.boardData);
-		this.completenessPanel.update(this.boardData.cards, this.boardData.constitution);
-		this.canvas.render();
-	}
-
-	private handleDuplicateNode(nodeId: string): void {
-		// Duplication is handled by Ctrl+D in BoardCanvas
-		// This callback is for the context menu 'Duplicate' action
-		const state = this.stateManager.getState();
-		const layout = state.nodeLayouts.find(n => n.id === nodeId);
-		if (layout) {
-			const newId = `${nodeId}-copy-${Date.now().toString(36)}`;
-			this.stateManager.addNodeLayout(newId, layout.type, {
-				x: layout.position.x + 30,
-				y: layout.position.y + 30,
-			});
-			this.canvas.render();
-		}
-	}
-
-	/* ─── Edge Operations ──────────────────────────────────── */
-
-	private handleAddEdge(source: string, target: string, type: FlowEdgeData['type']): void {
-		this.stateManager.addEdge(source, target, type);
-		this.canvas.render();
-	}
-
-	private handleRemoveEdge(edgeId: string): void {
-		this.stateManager.removeEdge(edgeId);
-		this.canvas.render();
+		this.diagramStateManager.addNodeLayout(newId, 'decision', pos);
+		this.engine.render();
 	}
 
 	/* ─── Layout ───────────────────────────────────────────── */
@@ -367,8 +227,8 @@ class BoardViewPane extends ViewPane {
 	}
 
 	override dispose(): void {
-		this.canvas?.destroy();
-		this.boardToolbar?.destroy();
+		this.engine?.destroy();
+		this.diagramToolbar?.destroy();
 		this.completenessPanel?.destroy();
 		super.dispose();
 	}

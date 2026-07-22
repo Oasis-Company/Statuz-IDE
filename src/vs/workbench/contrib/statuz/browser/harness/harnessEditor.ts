@@ -53,7 +53,12 @@ import { HarnessDetailPanel } from './harnessDetailPanel.js';
 import { IAgentManagementService } from '../agentManagementService.js';
 import { IAgentLLMService } from './agentLLMService.js';
 import { IAgentSkillItem, IAgentSkillFilter, AgentTemplate } from '../agentManagement.types.js';
-import { AgentCanvas } from './agentCanvas.js';
+import { ArchitectureDiagramEngine } from '../diagram/architectureDiagramEngine.js';
+import { DiagramStateManager } from '../diagram/diagramStateManager.js';
+import { DiagramUndoRedo } from '../diagram/diagramUndoRedo.js';
+import { DiagramToolbar } from '../diagram/diagramToolbar.js';
+import { agentDiagramDefinition } from '../diagram/agentDiagramDefinition.js';
+import type { DiagramNodeDefinition } from '../diagram/diagramTypes.js';
 import { AgentTemplateStore } from './agentTemplateStore.js';
 import { AgentSandbox } from './agentSandbox.js';
 import { AgentPerformanceDashboard } from './agentPerformanceDashboard.js';
@@ -83,7 +88,11 @@ export class HarnessEditor extends EditorPane {
 	private cardGridContainer!: HTMLElement;
 	private detailPanelContainer!: HTMLElement;
 	private agentCanvasContainer!: HTMLElement;
-	private agentCanvas!: AgentCanvas;
+	private engine!: ArchitectureDiagramEngine;
+	private diagramStateManager!: DiagramStateManager;
+	private diagramUndoRedo!: DiagramUndoRedo;
+	private diagramToolbar!: DiagramToolbar;
+	private agentItems: IAgentSkillItem[] = [];
 
 	private currentTab: HarnessTab = 'catalog';
 	private currentFilter: IAgentSkillFilter = {
@@ -106,6 +115,7 @@ export class HarnessEditor extends EditorPane {
 		@IInstantiationService instantiationService: IInstantiationService,
 		@IAgentManagementService private readonly agentMgmtService: IAgentManagementService,
 		@IAgentLLMService private readonly llmService: IAgentLLMService,
+		@IContextMenuService private readonly contextMenuService: IContextMenuService,
 	) {
 		super(HarnessEditor.ID, group, telemetryService, themeService, storageService);
 		// Reserved for Task 3: openSandbox() passes llmService to AgentSandbox constructor
@@ -161,23 +171,36 @@ export class HarnessEditor extends EditorPane {
 		this.detailPanel = new HarnessDetailPanel(this.detailPanelContainer);
 		this.templateStore = new AgentTemplateStore();
 
-		// Initialize AgentCanvas
-		this.agentCanvas = new AgentCanvas(this.agentCanvasContainer, {
-			onNodeDoubleClick: (nodeId) => {
-				const item = this.agentMgmtService.getItem(nodeId);
-				if (item) {
-					this.onCardSelect(item);
-				}
-			},
-			onInstall: (id) => this.handleInstall(id),
-			onUninstall: (id) => this.handleUninstall(id),
-			onAddEdge: (source, target, type) => {
-				this.agentCanvas.addEdge(source, target, type);
-			},
-			onRemoveEdge: (edgeId) => {
-				this.agentCanvas.removeEdge(edgeId);
-			},
-		});
+		// Initialize unified ArchitectureDiagramEngine with agent definition
+		this.diagramStateManager = new DiagramStateManager(agentDiagramDefinition);
+		this.diagramUndoRedo = new DiagramUndoRedo();
+
+		// Toolbar container
+		const toolbarContainer = document.createElement('div');
+		toolbarContainer.style.cssText = 'display:flex;align-items:center;gap:4px;padding:4px 8px;border-bottom:1px solid var(--vscode-panel-border);';
+		this.agentCanvasContainer.appendChild(toolbarContainer);
+
+		// Canvas container
+		const canvasContainer = document.createElement('div');
+		canvasContainer.style.cssText = 'flex:1;position:relative;overflow:hidden;';
+		this.agentCanvasContainer.appendChild(canvasContainer);
+
+		// Engine
+		this.engine = new ArchitectureDiagramEngine(
+			canvasContainer,
+			agentDiagramDefinition,
+			this.diagramStateManager,
+			this.diagramUndoRedo,
+			this.contextMenuService,
+		);
+
+		// Toolbar
+		this.diagramToolbar = new DiagramToolbar(
+			toolbarContainer,
+			this.engine,
+			this.diagramUndoRedo,
+			agentDiagramDefinition,
+		);
 
 		// Initial render
 		this.renderCurrentTab();
@@ -206,6 +229,28 @@ export class HarnessEditor extends EditorPane {
 		}
 		this.rootElement.style.height = `${dimension.height}px`;
 		this.rootElement.style.width = `${dimension.width}px`;
+	}
+
+	/* ─── Agent Canvas Sync ────────────────────────────────── */
+
+	private syncAgentItems(filteredItems: IAgentSkillItem[]): void {
+		const state = this.diagramStateManager.getState();
+		const validIds = new Set(filteredItems.map(i => i.id));
+
+		// Remove layouts for items that no longer exist
+		for (const layout of state.layouts) {
+			if (!validIds.has(layout.id)) {
+				this.diagramStateManager.removeNodeLayout(layout.id);
+			}
+		}
+
+		// Add layouts for new items
+		for (const item of filteredItems) {
+			const existing = state.layouts.find(l => l.id === item.id);
+			if (!existing) {
+				this.diagramStateManager.addNodeLayout(item.id, item.type);
+			}
+		}
 	}
 
 	// ─── Tab Switching ──────────────────────────────────────
@@ -259,9 +304,11 @@ export class HarnessEditor extends EditorPane {
 		this.agentCanvasContainer.style.display = '';
 
 		const items = this.agentMgmtService.getItems();
-		this.agentCanvas.setItems(items, items);
-		this.agentCanvas.render();
-		this.agentCanvas.focus();
+		this.agentItems = items;
+		this.syncAgentItems(items);
+		this.engine.updateData(items);
+		this.engine.render();
+		this.engine.focus();
 
 		const enabled = items.filter(i => i.state === 'enabled').length;
 		this.statusBar.update(items.length, enabled, enabled);
@@ -277,9 +324,11 @@ export class HarnessEditor extends EditorPane {
 
 		const items = this.agentMgmtService.getItems();
 		const installed = items.filter(i => i.state === 'enabled' || i.state === 'error');
-		this.agentCanvas.setItems(items, installed);
-		this.agentCanvas.render();
-		this.agentCanvas.focus();
+		this.agentItems = items;
+		this.syncAgentItems(installed);
+		this.engine.updateData(installed);
+		this.engine.render();
+		this.engine.focus();
 
 		this.statusBar.update(items.length, installed.length, installed.filter(i => i.state === 'enabled').length);
 	}
@@ -971,7 +1020,7 @@ export class HarnessEditor extends EditorPane {
 		}
 
 		// Render agent canvas in pipeline mode
-		this.agentCanvas.enablePipelineMode({
+		this.engine.enablePipelineMode({
 			id: 'pipeline-default',
 			name: 'New Pipeline',
 			description: '',
@@ -992,8 +1041,10 @@ export class HarnessEditor extends EditorPane {
 			const filtered = this.currentTab === 'installed'
 				? items.filter(i => i.state === 'enabled' || i.state === 'error')
 				: items;
-			this.agentCanvas.setItems(items, filtered);
-			this.agentCanvas.render();
+			this.agentItems = items;
+			this.syncAgentItems(filtered);
+			this.engine.updateData(filtered);
+			this.engine.render();
 		} else {
 			this.cardGrid.render(this.agentMgmtService.getItems(), this.currentFilter);
 		}
@@ -1010,14 +1061,38 @@ export class HarnessEditor extends EditorPane {
 
 	// ─── Actions ────────────────────────────────────────────
 
-	private async handleInstall(id: string): Promise<void> {
-		await this.agentMgmtService.installItem(id);
-		this.renderCurrentTab();
+	private handleInstall(id: string): void {
+		this.agentMgmtService.install(id);
+		if (this.currentTab === 'catalog' || this.currentTab === 'installed') {
+			const items = this.agentMgmtService.getItems();
+			const filtered = this.currentTab === 'installed'
+				? items.filter(i => i.state === 'enabled' || i.state === 'error')
+				: items;
+			this.agentItems = items;
+			this.syncAgentItems(filtered);
+			this.engine.updateData(filtered);
+			this.engine.render();
+		}
+		this.statusBar.update(this.agentMgmtService.getItems().length,
+			this.agentMgmtService.getItems().filter(i => i.state === 'enabled').length,
+			this.agentMgmtService.getItems().filter(i => i.state === 'enabled').length);
 	}
 
-	private async handleUninstall(id: string): Promise<void> {
-		await this.agentMgmtService.uninstallItem(id);
-		this.renderCurrentTab();
+	private handleUninstall(id: string): void {
+		this.agentMgmtService.uninstall(id);
+		if (this.currentTab === 'catalog' || this.currentTab === 'installed') {
+			const items = this.agentMgmtService.getItems();
+			const filtered = this.currentTab === 'installed'
+				? items.filter(i => i.state === 'enabled' || i.state === 'error')
+				: items;
+			this.agentItems = items;
+			this.syncAgentItems(filtered);
+			this.engine.updateData(filtered);
+			this.engine.render();
+		}
+		this.statusBar.update(this.agentMgmtService.getItems().length,
+			this.agentMgmtService.getItems().filter(i => i.state === 'enabled').length,
+			this.agentMgmtService.getItems().filter(i => i.state === 'enabled').length);
 	}
 
 	private handleToggle(id: string, state: 'enabled' | 'disabled'): void {
@@ -1051,7 +1126,8 @@ export class HarnessEditor extends EditorPane {
 		this.cardGrid?.dispose();
 		this.detailPanel?.dispose();
 		this.statusBar?.dispose();
-		this.agentCanvas?.destroy();
+		this.engine?.destroy();
+		this.diagramToolbar?.destroy();
 		this.sandbox?.dispose();
 		super.dispose();
 	}
