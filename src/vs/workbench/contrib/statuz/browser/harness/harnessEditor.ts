@@ -58,7 +58,6 @@ import { DiagramStateManager } from '../diagram/diagramStateManager.js';
 import { DiagramUndoRedo } from '../diagram/diagramUndoRedo.js';
 import { DiagramToolbar } from '../diagram/diagramToolbar.js';
 import { agentDiagramDefinition } from '../diagram/agentDiagramDefinition.js';
-import type { DiagramNodeDefinition } from '../diagram/diagramTypes.js';
 import { AgentTemplateStore } from './agentTemplateStore.js';
 import { AgentSandbox } from './agentSandbox.js';
 import { AgentPerformanceDashboard } from './agentPerformanceDashboard.js';
@@ -92,7 +91,6 @@ export class HarnessEditor extends EditorPane {
 	private diagramStateManager!: DiagramStateManager;
 	private diagramUndoRedo!: DiagramUndoRedo;
 	private diagramToolbar!: DiagramToolbar;
-	private agentItems: IAgentSkillItem[] = [];
 
 	private currentTab: HarnessTab = 'catalog';
 	private currentFilter: IAgentSkillFilter = {
@@ -304,7 +302,6 @@ export class HarnessEditor extends EditorPane {
 		this.agentCanvasContainer.style.display = '';
 
 		const items = this.agentMgmtService.getItems();
-		this.agentItems = items;
 		this.syncAgentItems(items);
 		this.engine.updateData(items);
 		this.engine.render();
@@ -324,7 +321,6 @@ export class HarnessEditor extends EditorPane {
 
 		const items = this.agentMgmtService.getItems();
 		const installed = items.filter(i => i.state === 'enabled' || i.state === 'error');
-		this.agentItems = items;
 		this.syncAgentItems(installed);
 		this.engine.updateData(installed);
 		this.engine.render();
@@ -1021,14 +1017,7 @@ export class HarnessEditor extends EditorPane {
 
 		// Render agent canvas in pipeline mode
 		this.engine.enablePipelineMode({
-			id: 'pipeline-default',
-			name: 'New Pipeline',
-			description: '',
-			nodes: [],
-			edges: [],
-			createdAt: Date.now(),
-			updatedAt: Date.now(),
-			enabled: true,
+			stages: [{ name: 'default', allowedNodeTypes: ['agent', 'skill', 'command', 'rule'], allowedEdgeTypes: ['depends-on', 'extends'] }],
 		});
 	}
 
@@ -1041,7 +1030,6 @@ export class HarnessEditor extends EditorPane {
 			const filtered = this.currentTab === 'installed'
 				? items.filter(i => i.state === 'enabled' || i.state === 'error')
 				: items;
-			this.agentItems = items;
 			this.syncAgentItems(filtered);
 			this.engine.updateData(filtered);
 			this.engine.render();
@@ -1061,14 +1049,13 @@ export class HarnessEditor extends EditorPane {
 
 	// ─── Actions ────────────────────────────────────────────
 
-	private handleInstall(id: string): void {
-		this.agentMgmtService.install(id);
+	private async handleInstall(id: string): Promise<void> {
+		await this.agentMgmtService.installItem(id);
 		if (this.currentTab === 'catalog' || this.currentTab === 'installed') {
 			const items = this.agentMgmtService.getItems();
 			const filtered = this.currentTab === 'installed'
 				? items.filter(i => i.state === 'enabled' || i.state === 'error')
 				: items;
-			this.agentItems = items;
 			this.syncAgentItems(filtered);
 			this.engine.updateData(filtered);
 			this.engine.render();
@@ -1078,14 +1065,13 @@ export class HarnessEditor extends EditorPane {
 			this.agentMgmtService.getItems().filter(i => i.state === 'enabled').length);
 	}
 
-	private handleUninstall(id: string): void {
-		this.agentMgmtService.uninstall(id);
+	private async handleUninstall(id: string): Promise<void> {
+		await this.agentMgmtService.uninstallItem(id);
 		if (this.currentTab === 'catalog' || this.currentTab === 'installed') {
 			const items = this.agentMgmtService.getItems();
 			const filtered = this.currentTab === 'installed'
 				? items.filter(i => i.state === 'enabled' || i.state === 'error')
 				: items;
-			this.agentItems = items;
 			this.syncAgentItems(filtered);
 			this.engine.updateData(filtered);
 			this.engine.render();

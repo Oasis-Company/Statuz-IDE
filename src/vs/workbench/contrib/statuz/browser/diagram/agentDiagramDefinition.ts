@@ -234,12 +234,12 @@ export const agentDiagramDefinition: DiagramDefinition = {
 	contextMenu: {
 		canvasActions: [],
 		nodeActions: [
-			{ id: 'install', label: 'Install', enabled: true, handler: () => {} },
-			{ id: 'uninstall', label: 'Uninstall', enabled: true, handler: () => {} },
-			{ id: 'view-details', label: 'View Details', enabled: true, handler: () => {} },
+			{ id: 'install', label: 'Install', enabled: true, handler: () => {} /* injected by installContextMenuHandlers */ },
+			{ id: 'uninstall', label: 'Uninstall', enabled: true, handler: () => {} /* injected by installContextMenuHandlers */ },
+			{ id: 'view-details', label: 'View Details', enabled: true, handler: () => {} /* injected by installContextMenuHandlers */ },
 		],
 		edgeActions: [
-			{ id: 'remove-edge', label: 'Remove Edge', enabled: true, handler: () => {} },
+			{ id: 'remove-edge', label: 'Remove Edge', enabled: true, handler: () => {} /* injected by installContextMenuHandlers */ },
 		],
 	},
 	callbacks: {},

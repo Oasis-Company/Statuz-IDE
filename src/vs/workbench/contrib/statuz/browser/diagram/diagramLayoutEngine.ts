@@ -9,6 +9,7 @@ import type {
 	DiagramEdgeDefinition,
 	DiagramDefinition,
 	LayoutStrategy,
+	PipelineDefinition,
 } from './diagramTypes.js';
 
 /* ─── Column Layout Strategy ─────────────────────────────── */
@@ -129,6 +130,53 @@ class DagreLayoutStrategy implements LayoutStrategy {
 	}
 }
 
+/* ─── Pipeline Layout Strategy ────────────────────────────── */
+
+class PipelineLayoutStrategy implements LayoutStrategy {
+	name = 'pipeline';
+	pipeline?: PipelineDefinition;
+
+	layout(
+		nodes: DiagramNodeDefinition[],
+		_edges: DiagramEdgeDefinition[],
+		_definition: DiagramDefinition,
+	): DiagramNodeDefinition[] {
+		if (!this.pipeline || this.pipeline.stages.length === 0) {
+			// Fallback to column layout
+			const col = new ColumnLayoutStrategy();
+			return col.layout(nodes, _edges, _definition);
+		}
+
+		const stageSpacing = 200;
+		const nodeSpacing = 120;
+		const startX = 100;
+		let stageY = 100;
+		const result: DiagramNodeDefinition[] = [];
+
+		for (const stage of this.pipeline.stages) {
+			const stageNodes = nodes.filter(n => stage.allowedNodeTypes.includes(n.type));
+
+			// Arrange stage nodes in a column
+			stageNodes.forEach((node, i) => {
+				result.push({
+					...node,
+					position: {
+						x: startX,
+						y: stageY + i * nodeSpacing,
+					},
+				});
+			});
+
+			// Move stageY down for next stage
+			if (stageNodes.length > 0) {
+				stageY += stageNodes.length * nodeSpacing + stageSpacing;
+			}
+		}
+
+		return result;
+	}
+}
+
 /* ─── Diagram Layout Engine ──────────────────────────────── */
 
 export class DiagramLayoutEngine {
@@ -138,10 +186,18 @@ export class DiagramLayoutEngine {
 		this.registerStrategy(new ColumnLayoutStrategy());
 		this.registerStrategy(new GroupedLayoutStrategy());
 		this.registerStrategy(new DagreLayoutStrategy());
+		this.registerStrategy(new PipelineLayoutStrategy());
 	}
 
 	registerStrategy(strategy: LayoutStrategy): void {
 		this.strategies.set(strategy.name, strategy);
+	}
+
+	setPipeline(pipeline: PipelineDefinition): void {
+		const strategy = this.strategies.get('pipeline') as PipelineLayoutStrategy | undefined;
+		if (strategy) {
+			strategy.pipeline = pipeline;
+		}
 	}
 
 	layout(

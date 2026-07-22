@@ -230,17 +230,17 @@ export const boardDiagramDefinition: DiagramDefinition = {
 	},
 	contextMenu: {
 		canvasActions: [
-			{ id: 'add-card', label: 'Add Strategy Card', enabled: true, handler: () => {} },
-			{ id: 'add-decision', label: 'Add Decision', enabled: true, handler: () => {} },
-			{ id: 'fit-view', label: 'Fit View', enabled: true, handler: () => {} },
+			{ id: 'add-card', label: 'Add Strategy Card', enabled: true, handler: () => {} /* injected by installContextMenuHandlers */ },
+			{ id: 'add-decision', label: 'Add Decision', enabled: true, handler: () => {} /* injected by installContextMenuHandlers */ },
+			{ id: 'fit-view', label: 'Fit View', enabled: true, handler: () => {} /* injected by installContextMenuHandlers */ },
 		],
 		nodeActions: [
-			{ id: 'edit-node', label: 'Edit', enabled: true, handler: () => {} },
-			{ id: 'duplicate-node', label: 'Duplicate', enabled: true, handler: () => {} },
-			{ id: 'remove-node', label: 'Remove', enabled: true, handler: () => {} },
+			{ id: 'edit-node', label: 'Edit', enabled: true, handler: () => {} /* injected by installContextMenuHandlers */ },
+			{ id: 'duplicate-node', label: 'Duplicate', enabled: true, handler: () => {} /* injected by installContextMenuHandlers */ },
+			{ id: 'remove-node', label: 'Remove', enabled: true, handler: () => {} /* injected by installContextMenuHandlers */ },
 		],
 		edgeActions: [
-			{ id: 'remove-edge', label: 'Remove Edge', enabled: true, handler: () => {} },
+			{ id: 'remove-edge', label: 'Remove Edge', enabled: true, handler: () => {} /* injected by installContextMenuHandlers */ },
 		],
 	},
 	callbacks: {},

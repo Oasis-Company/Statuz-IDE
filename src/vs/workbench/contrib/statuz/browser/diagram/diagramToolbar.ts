@@ -49,15 +49,15 @@ export class DiagramToolbar {
 		const cfg = this.definition.toolbar;
 
 		if (cfg.showUndoRedo) {
-			this.undoBtn = this.createButton('↩', 'Undo (Ctrl+Z)', () => (this.engine as any).undo?.());
-			this.redoBtn = this.createButton('↪', 'Redo (Ctrl+Shift+Z)', () => (this.engine as any).redo?.());
+			this.undoBtn = this.createButton('↩', 'Undo (Ctrl+Z)', () => this.engine.undo());
+			this.redoBtn = this.createButton('↪', 'Redo (Ctrl+Shift+Z)', () => this.engine.redo());
 			this.updateUndoRedoState(false, false);
 		}
 
 		if (cfg.showZoom) {
-			this.createButton('−', 'Zoom Out', () => (this.engine as any).zoomOut?.());
+			this.createButton('−', 'Zoom Out', () => this.engine.zoomOut());
 			this.zoomLabel = this.createLabel('100%');
-			this.createButton('+', 'Zoom In', () => (this.engine as any).zoomIn?.());
+			this.createButton('+', 'Zoom In', () => this.engine.zoomIn());
 		}
 
 		if (cfg.showFitView) {

@@ -25,6 +25,7 @@ import {
 	createSVGElement,
 } from './diagramEdgeUtils.js';
 import { getNodePorts } from './diagramPortUtils.js';
+import { DiagramLayoutEngine } from './diagramLayoutEngine.js';
 
 /* ─── Constants ──────────────────────────────────────────── */
 
@@ -46,6 +47,7 @@ export class ArchitectureDiagramEngine {
 	private stateManager: DiagramStateManager;
 	private undoRedo: DiagramUndoRedo;
 	private contextMenuService: IContextMenuService;
+	private layoutEngine: DiagramLayoutEngine;
 	private data: unknown[] = [];
 
 	// Interaction state
@@ -59,6 +61,10 @@ export class ArchitectureDiagramEngine {
 
 	// Drag-to-connect
 	private connectState: ConnectState | null = null;
+
+	// Pipeline mode
+	private pipelineLayoutSnapshot: DiagramSnapshot | null = null;
+	private pipelineMode = false;
 
 	// Viewport
 	private viewBox = { x: 0, y: 0, width: 1200, height: 800 };
@@ -84,6 +90,7 @@ export class ArchitectureDiagramEngine {
 		this.stateManager = stateManager;
 		this.undoRedo = undoRedo;
 		this.contextMenuService = contextMenuService;
+		this.layoutEngine = new DiagramLayoutEngine();
 
 		// Bind all handlers
 		this.boundMouseDown = this.onMouseDown.bind(this);
@@ -120,6 +127,7 @@ export class ArchitectureDiagramEngine {
 
 		this.bindEvents();
 		this.render();
+		this.installContextMenuHandlers();
 	}
 
 	/* ─── Public API ──────────────────────────────────────── */
@@ -167,7 +175,18 @@ export class ArchitectureDiagramEngine {
 	}
 
 	autoLayout(): void {
-		// Placeholder — will be implemented by DiagramLayoutEngine in Task 3.7
+		const state = this.stateManager.getState();
+		const strategy = state.layouts.length > 0
+			? this.definition.layoutStrategy || 'column'
+			: 'column';
+		const updated = this.layoutEngine.layout(
+			strategy,
+			state.layouts,
+			state.edges,
+			this.definition,
+		);
+		this.stateManager.setLayouts(updated);
+		this.render();
 	}
 
 	getNodeLayouts(): DiagramNodeDefinition[] {
@@ -180,15 +199,53 @@ export class ArchitectureDiagramEngine {
 
 	getZoom(): number {
 		const rect = this.svg.getBoundingClientRect();
-		return rect.width / this.viewBox.width;
+		// Fallback to container dimensions when getBoundingClientRect returns 0 (jsdom/test env)
+		if (rect.width > 0) {
+			return rect.width / this.viewBox.width;
+		}
+		const containerWidth = this.container.clientWidth;
+		if (containerWidth > 0) {
+			return containerWidth / this.viewBox.width;
+		}
+		// Default: assume 1:1 mapping
+		return 1.0;
 	}
 
-	enablePipelineMode(_pipeline: PipelineDefinition): void {
-		// Reserved for Task 3.6c
+	enablePipelineMode(pipeline: PipelineDefinition): void {
+		if (this.pipelineMode) { return; }
+
+		// Save current layout as snapshot for rollback
+		this.pipelineLayoutSnapshot = this.takeSnapshot();
+		this.pipelineMode = true;
+
+		// Apply pipeline layout
+		this.layoutEngine.setPipeline(pipeline);
+		const state = this.stateManager.getState();
+		const updated = this.layoutEngine.layout(
+			'pipeline',
+			state.layouts,
+			state.edges,
+			this.definition,
+		);
+		this.pushUndoSnapshot();
+		this.stateManager.setLayouts(updated);
+		this.render();
 	}
 
 	disablePipelineMode(): void {
-		// Reserved for Task 3.6c
+		if (!this.pipelineMode) { return; }
+
+		this.pipelineMode = false;
+		this.layoutEngine.setPipeline({ stages: [] });
+
+		// Restore previous layout, or fallback to autoLayout
+		if (this.pipelineLayoutSnapshot) {
+			this.restoreSnapshot(this.pipelineLayoutSnapshot);
+			this.pipelineLayoutSnapshot = null;
+		} else {
+			this.autoLayout();
+		}
+		this.render();
 	}
 
 	destroy(): void {
@@ -666,16 +723,38 @@ export class ArchitectureDiagramEngine {
 
 	/* ─── Undo / Redo ─────────────────────────────────────── */
 
-	private undo(): void {
+	public undo(): void {
 		const current = this.takeSnapshot();
 		const snapshot = this.undoRedo.undo(current);
 		if (snapshot) { this.restoreSnapshot(snapshot); }
 	}
 
-	private redo(): void {
+	public redo(): void {
 		const current = this.takeSnapshot();
 		const snapshot = this.undoRedo.redo(current);
 		if (snapshot) { this.restoreSnapshot(snapshot); }
+	}
+
+	public canUndo(): boolean {
+		return this.undoRedo.canUndo();
+	}
+
+	public canRedo(): boolean {
+		return this.undoRedo.canRedo();
+	}
+
+	/* ─── Zoom ─────────────────────────────────────────────── */
+
+	public zoomIn(): void {
+		const centerX = this.viewBox.x + this.viewBox.width / 2;
+		const centerY = this.viewBox.y + this.viewBox.height / 2;
+		this.zoomAt(centerX, centerY, -0.1);
+	}
+
+	public zoomOut(): void {
+		const centerX = this.viewBox.x + this.viewBox.width / 2;
+		const centerY = this.viewBox.y + this.viewBox.height / 2;
+		this.zoomAt(centerX, centerY, 0.1);
 	}
 
 	private pushUndoSnapshot(): void {
@@ -736,6 +815,126 @@ export class ArchitectureDiagramEngine {
 		};
 
 		this.contextMenuService.showContextMenu(delegate);
+	}
+
+	/* ─── Context Menu Handler Installation ───────────────── */
+
+	private installContextMenuHandlers(): void {
+		const def = this.definition;
+
+		// Canvas actions
+		for (const action of def.contextMenu.canvasActions) {
+			action.handler = this.createCanvasHandler(action.id);
+		}
+
+		// Node actions
+		for (const action of def.contextMenu.nodeActions) {
+			action.handler = this.createNodeHandler(action.id);
+		}
+
+		// Edge actions
+		for (const action of def.contextMenu.edgeActions) {
+			action.handler = this.createEdgeHandler(action.id);
+		}
+	}
+
+	private createCanvasHandler(actionId: string): () => void {
+		switch (actionId) {
+			case 'add-card': return () => this.addNode('card');
+			case 'add-decision': return () => this.addNode('decision');
+			case 'fit-view': return () => this.fitView();
+			default: return () => {};
+		}
+	}
+
+	private createNodeHandler(actionId: string): () => void {
+		switch (actionId) {
+			case 'edit-node': return () => this.editSelectedNode();
+			case 'duplicate-node': return () => this.duplicateSelectedNode();
+			case 'remove-node': return () => this.removeSelectedNode();
+			case 'install': return () => this.installAgent();
+			case 'uninstall': return () => this.uninstallAgent();
+			case 'view-details': return () => this.viewAgentDetails();
+			default: return () => {};
+		}
+	}
+
+	private createEdgeHandler(actionId: string): () => void {
+		switch (actionId) {
+			case 'remove-edge': return () => this.removeSelectedEdge();
+			default: return () => {};
+		}
+	}
+
+	/* ─── Context Menu Actions (Engine Methods) ────────────── */
+
+	private addNode(nodeType: string): void {
+		const config = this.definition.nodeTypes.find(t => t.type === nodeType);
+		if (!config) { return; }
+
+		this.pushUndoSnapshot();
+
+		// Place node at center of current viewport
+		const centerX = this.viewBox.x + this.viewBox.width / 2;
+		const centerY = this.viewBox.y + this.viewBox.height / 2;
+		const dims = config.defaultDimensions;
+		const nodeId = `${nodeType}-${Date.now().toString(36)}`;
+
+		this.stateManager.addNodeLayout(nodeId, nodeType, {
+			x: centerX - dims.width / 2,
+			y: centerY - dims.height / 2,
+		});
+
+		this.selectedNodeIds = new Set([nodeId]);
+		this.render();
+	}
+
+	private editSelectedNode(): void {
+		if (this.selectedNodeIds.size === 0) { return; }
+		const nodeId = [...this.selectedNodeIds][0];
+		const state = this.stateManager.getState();
+		const layout = state.layouts.find(n => n.id === nodeId);
+		if (layout) {
+			this.definition.callbacks.onNodeDoubleClick?.(nodeId, layout.type);
+		}
+	}
+
+	private duplicateSelectedNode(): void {
+		// Reuse existing duplicate logic
+		this.duplicateSelected();
+	}
+
+	private removeSelectedNode(): void {
+		// Reuse existing delete logic
+		this.deleteSelected();
+	}
+
+	private removeSelectedEdge(): void {
+		if (!this.selectedEdgeId) { return; }
+
+		this.pushUndoSnapshot();
+		this.stateManager.removeEdge(this.selectedEdgeId);
+		this.definition.callbacks.onRemoveEdge?.(this.selectedEdgeId);
+		this.selectedEdgeId = null;
+		this.render();
+	}
+
+	private installAgent(): void {
+		if (this.selectedNodeIds.size === 0) { return; }
+		const nodeId = [...this.selectedNodeIds][0];
+		const state = this.stateManager.getState();
+		const layout = state.layouts.find(n => n.id === nodeId);
+		if (layout) {
+			this.definition.callbacks.onNodeDoubleClick?.(nodeId, layout.type);
+		}
+	}
+
+	private uninstallAgent(): void {
+		this.removeSelectedNode();
+	}
+
+	private viewAgentDetails(): void {
+		this.editSelectedNode();
 	}
 
 	/* ─── Rendering ───────────────────────────────────────── */
