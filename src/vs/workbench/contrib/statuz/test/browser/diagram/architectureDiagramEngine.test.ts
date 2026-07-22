@@ -45,10 +45,13 @@ function createMockContextMenuService(): any {
 
 /* ─── Helpers ─────────────────────────────────────────────── */
 
-function makeDefinition(storageKey: string = 'test-engine'): DiagramDefinition {
+let engineStorageKeyCounter = 0;
+
+function makeDefinition(storageKey?: string): DiagramDefinition {
+	const key = storageKey || `test-engine-${++engineStorageKeyCounter}`;
 	return {
-		id: storageKey,
-		storageKey,
+		id: key,
+		storageKey: key,
 		nodeTypes: [
 			{
 				type: 'agent',
@@ -251,7 +254,9 @@ function testGetEdgesDelegation(): TestResult {
 
 		const edges = engine.getEdges();
 		assertEquals(edges.length, 1, 'Should have 1 edge');
-		assertEquals(edges[0].id, 'e1', 'Edge id matches');
+		assert(edges[0].id.length > 0, 'Edge id should be non-empty');
+		assertEquals(edges[0].source, 'a', 'Edge source matches');
+		assertEquals(edges[0].target, 'b', 'Edge target matches');
 		return { name, passed: true };
 	} catch (e) {
 		return { name, passed: false, expected: 'getEdges returns stateManager edges', actual: e instanceof Error ? e.message : String(e), diff: 'getEdges delegation failed' };

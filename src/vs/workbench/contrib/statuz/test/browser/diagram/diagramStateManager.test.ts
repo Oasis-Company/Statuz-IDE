@@ -30,17 +30,22 @@ interface TestResult {
 
 /* ─── Mock Definition ────────────────────────────────────── */
 
-const mockDefinition: DiagramDefinition = {
-	id: 'test',
-	nodeTypes: [],
-	edgeTypes: [],
-	storageKey: 'test-diagram',
-	maxUndoSteps: 50,
-	defaultViewport: { x: 0, y: 0, zoom: 1 },
-	toolbar: { showUndoRedo: true, showZoom: true, showFitView: true, showAutoLayout: true, showAddNode: false },
-	contextMenu: { canvasActions: [], nodeActions: [], edgeActions: [] },
-	callbacks: {},
-};
+let storageKeyCounter = 0;
+
+function createDefinition(): DiagramDefinition {
+	const key = `test-diagram-${++storageKeyCounter}`;
+	return {
+		id: 'test',
+		nodeTypes: [],
+		edgeTypes: [],
+		storageKey: key,
+		maxUndoSteps: 50,
+		defaultViewport: { x: 0, y: 0, zoom: 1 },
+		toolbar: { showUndoRedo: true, showZoom: true, showFitView: true, showAutoLayout: true, showAddNode: false },
+		contextMenu: { canvasActions: [], nodeActions: [], edgeActions: [] },
+		callbacks: {},
+	};
+}
 
 /* ─── Test 1: CRUD — add, update, remove nodes ──────────── */
 
@@ -48,7 +53,7 @@ function testNodeCRUD(): TestResult {
 	const name = 'Node CRUD: add, update, remove';
 
 	try {
-		const mgr = new DiagramStateManager(mockDefinition);
+		const mgr = new DiagramStateManager(createDefinition());
 
 		// Add
 		mgr.addNodeLayout('node-1', 'card', { x: 100, y: 200 });
@@ -82,7 +87,7 @@ function testEdgeCRUD(): TestResult {
 	const name = 'Edge CRUD: add, remove';
 
 	try {
-		const mgr = new DiagramStateManager(mockDefinition);
+		const mgr = new DiagramStateManager(createDefinition());
 
 		mgr.addNodeLayout('a', 'card');
 		mgr.addNodeLayout('b', 'card');
@@ -113,7 +118,7 @@ function testDuplicateEdgePrevention(): TestResult {
 	const name = 'Duplicate edge prevention';
 
 	try {
-		const mgr = new DiagramStateManager(mockDefinition);
+		const mgr = new DiagramStateManager(createDefinition());
 
 		mgr.addNodeLayout('a', 'card');
 		mgr.addNodeLayout('b', 'card');
@@ -138,7 +143,8 @@ function testPersistence(): TestResult {
 	const name = 'Persistence to localStorage';
 
 	try {
-		const mgr = new DiagramStateManager(mockDefinition);
+		const def = createDefinition();
+		const mgr = new DiagramStateManager(def);
 
 		mgr.addNodeLayout('node-1', 'card', { x: 50, y: 60 });
 		mgr.addEdge('node-1', 'node-2', 'extends');
@@ -146,12 +152,12 @@ function testPersistence(): TestResult {
 		mgr.flushPendingWrites();
 
 		// Verify localStorage
-		const layoutsRaw = localStorage.getItem('test-diagram-layouts');
+		const layoutsRaw = localStorage.getItem(`${def.storageKey}-layouts`);
 		assert(layoutsRaw !== null, 'Layouts persisted to localStorage');
 		const layouts = JSON.parse(layoutsRaw!);
 		assertEquals(layouts.length, 2, '2 layouts persisted');
 
-		const edgesRaw = localStorage.getItem('test-diagram-edges');
+		const edgesRaw = localStorage.getItem(`${def.storageKey}-edges`);
 		assert(edgesRaw !== null, 'Edges persisted to localStorage');
 
 		mgr.destroy();
@@ -167,7 +173,7 @@ function testSubscribe(): TestResult {
 	const name = 'Subscribe pattern';
 
 	try {
-		const mgr = new DiagramStateManager(mockDefinition);
+		const mgr = new DiagramStateManager(createDefinition());
 		let notified = false;
 
 		const unsubscribe = mgr.subscribe(() => { notified = true; });
@@ -192,7 +198,7 @@ function testRemoveNodeCascades(): TestResult {
 	const name = 'Remove node cascades to edges';
 
 	try {
-		const mgr = new DiagramStateManager(mockDefinition);
+		const mgr = new DiagramStateManager(createDefinition());
 
 		mgr.addNodeLayout('a', 'card');
 		mgr.addNodeLayout('b', 'card');
